@@ -1,0 +1,29 @@
+{
+  "npm": true,
+  "moduleResolution": "node",
+  "sources": [
+    "src/**",
+    "manifest.json",
+    "_config.yml"
+  ],
+  "extraDependencies": [
+    "node_modules/@webcomponents/webcomponentsjs/**"
+  ],
+  "builds": [
+    {
+      "name": "default",
+      "js": {
+        "minify": true,
+        "compile": true,
+        "transformModulesToAmd": true
+      },
+      "css": {
+        "minify": true
+      },
+      "html": {
+        "minify": true
+      },
+      "bundle": false
+    }
+  ]
+}

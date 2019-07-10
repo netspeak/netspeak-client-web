@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+	<title>netspeak</title>
+	<meta name="description" content="Netspeak web interface">
+	<link rel="shortcut icon" href="/src/img/favicon.ico">
+	<link rel="stylesheet" type="text/css" href="src/main.css">
+	<link rel="stylesheet" type="text/css" href="src/prism.css">
+
+	<!-- See https://goo.gl/OOhYW5 -->
+	<link rel="manifest" href="/manifest.json">
+
+	<script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
+
+	<script src="/src/prism.js"></script>
+	<script type="module" src="/src/netspeak-app/netspeak-navigator.js" crossorigin></script>
+	<script type="module" src="/src/netspeak-app/netspeak-header.js" crossorigin></script>
+	<script type="module" src="/src/netspeak-app/netspeak-footer.js" crossorigin></script>
+</head>
+
+<body>
+	<noscript style="display: block; height: 100%; position: relative;">
+		<div
+			style="width: 400px; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center">
+			<img src="src/img/netspeak.png" alt="Netspeak Logo">
+			<div
+				style="margin: 2em 1em; font-size: 20px; border: 1px solid red; background: rgba(255,0,0,.2); padding: 1em 1.6em;">
+				Please enable JavaScript in your web browser to use Netspeak.
+			</div>
+		</div>
+	</noscript>
+
+	<netspeak-header></netspeak-header>
+
+	<div id="content">
+		<script type="module">
+			import { NetspeakNavigator } from './src/netspeak-app/netspeak-navigator.js';
+
+			(function loader(timeoutTime) {
+				try {
+					// set defaults
+					NetspeakNavigator.defaultContainer = window.document.getElementById("content");
+					NetspeakNavigator.defaultPage = "search";
+					NetspeakNavigator.errorPage = "error";
+
+					NetspeakNavigator.loadPage();
+
+				} catch (error) {
+					console.log("Failed to load page");
+					console.dir(error);
+
+					setTimeout(loader, timeoutTime, Math.min(1000, timeoutTime * 1.5 + 1));
+				}
+			})(16);
+		</script>
+	</div>
+
+	<div id="footer">
+		<netspeak-footer></netspeak-footer>
+	</div>
+</body>
+
+</html>

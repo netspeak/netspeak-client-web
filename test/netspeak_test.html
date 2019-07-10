@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>netspeak test</title>
+
+    <script src="../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../bower_components/web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../src/components/netspeak.html">
+</head>
+
+<body>
+
+    <script>
+        suite('netspeak', function () {
+
+            const assert = chai.assert;
+            assert.exists = assert.exists || function (value, message = "The value dose not exist.") { assert(value !== undefined, message); };
+            assert.notExists = assert.notExists || function (value, message = "The value dose exist.") { assert(value === undefined, message); };
+
+            test('Netspeak.Word', function () {
+                const Word = Netspeak.Word;
+                const Types = Netspeak.Word.Types;
+
+                assert.exists(Word);
+                assert.exists(Types);
+
+                let w1 = new Word("abc")
+                let w2 = new Word("def", Types.Q_MARK);
+
+                assert.equal(w1.text, "abc");
+                assert.equal(w1.type, Types.WORD);
+
+                assert.equal(w2.text, "def");
+                assert.equal(w2.type, Types.Q_MARK);
+            });
+
+            test('Netspeak.Word.nameOfType', function () {
+                const nameOfType = Netspeak.Word.nameOfType;
+                const Types = Netspeak.Word.Types;
+
+                assert.exists(nameOfType);
+                assert.exists(Types);
+
+                for (let typeName in Types) {
+                    let value = Types[typeName];
+                    assert.equal(nameOfType(value), typeName)
+                }
+            });
+
+            test('Netspeak.Phrase', function () {
+                const Word = Netspeak.Word;
+                const Types = Netspeak.Word.Types;
+                const Phrase = Netspeak.Phrase;
+
+                assert.exists(Word);
+                assert.exists(Types);
+                assert.exists(Phrase);
+
+                const query = "abc def ?";
+                const freq = 123;
+                const words = [new Word("abc"), new Word("def"), new Word("ghi", Types.Q_MARK)];
+                let p = new Phrase(words, freq, query);
+
+                assert.equal(p.words, words);
+                assert.equal(p.frequency, freq);
+                assert.equal(p.query, query);
+                assert.equal(p.text, "abc def ghi");
+            });
+
+            test('Netspeak.PhraseCollection', function () {
+                const Word = Netspeak.Word;
+                const Types = Netspeak.Word.Types;
+                const Phrase = Netspeak.Phrase;
+                const PhraseCollection = Netspeak.PhraseCollection;
+
+                assert.exists(Word);
+                assert.exists(Types);
+                assert.exists(Phrase);
+                assert.exists(PhraseCollection);
+
+                let p1 = new Phrase([new Word("abc")], 1);
+                let p2 = new Phrase([new Word("def")], 2);
+                let p3 = new Phrase([new Word("def")], 3);
+
+                let c = new PhraseCollection();
+                c.add(p1, p2, p3);
+
+                assert.equal(c.length, 2);
+
+                assert.equal(c.at(0), p2);
+                assert.equal(c.at(1), p1);
+
+                assert.equal(c.get("abc"), p1);
+                assert.equal(c.get("def"), p2);
+            });
+
+
+        });
+    </script>
+
+
+</body>
+
+</html>

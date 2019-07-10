@@ -1,0 +1,31 @@
+{
+	"env": {
+		"browser": true,
+		"commonjs": true,
+		"es6": true
+	},
+	"parser": "babel-eslint",
+	"parserOptions": {
+		"sourceType": "module",
+		"allowImportExportEverywhere": false,
+		"ecmaFeatures": {
+			"jsx": false
+		}
+	},
+	"extends": "eslint:recommended",
+	"rules": {
+		"semi": "error",
+		"no-console": "off",
+		"no-unused-vars": [
+			"error",
+			{
+				"args": "none"
+			}
+		],
+		"no-self-assign": "off",
+		"no-useless-rename": "error",
+		"no-var": "warn",
+		"prefer-numeric-literals": "error",
+		"prefer-spread": "error"
+	}
+}

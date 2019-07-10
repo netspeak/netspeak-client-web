@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes">
+
+    <title>netspeak-search-bar test</title>
+
+    <script src="../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../bower_components/web-component-tester/browser.js"></script>
+
+    <link rel="import" href="../src/components/netspeak-search-bar.html">
+</head>
+
+<body>
+
+    <!-- <test-fixture id="BasicTestFixture">
+      <template>
+        <netspeak-search-bar></netspeak-search-bar>
+      </template>
+    </test-fixture>
+
+    <test-fixture id="ChangedPropertyTestFixture">
+      <template>
+        <netspeak-search-bar prop1="new-prop1"></netspeak-search-bar>
+      </template>
+    </test-fixture> -->
+
+    <script>
+        suite('netspeak-search-bar', function () {
+
+            const assert = chai.assert;
+            assert.exists = assert.exists || function (value, message = "The value dose not exist.") { assert(value !== undefined, message); };
+            assert.notExists = assert.notExists || function (value, message = "The value dose exist.") { assert(value === undefined, message); };
+
+            /*test('instantiating the element with default properties works', function() {
+              var element = fixture('BasicTestFixture');
+              assert.equal(element.prop1, 'netspeak-search-bar');
+              var elementShadowRoot = element.shadowRoot;
+              var elementHeader = elementShadowRoot.querySelector('h2');
+              assert.equal(elementHeader.innerHTML, 'Hello netspeak-search-bar!');
+            });
+    
+            test('setting a property on the element works', function() {
+              // Create a test fixture
+              var element = fixture('ChangedPropertyTestFixture');
+              assert.equal(element.prop1, 'new-prop1');
+              var elementShadowRoot = element.shadowRoot;
+              var elementHeader = elementShadowRoot.querySelector('h2');
+              assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
+            });*/
+
+        });
+    </script>
+
+
+</body>
+
+</html>

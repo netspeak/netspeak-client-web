@@ -1,0 +1,7 @@
+{
+  "name": "Netspeak",
+  "short_name": "Netspeak",
+  "description": "The Netspeak website.",
+  "start_url": "/",
+  "display": "standalone"
+}
