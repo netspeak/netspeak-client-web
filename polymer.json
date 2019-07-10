@@ -3,8 +3,7 @@
   "moduleResolution": "node",
   "sources": [
     "src/**",
-    "manifest.json",
-    "_config.yml"
+    "manifest.json"
   ],
   "extraDependencies": [
     "node_modules/@webcomponents/webcomponentsjs/**"
@@ -14,7 +13,7 @@
       "name": "default",
       "js": {
         "minify": true,
-        "compile": true,
+        "compile": "es2015",
         "transformModulesToAmd": true
       },
       "css": {
