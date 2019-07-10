@@ -3,7 +3,8 @@
   "moduleResolution": "node",
   "sources": [
     "src/**",
-    "manifest.json"
+    "manifest.json",
+    ".nojekyll"
   ],
   "extraDependencies": [
     "node_modules/@webcomponents/webcomponentsjs/**"
