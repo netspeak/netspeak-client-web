@@ -1,9 +1,9 @@
 # [Netspeak](https://netspeak.github.io)
 
-This is the development branch of the [netspeak.org](http://netspeak.org) website.
+This is the development project of the [netspeak.org](http://netspeak.org) website.
 
 The website is a single page application and uses the [Polymer 3 framework](https://polymer-library.polymer-project.org/3.0/docs/devguide/feature-overview).
-It is served using [GitHub pages](https://pages.github.com/) over the `master` branch.
+It is served using [GitHub pages](https://pages.github.com/) over [netspeak.github.io](https://github.com/netspeak/netspeak.github.io).
 
 
 ## Getting started
@@ -63,7 +63,7 @@ This will run all unit tests in all of your installed browsers. (Browser windows
 
 ## Deploy
 
-If all tests pass, you can deploy your updated build. Simply copy the contents of the build (the files in `build/<build name>/`) to the `master` branch, push and GitHub pages will take care of the rest and update the website in a few seconds.
+If all tests pass, you can deploy your updated build. Copy the contents of the build (the files in `build/<build name>/`) to the `master` branch of [`netspeak.github.io`](https://github.com/netspeak/netspeak.github.io) project and push. GitHub pages will take care of the rest and update the website in a few seconds.
 
 __You changes will then be out there for the world to see, so make sure that everything is working correctly.__
 
