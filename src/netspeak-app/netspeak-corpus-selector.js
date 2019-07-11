@@ -1,8 +1,10 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { loadLocalization } from './netspeak-element';
 import { Netspeak } from "./netspeak.js";
 
 
 export class NetspeakCorpusSelector extends PolymerElement {
+	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-corpus-selector'; }
 	static get properties() {
 		return {
@@ -104,7 +106,7 @@ export class NetspeakCorpusSelector extends PolymerElement {
 			for (let c of corporaInfo.corpora) {
 				let option = document.createElement("OPTION");
 				option.setAttribute("value", c.key);
-				option.innerHTML = this.labelProvider.getLabel(c);
+				option.innerHTML = this.labelProvider.getLabel(c, this);
 				select.appendChild(option);
 			}
 
@@ -140,6 +142,14 @@ export class NetspeakCorpusSelector extends PolymerElement {
 
 }
 
+const localLabels = loadLocalization(NetspeakCorpusSelector).then(json => {
+	if (json && json.custom && json.custom.labels) {
+		return /** @type {Object<string, string>} */ (json.custom.labels);
+	}
+	return false;
+});
+let idCounter = 0;
+
 /**
  * A LabelProvider converts corpora into HTML source code.
  */
@@ -151,10 +161,24 @@ export class LabelProvider {
 	 * Provides the label of the given corpus.
 	 *
 	 * @param {import("./netspeak.js").Corpus} corpus The corpus.
-	 * @returns {string} The label string.
+	 * @param {NetspeakCorpusSelector} corpusSelector The corpus selector for which the label is generated.
+	 * @returns {string} The label source code.
 	 */
-	getLabel(corpus) {
-		return corpus.name;
+	getLabel(corpus, corpusSelector) {
+		const id = `corpus-selector-label-${idCounter++}`;
+		localLabels.then(labels => {
+			const element = corpusSelector.shadowRoot.querySelector(`#${id}`);
+			if (labels && labels[corpus.name]) {
+				element.textContent = labels[corpus.name];
+			} else {
+				element.textContent = corpus.name;
+			}
+		}).catch(e => {
+			const element = corpusSelector.shadowRoot.querySelector(`#${id}`);
+			element.textContent = corpus.name;
+			throw e;
+		});
+		return `<span id="${id}"></span>`;
 	}
 
 	/**

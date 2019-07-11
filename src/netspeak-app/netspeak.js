@@ -19,7 +19,7 @@ export function normalizeQuery(query) {
  * @typedef Corpus
  * @property {string} key The unique key (or id) of the corpus.
  * @property {string} name The english name of the corpus.
- * @property {string} [iso_639_1_name] The ISO 639-1 name of the language of the corpus. Only available for Netspeak >= 4.
+ * @property {string} [language] The ISO 639-1 name of the language of the corpus. Only available for Netspeak >= 4.
  */
 
 /**
