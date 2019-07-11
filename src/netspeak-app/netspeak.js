@@ -283,7 +283,7 @@ export class Netspeak {
 	 * @type {string}
 	 */
 	static get defaultBaseUrl() {
-		return "https://temir6.informatik.uni-leipzig.de:8081/netspeak3-server2/";
+		return "https://api.netspeak.org/netspeak4/";
 	}
 
 	/**
