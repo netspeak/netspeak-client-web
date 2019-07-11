@@ -166,18 +166,20 @@ export class LabelProvider {
 	 */
 	getLabel(corpus, corpusSelector) {
 		const id = `corpus-selector-label-${idCounter++}`;
+		const setLabelText = text => corpusSelector.shadowRoot.querySelector(`#${id}`).textContent = text;
+
 		localLabels.then(labels => {
-			const element = corpusSelector.shadowRoot.querySelector(`#${id}`);
 			if (labels && labels[corpus.name]) {
-				element.textContent = labels[corpus.name];
+				setLabelText(labels[corpus.name]);
 			} else {
-				element.textContent = corpus.name;
+				setLabelText(corpus.name);
 			}
 		}).catch(e => {
-			const element = corpusSelector.shadowRoot.querySelector(`#${id}`);
-			element.textContent = corpus.name;
+			setLabelText(corpus.name);
 			throw e;
 		});
+
+		// create an empty label. The text will be set asynchronously by the above promise logic.
 		return `<span id="${id}"></span>`;
 	}
 
