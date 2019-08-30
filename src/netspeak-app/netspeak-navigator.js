@@ -76,6 +76,9 @@ export class NetspeakNavigator {
 		for (let l of navigator.languages) {
 			l = l.toLowerCase();
 			if (isValid(l)) return l;
+			// reduce e.g. "en-US" to "en"
+			l = (/^(\w+)-\w+$/.exec(l) || [])[1];
+			if (isValid(l)) return l;
 		}
 
 		// return default language
