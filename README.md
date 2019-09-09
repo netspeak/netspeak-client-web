@@ -129,3 +129,10 @@ The `NetspeakElement` can also automatically insert the localization into the sh
 Localized message will be inserted into the shadow DOM asynchronously after the element has be connected to a host DOM. After this is done, the shadow DOM will not be touched again.
 
 _Note:_ Only element with an ID __and__ no child element at the time of the insertion can be localized this way.
+
+
+---
+
+## Contributors
+
+[Michael Schmidt](mailto:mitchi5000.ms@googlemail.com) (2018 - 2019)
