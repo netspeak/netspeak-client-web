@@ -1,7 +1,21 @@
 {
   "name": "Netspeak",
   "short_name": "Netspeak",
-  "description": "The Netspeak website.",
+  "icons": [
+    {
+      "src": "/src/img/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/src/img/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
   "start_url": "/",
-  "display": "standalone"
+  "background_color": "#CB0C29",
+  "display": "standalone",
+  "scope": "/",
+  "theme_color": "#CB0C29"
 }

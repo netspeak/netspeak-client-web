@@ -21,6 +21,16 @@
 
 	<script src="node_modules/@webcomponents/webcomponentsjs/webcomponents-loader.js"></script>
 
+	<script>
+		// Feature detect for service worker capability in the browser
+		if ('serviceWorker' in navigator) {
+			// Delay registering until page load
+			window.addEventListener('load', function () {
+				navigator.serviceWorker.register('service-worker.js');
+			});
+		}
+	</script>
+
 	<script src="src/prism.js"></script>
 	<script type="module" src="src/netspeak-app/netspeak-navigator.js" crossorigin></script>
 	<script type="module" src="src/netspeak-app/netspeak-header.js" crossorigin></script>
