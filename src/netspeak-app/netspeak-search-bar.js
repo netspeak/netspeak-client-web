@@ -1,6 +1,6 @@
 import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
-import { ChatNoir } from "./char-noir.js";
+import { Snippets } from "./snippets";
 import { newElement, appendNewElements, textContent } from "./util.js";
 
 
@@ -514,10 +514,10 @@ export class NetspeakSearchBar extends PolymerElement {
 	/**
 	 * The client used to query data provided by the ChatNoir API.
 	 *
-	 * @type {ChatNoir}
+	 * @type {Snippets}
 	 */
-	get charNoirApi() {
-		return this._charNoirApi;
+	get snippetsApi() {
+		return this._snippetsApi;
 	}
 
 	/**
@@ -561,8 +561,7 @@ export class NetspeakSearchBar extends PolymerElement {
 		this._connected = false;
 
 		this._netspeakApi = new Netspeak();
-		this._charNoirApi = new ChatNoir("d07546d8-e437-4b04-aad3-2957013ee232");
-		// TODO: find a better way to store the api key
+		this._snippetsApi = new Snippets();
 
 		this._pinnedPhrases = new PhraseCollection();
 		this._queriedPhrases = new PhraseCollection();
@@ -935,7 +934,7 @@ export class NetspeakSearchBar extends PolymerElement {
 		appendNewElements(e, "SPAN.btn-img.loading", "SPAN.btn-img");
 
 		// fetch
-		this.charNoirApi.search({ query: text, size: pageSize, from: page * pageSize }).then(res => {
+		this.snippetsApi.search({ query: text, size: pageSize, from: page * pageSize }).then(res => {
 			this._showExamples(e, {
 				text, corpus, page, pageSize,
 				examples: res.results.map(r => {

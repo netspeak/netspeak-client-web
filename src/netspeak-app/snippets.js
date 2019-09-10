@@ -1,32 +1,30 @@
 import { LRUCache } from "./lru-cache.js";
 
 /**
- * @typedef CharNoirRequest
+ * @typedef SnippetsRequest
  * @property {string} query
  * @property {string[]} [index] list of indices to search
  * @property {number} from result pagination begin
  * @property {number} size number of results per page
- * @property {boolean} [explain=false] return additional scoring information
- * @property {boolean} [pretty=false]
  */
 
 /**
  * @typedef CharNoirSearchOptions
- * @property {string} [baseUrl=this.defaultBaseUrl] The base URL of the ChatNoir API.
+ * @property {string} [baseUrl=this.defaultBaseUrl] The base URL of the Snippets API.
  * @property {boolean} [caching=true] Whether the queried corpora will be cached.
  */
 
 /**
- * @typedef ChatNoirSimpleSearchResponse
+ * @typedef SnippetsResponse
  * @property {object} meta global result meta information
  * @property {number} meta.query_time query time in milliseconds
  * @property {number} meta.total_results number of total hits
  * @property {string[]} meta.indices list of indices that were searched
- * @property {ChatNoirSimpleSearchResponseItem[]} results list of search results
+ * @property {SnippetsResponseItem[]} results list of search results
  */
 
 /**
- * @typedef ChatNoirSimpleSearchResponseItem
+ * @typedef SnippetsResponseItem
  * @property {number} score ranking score of this result
  * @property {string} uuid Webis UUID of this document
  * @property {string} index index the document was retrieved from
@@ -41,29 +39,22 @@ import { LRUCache } from "./lru-cache.js";
  */
 
 /**
- * The base class of the ChatNoir API.
+ * The base class of the snippets API.
  */
-export class ChatNoir {
+export class Snippets {
 
-	/**
-	 * Creates an instance of ChatNoir.
-	 *
-	 * @param {string} apiKey The default ChatNoir API key.
-	 */
-	constructor(apiKey) {
-		this.apiKey = apiKey;
-		this.baseUrl = ChatNoir.defaultBaseUrl;
-		this.defaultIndex = ChatNoir.defaultIndexes;
+	constructor() {
+		this.baseUrl = Snippets.defaultBaseUrl;
 		/** @type {LRUCache<Promise<Response>>} */
 		this._cache = new LRUCache();
 		this.caching = true;
 	}
 
 	/**
-	 * The simple search operation of the ChatNoir API.
+	 * The simple search operation of the Snippets API.
 	 *
-	 * @param {CharNoirRequest} request The request details passed to the API.
-	 * @returns {Promise<ChatNoirSimpleSearchResponse>}
+	 * @param {SnippetsRequest} request The request details passed to the API.
+	 * @returns {Promise<SnippetsResponse>}
 	 */
 	search(request) {
 		try {
@@ -71,13 +62,11 @@ export class ChatNoir {
 
 			// copy request and add defaults
 			const req = Object.assign({}, request);
-			this._addDefaults(req);
 
 			// construct URL
 			let url = this.baseUrl;
-			url += "_search?q=" + encodeURIComponent(req.query);
-			url += "&apikey=" + encodeURIComponent(this.apiKey);
-			["index", "from", "size", "explain", "pretty"].forEach(p => {
+			url += "_search?query=" + encodeURIComponent(req.query);
+			["index", "from", "size"].forEach(p => {
 				if (!(p in req)) return;
 				let v = req[p];
 
@@ -93,7 +82,7 @@ export class ChatNoir {
 			// fetch data
 			let fetched;
 			if (this.caching && this._cache.contains(url)) {
-				// console.log("cache hit");
+				// cache hit
 				fetched = this._cache.get(url);
 			} else {
 				fetched = fetch(url);
@@ -109,33 +98,13 @@ export class ChatNoir {
 	}
 
 	/**
-	 * Adds the default values to the given request.
-	 *
-	 * @param {CharNoirRequest} request The request.
-	 * @returns {Object} The request.
-	 */
-	_addDefaults(request) {
-		if (!request.index) request.index = this.defaultIndex;
-	}
-
-	/**
-	 * The default base URL of the CharNoir API.
+	 * The default base URL of the snippets API.
 	 *
 	 * @readonly
 	 * @type {string}
 	 */
 	static get defaultBaseUrl() {
-		return "https://webis16.medien.uni-weimar.de/chatnoir2/api/v1/";
-	}
-
-	/**
-	 * The default indexes of the CharNoir API.
-	 *
-	 * @readonly
-	 * @type {string[]}
-	 */
-	static get defaultIndexes() {
-		return ["cw09", "cw12", "cc1511"];
+		return "https://snippets.netspeak.org/";
 	}
 
 }
