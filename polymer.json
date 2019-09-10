@@ -24,8 +24,6 @@
       "html": {
         "minify": true
       },
-      "addServiceWorker": true,
-      "insertPrefetchLinks": true,
       "bundle": false
     }
   ]
