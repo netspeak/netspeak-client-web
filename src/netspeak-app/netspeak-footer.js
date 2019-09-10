@@ -124,13 +124,13 @@ class NetspeakFooter extends NetspeakElement {
 					</a>
 				</li>
 				<li>
-					<a href="https://github.com/netspeak" id="github">
+					<a href="https://github.com/netspeak" target="_blank" id="github">
 						GitHub
 					</a>
 				</li>
 				<li>
 					<a href="https://www.uni-weimar.de/en/media/chairs/computer-science-department/webis/research/activities-by-field/netspeak/"
-						id="labs">
+						target="_blank" id="labs">
 						Labs
 					</a>
 				</li>
@@ -174,9 +174,9 @@ class NetspeakFooter extends NetspeakElement {
 
 <div>
 	<div class="webis-copyright">
-		Copyright &copy; 2019 <a href="https://webis.de">Webis group</a> <span class="bullet">&bullet;</span>
-		<a href="https://webis.de/people.html">Contact</a> <span class="bullet">&bullet;</span>
-		<a href="https://webis.de/impressum.html">Impressum&nbsp;/&nbsp;Privacy&nbsp;policy</a>
+		Copyright &copy; 2019 <a href="https://webis.de" target="_blank">Webis group</a> <span class="bullet">&bullet;</span>
+		<a href="https://webis.de/people.html" target="_blank">Contact</a> <span class="bullet">&bullet;</span>
+		<a href="https://webis.de/impressum.html" target="_blank">Impressum&nbsp;/&nbsp;Privacy&nbsp;policy</a>
 	</div>
 </div>
 		`;
