@@ -3,7 +3,6 @@
   "moduleResolution": "node",
   "sources": [
     "src/**",
-    "manifest.json",
     ".nojekyll"
   ],
   "extraDependencies": [
