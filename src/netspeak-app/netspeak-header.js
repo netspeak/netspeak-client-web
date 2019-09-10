@@ -11,11 +11,11 @@ class NetspeakHeader extends NetspeakElement {
 		return html`
 		<style>
 			:host {
-				background: #444;
+				background: #323232;
 				display: block;
 				height: 32px;
 				padding: 0 2.5em;
-				border-bottom: 1px solid rgb(161, 159, 159);
+				border-bottom: 1px solid #727272;
 				position: relative;
 			}
 

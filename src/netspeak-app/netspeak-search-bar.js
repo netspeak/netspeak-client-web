@@ -38,7 +38,7 @@ export class NetspeakSearchBar extends PolymerElement {
 
 			initialLimit: {
 				type: Number,
-				value: 20,
+				value: 30,
 			},
 
 			readonly: {
@@ -130,6 +130,7 @@ export class NetspeakSearchBar extends PolymerElement {
 				border-bottom: none;
 				box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
 				margin: var(--input-margin, 0 0 .25em 0);
+				font-family: var(--input-font-family, inherit);
 			}
 
 			#box table,
@@ -143,7 +144,8 @@ export class NetspeakSearchBar extends PolymerElement {
 				box-sizing: border-box;
 				width: 100%;
 				padding: .5em;
-				font-size: 1em;
+				font-family: var(--input-font-family, inherit);
+				font-size: 100%;
 			}
 
 			#box input::-ms-clear {
@@ -188,7 +190,7 @@ export class NetspeakSearchBar extends PolymerElement {
 			}
 
 			#drop-down .option:nth-child(2n) {
-				background-color: #FAFAFA;
+				background-color: #F8F8F8;
 			}
 
 			#drop-down .option:hover {
@@ -208,6 +210,7 @@ export class NetspeakSearchBar extends PolymerElement {
 				border-right: var(--result-border-right, 1px solid #BBB);
 				border-bottom: var(--result-border-bottom, 1px solid #BBB);
 				border-left: var(--result-border-left, 1px solid #BBB);
+				font-family: var(--result-font-family, inherit);
 			}
 
 			/*
@@ -240,7 +243,7 @@ export class NetspeakSearchBar extends PolymerElement {
 			}
 
 			#result-list>div:nth-child(2n) {
-				background-color: #FAFAFA;
+				background-color: #F8F8F8;
 			}
 
 			#result-list>div:hover {
