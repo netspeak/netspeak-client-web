@@ -13,17 +13,24 @@ class NetspeakHeader extends NetspeakElement {
 			:host {
 				background: #323232;
 				display: block;
-				height: 32px;
-				padding: 0 2.5em;
+				height: 64px;
+				padding: 0;
 				border-bottom: 1px solid #727272;
 				position: relative;
+			}
+
+			#content {
+				max-width: 800px;
+				padding: 16px;
+				box-sizing: border-box;
+				margin: 0 auto;
 			}
 
 			#logo {
 				display: block;
 				float: left;
-				width: 121px;
 				height: 32px;
+				width: 121px;
 				background-image: url('/src/img/netspeak-path-white-121x32.svg');
 				background-size: contain;
 				background-repeat: no-repeat;
@@ -31,19 +38,24 @@ class NetspeakHeader extends NetspeakElement {
 			}
 
 			#slogan {
-				color: #FFF;
+				color: rgba(255, 255, 255, .80);
 				font-size: 10pt;
 				white-space: nowrap;
 				display: block;
 				float: left;
+				font-size: 15px;
 				padding-top: 10px;
-				padding-left: 12px;
+				padding-left: 16px;
 			}
 
 			@media screen and (max-width: 750px) {
 
 				:host {
 					height: 48px;
+				}
+
+				#content {
+					padding: 0;
 				}
 
 				#logo {
@@ -61,11 +73,13 @@ class NetspeakHeader extends NetspeakElement {
 			}
 		</style>
 
-		<a href="[[getStartUrl()]]" id="logo" on-click="_clearSearchBar"></a>
-		<span id="slogan">
-			One word leads to another.
-		</span>
-		<div style="clear: both"></div>
+		<div id="content">
+			<a href="[[getStartUrl()]]" id="logo" on-click="_clearSearchBar"></a>
+			<span id="slogan">
+				One word leads to another.
+			</span>
+			<div style="clear: both"></div>
+		</div>
 		`;
 	}
 
