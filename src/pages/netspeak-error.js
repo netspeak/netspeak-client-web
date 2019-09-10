@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { styles } from './page-styles.js';
 
 export class NetspeakError extends NetspeakElement {
@@ -15,4 +15,5 @@ export class NetspeakError extends NetspeakElement {
 		`;
 	}
 }
-window.customElements.define(NetspeakError.is, NetspeakError);
+
+registerElement(NetspeakError);

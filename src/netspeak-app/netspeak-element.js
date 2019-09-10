@@ -6,6 +6,8 @@ import { NetspeakNavigator } from './netspeak-navigator';
  * @typedef LocalizationJson
  * @property {Object<string, string>} [template]
  * @property {any} [custom]
+ *
+ * @typedef {Function & { is: string }} PolymerConstructor
  */
 
 /**
@@ -15,7 +17,7 @@ import { NetspeakNavigator } from './netspeak-navigator';
  *
  * The returned promise will resolve to `false` if the current language is the default language (en).
  *
- * @param {Function} constructor
+ * @param {PolymerConstructor} constructor
  * @returns {Promise<LocalizationJson | false>}
  */
 export function loadLocalization(constructor) {
@@ -129,3 +131,14 @@ export const htmlR = (strings, ...values) => {
 	newStrings.raw = strings.raw;
 	return html_tag(newStrings, ...values);
 };
+
+/**
+ *
+ * @param {PolymerConstructor} constructor
+ */
+export function registerElement(constructor) {
+	window.customElements.define(constructor.is, constructor);
+
+	// preload localization
+	loadLocalization(constructor);
+}

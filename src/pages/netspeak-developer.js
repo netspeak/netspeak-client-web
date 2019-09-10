@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { styles } from './page-styles.js';
 
 const rawCode = (strings, ...values) => {
@@ -462,4 +462,5 @@ export class NetspeakDeveloper extends NetspeakElement {
 		`;
 	}
 }
-window.customElements.define(NetspeakDeveloper.is, NetspeakDeveloper);
+
+registerElement(NetspeakDeveloper);

@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from './netspeak-element.js';
+import { html, NetspeakElement, registerElement } from './netspeak-element.js';
 import { NetspeakNavigator } from './netspeak-navigator';
 
 
@@ -248,4 +248,4 @@ class NetspeakFooter extends NetspeakElement {
 
 }
 
-window.customElements.define(NetspeakFooter.is, NetspeakFooter);
+registerElement(NetspeakFooter);

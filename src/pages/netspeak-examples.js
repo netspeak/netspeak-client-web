@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { styles } from './page-styles.js';
 import '../netspeak-app/netspeak-search-bar.js';
 
@@ -80,4 +80,5 @@ export class NetspeakExamples extends NetspeakElement {
 `;
 	}
 }
-window.customElements.define(NetspeakExamples.is, NetspeakExamples);
+
+registerElement(NetspeakExamples);

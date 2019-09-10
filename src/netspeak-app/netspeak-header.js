@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from './netspeak-element.js';
+import { html, NetspeakElement, registerElement } from './netspeak-element.js';
 import { NetspeakNavigator } from './netspeak-navigator';
 import { shadyQuerySelector } from './util';
 
@@ -90,4 +90,4 @@ class NetspeakHeader extends NetspeakElement {
 	}
 }
 
-window.customElements.define(NetspeakHeader.is, NetspeakHeader);
+registerElement(NetspeakHeader);

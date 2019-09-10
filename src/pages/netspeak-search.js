@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { NetspeakNavigator, HashUtil, UrlUtil } from '../netspeak-app/netspeak-navigator.js';
 import '../netspeak-app/netspeak-search-bar.js';
 import '../netspeak-app/netspeak-corpus-selector.js';
@@ -399,4 +399,5 @@ export class NetspeakSearch extends NetspeakElement {
 		return href;
 	}
 }
-window.customElements.define(NetspeakSearch.is, NetspeakSearch);
+
+registerElement(NetspeakSearch);

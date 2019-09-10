@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { styles } from './page-styles.js';
 
 export class NetspeakPrivacy extends NetspeakElement {
@@ -148,4 +148,5 @@ export class NetspeakPrivacy extends NetspeakElement {
 		`;
 	}
 }
-window.customElements.define(NetspeakPrivacy.is, NetspeakPrivacy);
+
+registerElement(NetspeakPrivacy);

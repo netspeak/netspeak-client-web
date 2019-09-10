@@ -1,4 +1,4 @@
-import { html, NetspeakElement } from "../netspeak-app/netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
 import { styles } from './page-styles.js';
 
 export class NetspeakPublisher extends NetspeakElement {
@@ -39,4 +39,5 @@ export class NetspeakPublisher extends NetspeakElement {
 		`;
 	}
 }
-window.customElements.define(NetspeakPublisher.is, NetspeakPublisher);
+
+registerElement(NetspeakPublisher);
