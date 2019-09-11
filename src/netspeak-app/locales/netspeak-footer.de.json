@@ -5,6 +5,9 @@
         "labs": "Labors",
         "publisher": "Impressum",
         "terms": "AGB",
-        "privacy": "Datenschutz"
+        "privacy": "Datenschutz",
+
+        "contact": "Kontakt",
+        "impressum-and-privacy": "Impressum\u00A0/\u00A0Datenschutz"
     }
 }
