@@ -1,11 +1,7 @@
 {
     "template": {
-        "examples": "Beispiele",
-        "developer": "Enwickler",
-        "labs": "Labors",
-        "publisher": "Impressum",
+        "help": "Hilfe",
         "terms": "AGB",
-        "privacy": "Datenschutz",
 
         "contact": "Kontakt",
         "impressum-and-privacy": "Impressum\u00A0/\u00A0Datenschutz"

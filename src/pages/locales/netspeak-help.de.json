@@ -1,0 +1,16 @@
+{
+	"template": {
+		"help": "Hilfe",
+
+		"how": "Wie Netspeak funktioniert",
+		"how-desc": "Netspeak ist eine Suchmaschine, die ihnen hilft sich in einer fremden Sprache auszudrücken, indem es dir anzeigt wie häufig Muttersprachler bestimmte Wendungen nutzen. Die folgenden Beispiele zeigen, wie sie mit Netspeak Wendungen und Wortgruppen abfragen.",
+		"examples-link": "Beispiele",
+
+		"for-developers": "Für Entwickler",
+		"developer-link": "Entwicklerseite",
+		"github-link": "GitHub",
+
+		"contact": "Kontakt",
+		"email": "Email:"
+	}
+}
