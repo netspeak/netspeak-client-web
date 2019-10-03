@@ -812,7 +812,7 @@ export class NetspeakSearchBar extends PolymerElement {
 			const tr = appendNewElements(e, "TABLE", "TBODY", "TR");
 
 			const td = appendNewElements(tr, "TD");
-			const relativeFreq = Math.sqrt(p.frequency / phrases.maxFrequency);
+			const relativeFreq = p.frequency / phrases.maxFrequency;
 			td.style.backgroundSize = (relativeFreq * .618 * 100) + "% 100%";
 
 			appendNewElements(td, "DIV", "SPAN.text").innerHTML = formatter.formatText(p, phrases);
