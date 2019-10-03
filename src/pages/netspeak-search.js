@@ -25,6 +25,10 @@ export class NetspeakSearch extends NetspeakElement {
 				margin: 0 0 2em auto;
 			}
 
+			netspeak-search-bar {
+				--result-font-family: 'Verdana', 'Geneva', sans-serif;
+			}
+
 			/*
 			 * INFO
 			 */
@@ -75,6 +79,13 @@ export class NetspeakSearch extends NetspeakElement {
 				width: 50%;
 			}
 
+			#info a {
+				text-decoration: none;
+			}
+			#info a:hover {
+				text-decoration: underline;
+			}
+
 			.highlight-red {
 				color: #c5000b;
 			}
@@ -90,7 +101,6 @@ export class NetspeakSearch extends NetspeakElement {
 				}
 
 				netspeak-search-bar {
-					font-size: 18px;
 					--icon-size: 20px;
 					--icon-padding: 6px;
 					--result-item-data-margin: 0 .5em;
@@ -100,7 +110,6 @@ export class NetspeakSearch extends NetspeakElement {
 				}
 
 				netspeak-corpus-selector {
-					font-size: 18px;
 					margin: 0 .5em 2em auto;
 				}
 
@@ -207,6 +216,20 @@ export class NetspeakSearch extends NetspeakElement {
 								<span id="explanation-order-1">The</span>
 								<span class="highlight-blue">{}</span>
 								<span id="explanation-order-2">check the order.</span>
+							</span>
+						</div>
+					</div>
+
+					<div class="example-container">
+						<div class="example">
+							<a href="[[getQueryUrl('mind... the g?p')]]">
+								mind<span class="highlight-red">...</span>
+								the g<span class="highlight-red">?</span>p
+							</a>
+						</div>
+						<div class="explanation">
+							<span>
+								<span id="explanation-space">The space is important.</span>
 							</span>
 						</div>
 					</div>

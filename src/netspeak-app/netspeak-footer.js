@@ -12,7 +12,7 @@ class NetspeakFooter extends NetspeakElement {
 	:host {
 		display: block;
 		background-color: #F8F8F8;
-		font-size: 80%;
+		font-size: 90%;
 		color: #666;
 		padding: 2em 3em;
 		line-height: 1.4;
