@@ -38,7 +38,7 @@ export class NetspeakSearchBar extends PolymerElement {
 
 			initialLimit: {
 				type: Number,
-				value: 30,
+				value: 40,
 			},
 
 			readonly: {
