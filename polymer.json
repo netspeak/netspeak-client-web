@@ -1,6 +1,7 @@
 {
   "npm": true,
-  "moduleResolution": "node",
+  "moduleResolution": "none",
+  "entrypoint": "*.html",
   "sources": [
     "src/**",
     ".nojekyll"

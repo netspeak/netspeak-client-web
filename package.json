@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@polymer/test-fixture": "^4.0.2",
+    "@types/prismjs": "^1.16.0",
     "@webcomponents/webcomponentsjs": "^2.0.0",
     "babel-eslint": "^10.0.1",
     "chai": "^4.2.0",

@@ -1,5 +1,5 @@
-import { PolymerElement, html as html_tag } from '@polymer/polymer';
-import { NetspeakNavigator } from './netspeak-navigator';
+import { PolymerElement, html as html_tag } from '../../node_modules/@polymer/polymer/polymer-element.js';
+import { NetspeakNavigator } from './netspeak-navigator.js';
 
 
 /**
@@ -7,7 +7,7 @@ import { NetspeakNavigator } from './netspeak-navigator';
  * @property {Object<string, string>} [template]
  * @property {any} [custom]
  *
- * @typedef {Function & { is: string }} PolymerConstructor
+ * @typedef {Function & { is: string, importMeta?: any }} PolymerConstructor
  */
 
 /**

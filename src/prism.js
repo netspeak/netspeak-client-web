@@ -638,30 +638,12 @@ Prism.languages.clike = {
 	});
 }(Prism));
 
-Prism.languages.netspeakquery = {
-	'q-mark': {
-		alias: 'operator',
-		pattern: /\?/
-	},
-	'asterisk': {
-		alias: 'operator',
-		pattern: /\*/
-	},
-	'plus': {
-		alias: 'operator',
-		pattern: /\+/
-	},
-	'order-set': {
-		alias: 'operator',
-		pattern: /[{}]/
-	},
-	'option-set': {
-		alias: 'operator',
-		pattern: /[\[\]]/
-	},
-	'dict-set': {
-		alias: 'operator',
-		pattern: /\#/
-	},
+Prism.languages['netspeak-query'] = {
+	'q-mark': /\?/,
+	'asterisk': /\*|\.{2,}/,
+	'plus': /\+/,
+	'order-set': /[{}]/,
+	'option-set': /[\[\]]/,
+	'dict-set': /\#/,
 	'punctuation': /["]/
 };

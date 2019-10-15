@@ -1,4 +1,4 @@
-import { html } from "@polymer/polymer";
+import { html } from "../../node_modules/@polymer/polymer/polymer-element.js";
 
 export const styles = html`
 <style>

@@ -1,6 +1,6 @@
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
+import { html, PolymerElement } from '../../node_modules/@polymer/polymer/polymer-element.js';
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
-import { Snippets } from "./snippets";
+import { Snippets } from "./snippets.js";
 import { newElement, appendNewElements, textContent } from "./util.js";
 
 

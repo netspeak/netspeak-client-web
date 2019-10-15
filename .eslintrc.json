@@ -13,6 +13,9 @@
 		}
 	},
 	"extends": "eslint:recommended",
+	"globals": {
+		"Prism": "readonly"
+	},
 	"rules": {
 		"semi": "error",
 		"no-console": "off",

@@ -1,21 +1,3 @@
-import { EventSystem } from "./event-system.js";
-
-
-const eventSystem = new EventSystem();
-
-/** @type {string | undefined} */
-let defaultPage = undefined;
-/** @type {string | undefined} */
-let errorPage = undefined;
-/** @type {HTMLElement | undefined} */
-let defaultContainer = undefined;
-/** @type {boolean} */
-let autoReload = true;
-
-/** @type {string | undefined} */
-let lastPage = undefined;
-
-
 
 /**
  * The component containing the logic for navigation within the Netspeak website.
@@ -87,165 +69,27 @@ export class NetspeakNavigator {
 
 
 	/**
-	 * The current page.
-	 *
-	 * If no page is set by the URL, an empty string will be returned.
-	 *
-	 * This will not change the document itself.
-	 *
-	 * @type {string}
-	 */
-	static get page() {
-		let hash = UrlUtil.getHash(location.href, "");
-		if (!hash) return "";
-		hash = hash.replace(/([\w-]*)[\s\S]*/, "$1");
-		if (!hash) return "";
-		return hash.toLowerCase();
-	}
-	static set page(value) {
-		if (typeof value === 'string') value = value.toLowerCase();
-		let href = UrlUtil.setHash(location.href, value);
-		if (href != location.href)
-			location.href = href;
-	}
-
-	/**
-	 * The default page.
-	 *
-	 * If no page is specified by the URL, this page will be used.
-	 *
-	 * @type {string | undefined}
-	 */
-	static get defaultPage() {
-		return defaultPage;
-	}
-	static set defaultPage(value) {
-		defaultPage = String(value).toLowerCase();
-	}
-
-	/**
-	 * The error page.
-	 *
-	 * @type {string | undefined}
-	 */
-	static get errorPage() {
-		return errorPage;
-	}
-	static set errorPage(value) {
-		errorPage = String(value).toLowerCase();
-	}
-
-	/**
-	 * The default container.
-	 *
-	 * @type {HTMLElement | undefined}
-	 */
-	static get defaultContainer() {
-		return defaultContainer;
-	}
-	static set defaultContainer(value) {
-		defaultContainer = value;
-	}
-
-	/**
-	 * Whether or not changes in the page URL will automatically reload the page.
-	 *
-	 * Default: true.
-	 *
-	 * @type {Boolean}
-	 */
-	static get autoReload() {
-		return autoReload;
-	}
-	static set autoReload(value) {
-		value = Boolean(value);
-
-		NetspeakNavigator.removeEventListener("pageChange", NetspeakNavigator.onUrlChange);
-		if (value) {
-			NetspeakNavigator.addEventListener("pageChange", NetspeakNavigator.onUrlChange);
-		}
-
-		autoReload = value;
-	}
-
-	static onUrlChange() {
-		NetspeakNavigator.reloadPage();
-	}
-
-	/**
-	 * Loads the page given by the page URL.
-	 * If no page is specified by the URL, the default page will be used.
-	 *
-	 * @param {HTMLElement} [container=NetspeakNavigator.defaultContainer] The container element to insert the page into.
-	 * @returns {Promise<void>}
-	 */
-	static loadPage(container = NetspeakNavigator.defaultContainer) {
-		// get the page
-		let page = NetspeakNavigator.page;
-		let pageContent = page || NetspeakNavigator.defaultPage;
-
-		const pageUrl = name => `../pages/${name}.js`;
-
-		return import(pageUrl(`netspeak-${pageContent}`)).then(() => {
-			lastPage = page;
-
-			container.innerHTML = "";
-			container.appendChild(document.createElement("NETSPEAK-" + pageContent));
-		}, reason => {
-			container.innerHTML = "";
-
-			console.error(reason);
-
-			let errPage = NetspeakNavigator.errorPage;
-			return import(pageUrl(`netspeak-${errPage}`)).then(() => {
-				container.appendChild(document.createElement("NETSPEAK-" + errPage));
-			});
-		}).catch(reason => {
-			console.dir(reason);
-			container.appendChild(document.createTextNode("Could not connect to Netspeak website."));
-		});
-	}
-
-	/**
-	 * Reloads the page by swapping the loaded contents - a soft reload - or by actually reloading the page - a hard reload.
-	 *
-	 * A soft reload requires the NetspeakNavigator.defaultPage to be set!
-	 *
-	 * @param {boolean} [softReload=true] Whether or not a soft reload should be performed.
-	 */
-	static reloadPage(softReload = true) {
-		if (!softReload || !NetspeakNavigator.defaultContainer) {
-			location.reload();
-			return;
-		}
-
-		NetspeakNavigator.loadPage();
-		window.scrollTo(0, 0);
-	}
-
-	/**
 	 * Returns the url the given page will have.
 	 *
 	 * This will include a lang parameter.
 	 *
 	 * @param {string} page The page.
+	 * @param {string} [hash] The hash of the target url.
 	 * @return {string} The url of the page.
 	 */
-	static getPageUrl(page) {
-		let url = location.href;
+	static getPageUrl(page, hash) {
+		const baseUrl = location.href.replace(/[?#][\s\S]*$/, "").replace(/\/[^/]*$/, "");
 
-		// remove all parameters
-		url = UrlUtil.setParameters(location.href, undefined);
-
-		// add page
-		url = UrlUtil.setHash(url, page);
-
-		// add language
-		let lang = NetspeakNavigator.currentLanguage;
-		if (lang) {
-			url = UrlUtil.setParameter(url, "lang", lang);
+		if (page === "index") {
+			page = "";
+		} else {
+			page += ".html";
 		}
 
+		let url = `${baseUrl}/${page}?lang=${NetspeakNavigator.currentLanguage}`;
+		if (hash) {
+			url += "#" + hash;
+		}
 		return url;
 	}
 
@@ -264,15 +108,6 @@ export class NetspeakNavigator {
 		return url;
 	}
 
-	static addEventListener(event, listener) {
-		return eventSystem.addEventListener(event, listener);
-	}
-	static removeEventListener(event, listener) {
-		return eventSystem.removeEventListener(event, listener);
-	}
-	static fire(event, newValue = undefined, oldValue = undefined) {
-		eventSystem.fireEvent(new EventSystem.Event(event, newValue, oldValue));
-	}
 }
 
 /**
@@ -407,42 +242,6 @@ export class HashUtil {
 	}
 
 	/**
-	 * Gets the Netspeak page of a URL hash.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @param {string} [defaultValue=undefined] The default value.
-	 * @returns {string} The page specified by the hash or defaultValue.
-	 */
-	static getPage(hash, defaultValue = undefined) {
-		if (hash === undefined || hash === null) return defaultValue;
-		return new URL(HashUtil.baseUrl + hash).pathname.substr(1) || defaultValue;
-	}
-	/**
-	 * Sets the Netspeak page of a URL hash.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @param {string} value The new page.
-	 * @returns {string} The change hash value.
-	 */
-	static setPage(hash, value) {
-		if (hash === undefined || hash === null || (hash = String(hash)) === "") return value;
-
-		let u = new URL(HashUtil.baseUrl + hash);
-		u.pathname = "/" + (value || "");
-		return u.href.substr(HashUtil.baseUrl.length);
-	}
-
-	/**
-	 * Returns an object of all URL hash value parameter key-value-pairs.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @returns {string} The change hash value.
-	 */
-	static getParameters(hash) {
-		return UrlUtil.getParameters(HashUtil.baseUrl + hash);
-	}
-
-	/**
 	 * Returns the parameter value of the given URL hash value of defaultValue.
 	 *
 	 * @param {string} hash The URL hash value.
@@ -453,20 +252,6 @@ export class HashUtil {
 	static getParameter(hash, name, defaultValue = undefined) {
 		return UrlUtil.getParameter(HashUtil.baseUrl + hash, name, defaultValue);
 	}
-	/**
-	 * Sets the parameter value of the given URL hash value.
-	 *
-	 * If value is undefined, null or an empty string, any parameter with the given name will be removed.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @param {string} name The name of the parameter.
-	 * @param {string} value The new value of the parameter.
-	 * @returns {string} The changed hash value.
-	 */
-	static setParameter(hash, name, value) {
-		return UrlUtil.setParameter(HashUtil.baseUrl + hash, name, value).substr(HashUtil.baseUrl.length);
-	}
-
 	/**
 	 * Sets the parameters of the given URL hash value.
 	 *
@@ -483,17 +268,3 @@ export class HashUtil {
 	}
 
 }
-
-// Setup everything
-NetspeakNavigator.autoReload = true;
-
-window.onhashchange = function (e) {
-	NetspeakNavigator.fire("urlChange", location.href);
-
-	let page = NetspeakNavigator.page;
-	if (lastPage !== page) {
-		let old = lastPage;
-		lastPage = page;
-		NetspeakNavigator.fire("pageChange", page, old);
-	}
-};

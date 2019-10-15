@@ -1,5 +1,5 @@
 import { html, NetspeakElement, registerElement } from './netspeak-element.js';
-import { NetspeakNavigator } from './netspeak-navigator';
+import { NetspeakNavigator } from './netspeak-navigator.js';
 
 
 class NetspeakFooter extends NetspeakElement {
@@ -92,11 +92,9 @@ class NetspeakFooter extends NetspeakElement {
 	</div>
 	<div id="language-section">
 		<span class="pipe">|</span>
-		<a class$="[[isCurrentLang('de')]]" href$="[[getLangUrl('de')]]"
-			id$="[[registerLang('de')]]">Deutsch</a>
+		<a class$="[[isCurrentLang('de')]]" href$="[[getLangUrl('de')]]">Deutsch</a>
 		<span class="bullet">&bullet;</span>
-		<a class$="[[isCurrentLang('en')]]" href$="[[getLangUrl('en')]]"
-			id$="[[registerLang('en')]]">English</a>
+		<a class$="[[isCurrentLang('en')]]" href$="[[getLangUrl('en')]]">English</a>
 	</div>
 </div>
 
@@ -104,13 +102,6 @@ class NetspeakFooter extends NetspeakElement {
 		`;
 	}
 
-
-	constructor() {
-		super();
-
-		this.langRegister = {};
-		NetspeakNavigator.addEventListener("urlChange", () => this.onUrlChange.apply(this));
-	}
 
 	/**
 	 * Returns the URL a given page will have.
@@ -138,34 +129,6 @@ class NetspeakFooter extends NetspeakElement {
 	 */
 	isCurrentLang(lang) {
 		return (NetspeakNavigator.currentLanguage == lang) ? 'current-lang' : '';
-	}
-
-	/**
-	 * Registers a new language link and returns the id the link should have.
-	 *
-	 * New language links have to be registered here in order to function properly.
-	 *
-	 * @param {string} lang The language.
-	 * @returns The id.
-	 */
-	registerLang(lang) {
-		this.langRegister[lang] = false;
-		return "lang-" + lang;
-	}
-
-	/**
-	 * A listener function for "urlChange"-events.
-	 *
-	 */
-	onUrlChange() {
-		// update the href of registered links
-		for (let lang in this.langRegister) {
-			if (!this.langRegister[lang]) {
-				this.langRegister[lang] = this.shadowRoot.querySelector("#lang-" + lang);
-			}
-			let a = this.langRegister[lang];
-			a.setAttribute("href", this.getLangUrl(lang));
-		}
 	}
 
 }

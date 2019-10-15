@@ -1,6 +1,5 @@
 import { html, NetspeakElement, registerElement } from './netspeak-element.js';
-import { NetspeakNavigator } from './netspeak-navigator';
-import { shadyQuerySelector } from './util';
+import { NetspeakNavigator } from './netspeak-navigator.js';
 
 
 class NetspeakHeader extends NetspeakElement {
@@ -74,7 +73,7 @@ class NetspeakHeader extends NetspeakElement {
 		</style>
 
 		<div id="content">
-			<a href="[[getStartUrl()]]" id="logo" on-click="_clearSearchBar"></a>
+			<a href="[[getStartUrl()]]" id="logo"></a>
 			<span id="slogan">
 				One word leads to another.
 			</span>
@@ -93,14 +92,7 @@ class NetspeakHeader extends NetspeakElement {
 	 * @returns {string} The URL.
 	 */
 	getStartUrl() {
-		return NetspeakNavigator.getPageUrl("");
-	}
-
-	_clearSearchBar() {
-		/** @type {import("../pages/netspeak-search").NetspeakSearch} */
-		const search = shadyQuerySelector(window.document, "netspeak-search");
-		if (!search || !search.searchBar) return;
-		search.searchBar.clear();
+		return NetspeakNavigator.getPageUrl("index");
 	}
 }
 

@@ -1,5 +1,5 @@
-import { html, PolymerElement } from '@polymer/polymer/polymer-element.js';
-import { loadLocalization } from './netspeak-element';
+import { html, PolymerElement } from '../../node_modules/@polymer/polymer/polymer-element.js';
+import { loadLocalization } from './netspeak-element.js';
 import { Netspeak } from "./netspeak.js";
 
 
