@@ -1,0 +1,12 @@
+{
+	"custom": {
+		"queries": {
+			"q-mark": "The ? finds one word.",
+			"dots": "The ... finds many words.",
+			"option-set": "The [] compare options.",
+			"hash": "The # finds similar words.",
+			"order": "The {} check the order.",
+			"gap": "The space is important."
+		}
+	}
+}

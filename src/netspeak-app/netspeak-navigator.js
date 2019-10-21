@@ -115,66 +115,8 @@ export class NetspeakNavigator {
 *
 * @class UrlUtil
 */
-export class UrlUtil {
+class UrlUtil {
 
-	/**
-	 * Returns the hash value (without the hash symbol) of the given URL of the default value.
-	 *
-	 * @param {string} url The URL.
-	 * @param {string} [defaultValue=undefined] The value returned if no hash value is present.
-	 * @returns {string} The hash value or defaultValue.
-	 */
-	static getHash(url, defaultValue = undefined) {
-		let match = url.match(/#([\s\S]*)/);
-		if (match === null || match[1] === undefined) return defaultValue;
-		return match[1];
-	}
-	/**
-	 * Sets the hash value of the given URL. This will add the hash if necessary.
-	 *
-	 * If value is undefined or null, any hash value (including the hash symbol) will be removed from the URL.
-	 *
-	 * @param {string} url The URL.
-	 * @param {string} value The new hash value.
-	 * @returns {string} The changed URL.
-	 */
-	static setHash(url, value) {
-		// remove hash
-		url = url.replace(/#([\s\S]*)/, "");
-
-		// just remove the hash
-		if (value === undefined || value === null) {
-			return url;
-		}
-
-		// set the hash
-		return url + "#" + String(value);
-	}
-
-	/**
-	 * Returns an object of all URL parameter key-value-pairs.
-	 *
-	 * @param {string} url The URL.
-	 * @returns {Object} The parameters.
-	 */
-	static getParameters(url) {
-		let parameters = {};
-		new URL(url).searchParams.forEach((value, name) => parameters[name] = value);
-		return parameters;
-	}
-
-	/**
-	 * Returns the parameter value of the given URL of defaultValue.
-	 *
-	 * @param {string} url The URL.
-	 * @param {string} name The name of the parameter.
-	 * @param {string} [defaultValue=undefined] The default value.
-	 * @returns {string} The value of the parameter.
-	 */
-	static getParameter(url, name, defaultValue = undefined) {
-		let value = new URL(url).searchParams.get(String(name));
-		return value === null ? defaultValue : value;
-	}
 	/**
 	 * Sets the parameter value of the given URL.
 	 *
@@ -220,51 +162,6 @@ export class UrlUtil {
 		}
 
 		return u.href;
-	}
-
-}
-
-/**
-* A utility class for URL-hash-manipulation.
-*/
-export class HashUtil {
-
-	/**
-	 * Returns a base URL.
-	 *
-	 * This is for private use of the methods of Hash only.
-	 *
-	 * @readonly
-	 * @returns {string} The base URL.
-	 */
-	static get baseUrl() {
-		return "http://www.abc.de/";
-	}
-
-	/**
-	 * Returns the parameter value of the given URL hash value of defaultValue.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @param {string} name The name of the parameter.
-	 * @param {string} [defaultValue=undefined] The default value.
-	 * @returns {string} The value of the parameter.
-	 */
-	static getParameter(hash, name, defaultValue = undefined) {
-		return UrlUtil.getParameter(HashUtil.baseUrl + hash, name, defaultValue);
-	}
-	/**
-	 * Sets the parameters of the given URL hash value.
-	 *
-	 * If the value of a parameter is undefined, null or an empty string, the parameter will be removed.
-	 *
-	 * If parameters is undefined or null, all parameters will be removed.
-	 *
-	 * @param {string} hash The URL hash value.
-	 * @param {Object} parameters The collection of key-value-pairs of parameters to change or undefined.
-	 * @returns {string} The changed hash value.
-	 */
-	static setParameters(hash, parameters) {
-		return UrlUtil.setParameters(HashUtil.baseUrl + hash, parameters).substr(HashUtil.baseUrl.length);
 	}
 
 }

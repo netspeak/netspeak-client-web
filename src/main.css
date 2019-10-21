@@ -12,12 +12,12 @@ body {
     border-collapse: collapse;
     display: table;
     font-family: "Product Sans", "Noto Sans", "Verdana", sans-serif;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 @media screen and (max-width: 750px) {
     body {
-        font-size: 16px;
+        font-size: 15px;
     }
 }
 

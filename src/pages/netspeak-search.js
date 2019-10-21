@@ -1,5 +1,4 @@
 import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
-import { HashUtil, UrlUtil } from '../netspeak-app/netspeak-navigator.js';
 import '../netspeak-app/netspeak-search-bar.js';
 import '../netspeak-app/netspeak-corpus-selector.js';
 
@@ -149,76 +148,6 @@ export class NetspeakSearch extends NetspeakElement {
 		<div id="wrapper">
 			<netspeak-corpus-selector></netspeak-corpus-selector>
 			<netspeak-search-bar></netspeak-search-bar>
-
-			<div id="info">
-				<div id="quick-examples">
-
-					<div class="example-container">
-						<div class="example" data-query="how to ? this"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-qmark-1">The</span>
-								<span class="highlight-red">?</span>
-								<span id="explanation-qmark-2">finds one word.</span>
-							</span>
-						</div>
-					</div>
-
-					<div class="example-container">
-						<div class="example" data-query="see ... works"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-dots-1">The</span>
-								<span class="highlight-red">...</span>
-								<span id="explanation-dots-2">finds many words.</span>
-							</span>
-						</div>
-					</div>
-
-					<div class="example-container">
-						<div class="example" data-query="it's [ great well ]"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-option-1">The</span>
-								<span class="highlight-blue">[]</span>
-								<span id="explanation-option-2">compare options.</span>
-							</span>
-						</div>
-					</div>
-
-					<div class="example-container">
-						<div class="example" data-query="and knows #much"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-synonym-1">The</span>
-								<span class="highlight-blue">#</span>
-								<span id="explanation-synonym-2">finds similar words.</span>
-							</span>
-						</div>
-					</div>
-
-					<div class="example-container">
-						<div class="example" data-query="{ more show me }"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-order-1">The</span>
-								<span class="highlight-blue">{}</span>
-								<span id="explanation-order-2">check the order.</span>
-							</span>
-						</div>
-					</div>
-
-					<div class="example-container">
-						<div class="example" data-query="mind... the g?p"></div>
-						<div class="explanation">
-							<span>
-								<span id="explanation-space">The space is important.</span>
-							</span>
-						</div>
-					</div>
-
-				</div>
-			</div>
 		</div>
 		`;
 	}
@@ -237,13 +166,9 @@ export class NetspeakSearch extends NetspeakElement {
 		this.searchBar = /** @type {any} */ (this.shadowRoot.querySelector("netspeak-search-bar"));
 		/** @type {import("../netspeak-app/netspeak-corpus-selector").NetspeakCorpusSelector} */
 		this.corpusSelector = /** @type {any} */ (this.shadowRoot.querySelector("netspeak-corpus-selector"));
-		/** @type {HTMLElement} */
-		this.info = this.shadowRoot.querySelector("#info");
 
 		this.searchBar.addEventListener("queryChange", () => {
 			this.updateUrl();
-
-			this.toggleInfo(!this.searchBar.query);
 
 			clearTimeout(this._writeHistoryInterval);
 			this._writeHistoryInterval = setTimeout(() => this.writeHistory(), 500);
@@ -257,26 +182,15 @@ export class NetspeakSearch extends NetspeakElement {
 
 		this.initializeSettingsFromUrl();
 		this.loadHistory();
-
-		// add query text to examples
-		this.info.querySelectorAll(".example[data-query]").forEach(div => {
-			const query = div.getAttribute("data-query");
-			const span = div.appendChild(document.createElement("span"));
-			span.addEventListener("click", () => {
-				this.searchBar.query = query;
-			});
-			// @ts-ignore
-			span.innerHTML = Prism.highlight(query, Prism.languages['netspeak-query'], 'netspeak-query');
-			// @ts-check
-		});
 	}
 
 	/**
 	 * Sets the values of the elements of the page to the values specified in the URL.
 	 */
 	initializeSettingsFromUrl() {
-		const query = HashUtil.getParameter(UrlUtil.getHash(location.href, ""), "q", "");
-		const corpus = HashUtil.getParameter(UrlUtil.getHash(location.href, ""), "corpus", "");
+		const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+		const query = params.get("q");
+		const corpus = params.get("corpus");
 
 		if (corpus) this.corpusSelector.value = corpus;
 		if (query) this.searchBar.query = query;
@@ -289,12 +203,11 @@ export class NetspeakSearch extends NetspeakElement {
 		const query = this.searchBar.query;
 		const corpus = this.searchBar.corpus;
 
-		const hash = location.hash.replace(/^#/, "");
-		location.hash = HashUtil.setParameters(hash, { q: query, corpus: corpus });
-	}
+		const params = new URLSearchParams(location.hash.replace(/^#/, ""));
+		params.set("q", query);
+		params.set("corpus", corpus);
 
-	toggleInfo(showInfo) {
-		this.info.style.display = showInfo ? "block" : "none";
+		location.hash = params.toString();
 	}
 
 	/**

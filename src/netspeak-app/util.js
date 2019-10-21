@@ -1,3 +1,16 @@
+/**
+ *
+ * @param {T | T[]} value
+ * @returns {T[]}
+ * @template T
+ */
+function toArray(value) {
+	if (Array.isArray(value)) {
+		return value;
+	} else {
+		return [value];
+	}
+}
 
 /**
  * Creates phrase new HTML element matching the given selector.
@@ -49,54 +62,111 @@ export function appendNewElements(parent, ...selectors) {
 }
 
 /**
- * Queries all children of the given element matching the given selector.
  *
- * @param {ParentNode} element The parent HTML element.
- * @param {string} selector The selector.
- * @returns {Element[]} The matching elements.
- */
-export function shadyQuerySelectorAll(element, selector) {
-	const result = Array.from(element.querySelectorAll(selector));
-
-	element.querySelectorAll(irregularTagSelector).forEach(e => {
-		if (e.shadowRoot && e.shadowRoot.querySelectorAll) {
-			result.push(...(shadyQuerySelectorAll(e.shadowRoot, selector)));
-		}
-	});
-
-	return result;
-}
-
-/**
- * Queries all children of the given element matching the given selector.
+ * @param {Element} parent
+ * @param {AppendNewChildren} children
+ * @returns {Object<string, HTMLElement>}
  *
- * @param {ParentNode} element The parent HTML element.
- * @param {string} selector The selector.
- * @returns {T & Element} The matching element or undefined.
- * @template T
+ * @typedef {AppendNewChild | AppendNewChild[]} AppendNewChildren
+ * @typedef {string | AppendNewSelectorObject | AppendNewTagObject} AppendNewChild
+ *
+ * @typedef AppendNewSelectorObject
+ * @property {string} [out]
+ * @property {string} selector
+ * @property {Object<string, (this: Element, ev: Event) => any>} [listener]
+ * @property {AppendNewChildren} [children]
+ *
+ * @typedef AppendNewTagObject
+ * @property {string} [out]
+ * @property {string} tag
+ * @property {string} [className]
+ * @property {Object<string, string>} [attr]
+ * @property {Object<string, (this: Element, ev: Event) => any>} [listener]
+ * @property {AppendNewChildren} [children]
  */
-export function shadyQuerySelector(element, selector) {
-	const result = element.querySelector(selector);
-	if (result) return /** @type {any} */ (result);
+export function appendNew(parent, children) {
+	/** @type {Object<string, HTMLElement>} */
+	const outObject = {};
 
-	for (let e of element.querySelectorAll(irregularTagSelector)) {
-		if (e.shadowRoot && e.shadowRoot.querySelector) {
-			const res = shadyQuerySelector(e.shadowRoot, selector);
-			if (res) return res;
+	for (let child of toArray(children)) {
+		if (typeof child === "string") {
+			child = { selector: child };
 		}
+
+		/** @type {HTMLElement} */
+		let element;
+		if ("selector" in child) {
+			let selector = child.selector;
+
+			if (!selector) {
+				throw new Error(`Selector cannot be ${selector}`);
+			}
+			const tag = /^[^.#\s<>=$[\]]+/.exec(selector)[0];
+			selector = selector.slice(tag.length);
+			element = document.createElement(tag);
+
+			let chainParent;
+			let chainElement;
+
+			while (selector) {
+				/** @type {RegExpExecArray | null} */
+				let m;
+				if ((m = /^\.([^.#\s<>=$[\]]+)/.exec(selector))) {
+					element.classList.add(m[1]);
+
+				} else if ((m = /^#([^.#\s<>=$[\]]+)/.exec(selector))) {
+					element.id = m[1];
+
+				} else if ((m = /^[^.#\s<>=$[\]]+/.exec(selector))) {
+					chainParent = chainElement;
+					chainElement = document.createElement(m[0]);
+					if (chainParent) {
+						chainParent.appendChild(chainElement);
+					}
+
+				} else if ((m = /^\s+/.exec(selector))) {
+					chainParent = chainElement;
+					chainElement = undefined;
+
+				} else {
+					throw new Error(`Cannot parse sub-selector: ${JSON.stringify(selector)}`);
+				}
+				selector = selector.slice(m[0].length);
+			}
+
+			element = chainElement;
+		} else {
+			element = document.createElement(child.tag);
+			if (child.className) element.className = child.className;
+			if (child.attr) {
+				for (const key in child.attr) {
+					if (child.attr.hasOwnProperty(key)) {
+						element.setAttribute(key, child.attr[key]);
+					}
+				}
+			}
+		}
+
+		if ("out" in child) {
+			outObject[child.out] = element;
+		}
+		if ("children" in child) {
+			Object.assign(outObject, appendNew(element, child.children));
+		}
+		if ("listener" in child) {
+			for (const key in child.listener) {
+				if (child.listener.hasOwnProperty(key)) {
+					element.addEventListener(key, child.listener[key]);
+				}
+			}
+		}
+
+		parent.appendChild(element);
 	}
-	return undefined;
+
+	return outObject;
 }
 
-/**
- * An array of plain old HTML tag names.
- *
- * @readonly
- * @type {string[]}
- */
-export const regularTagNames = ["style", "script", "link", "div", "span", "a", "h3", "h4", "h5", "h6", "br", "p", "b", "i", "img", "em", "strong", "button", "input", "option", "table", "tr", "td", "th", "ul", "ol", "li", "iframe", "th", "pre", "code"];
-
-const irregularTagSelector = "*" + regularTagNames.map(e => ":not(" + e + ")").join("");
 
 
 /**
@@ -114,7 +184,7 @@ const irregularTagSelector = "*" + regularTagNames.map(e => ":not(" + e + ")").j
 export function debounce(func, wait, immediate) {
 	let timeout = undefined;
 
-	return /** @type {any} */ (function() {
+	return /** @type {any} */ (function () {
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			timeout = undefined;
@@ -132,8 +202,86 @@ export function debounce(func, wait, immediate) {
  * @returns {string}
  */
 export function textContent(html) {
-	// TODO: This is vulnerable to XSS
-	const e = document.createElement('DIV');
-	e.innerHTML = html;
-	return e.textContent || '';
+	// copied from PrismJS' markup definition
+	return html.replace(/<\/?(?!\d)[^\s>/=$<%]+(?:\s(?:\s*[^\s>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g, "");
 }
+
+/**
+ * Returns a function which will execute the given function only once in the next frame.
+ *
+ * @param {() => void} func
+ * @returns {() => void}
+ */
+export function createNextFrameInvoker(func) {
+	let requested = false;
+	const invoke = () => {
+		requested = false;
+		func();
+	};
+
+	return () => {
+		if (!requested) {
+			requested = true;
+
+			if (typeof requestAnimationFrame === "undefined") {
+				setTimeout(invoke, 16);
+			} else {
+				requestAnimationFrame(invoke);
+			}
+		}
+	};
+}
+
+
+/**
+ * Queries all children of the given element matching the given selector.
+ *
+ * @param {ParentNode} element The parent HTML element.
+ * @param {string} selector The selector.
+ * @returns {T & Element | null} The matching element or undefined.
+ * @template T
+ */
+function shadyQuerySelector(element, selector) {
+	const result = element.querySelector(selector);
+	if (result) return /** @type {any} */ (result);
+
+	for (let e of element.querySelectorAll(irregularTagSelector)) {
+		if (e.shadowRoot && e.shadowRoot.querySelector) {
+			const res = shadyQuerySelector(e.shadowRoot, selector);
+			if (res) return res;
+		}
+	}
+	return null;
+}
+
+/**
+ * An array of plain old HTML tag names.
+ *
+ * @readonly
+ * @type {string[]}
+ */
+const regularTagNames = ["style", "script", "link", "div", "span", "a", "h3", "h4", "h5", "h6", "br", "p", "b", "i", "img", "em", "strong", "button", "input", "option", "table", "tr", "td", "th", "ul", "ol", "li", "iframe", "th", "pre", "code"];
+
+const irregularTagSelector = "*" + regularTagNames.map(e => ":not(" + e + ")").join("");
+
+
+export function startScrollToUrlHash() {
+	/** @type {string | null} */
+	let lastHash = null;
+	/** @type {HTMLElement | null} */
+	let lastElement = null;
+	setInterval(() => {
+		const hash = location.hash.replace(/^#/, "");
+		if (hash !== lastHash || !lastElement) {
+			lastElement = null;
+
+			lastElement = shadyQuerySelector(document, "#" + hash);
+			if (lastElement) {
+				lastElement.scrollIntoView();
+			}
+		}
+		lastHash = hash;
+
+	}, 16);
+}
+

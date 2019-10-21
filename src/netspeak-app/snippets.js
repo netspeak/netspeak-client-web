@@ -107,4 +107,13 @@ export class Snippets {
 		return "https://snippets.netspeak.org/";
 	}
 
+	/**
+	 * @returns {Snippets}
+	 */
+	static getInstance() {
+		return defaultSnippetsInstance = defaultSnippetsInstance || new Snippets();
+	}
+
 }
+
+let defaultSnippetsInstance;

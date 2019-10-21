@@ -1,9 +1,8 @@
-import { html, PolymerElement } from '../../node_modules/@polymer/polymer/polymer-element.js';
-import { loadLocalization } from './netspeak-element.js';
+import { html, loadLocalization, NetspeakElement, registerElement } from './netspeak-element.js';
 import { Netspeak } from "./netspeak.js";
 
 
-export class NetspeakCorpusSelector extends PolymerElement {
+export class NetspeakCorpusSelector extends NetspeakElement {
 	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-corpus-selector'; }
 	static get properties() {
@@ -196,4 +195,4 @@ export class LabelProvider {
 
 const defaultLabelProvide = new LabelProvider();
 
-window.customElements.define(NetspeakCorpusSelector.is, NetspeakCorpusSelector);
+registerElement(NetspeakCorpusSelector);

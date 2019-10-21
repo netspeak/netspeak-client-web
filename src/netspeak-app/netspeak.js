@@ -296,7 +296,16 @@ export class Netspeak {
 		return "web-en";
 	}
 
+	/**
+	 * @returns {Netspeak}
+	 */
+	static getInstance() {
+		return defaultNetspeakInstance = defaultNetspeakInstance || new Netspeak();
+	}
+
 }
+
+let defaultNetspeakInstance;
 
 export class Word {
 
@@ -354,17 +363,18 @@ export class Phrase {
 	/**
 	 * Creates an instance of Phrase.
 	 *
-	 * @param {Word[]} words The array of words creating the phrase.
+	 * @param {readonly Word[]} words The array of words creating the phrase.
 	 * @param {number} frequency The absolute frequency of the phrase.
-	 * @param {string} [query] The query this phase matches.
-	 * @param {string} [corpus] The corpus from which the phrases where retrieved.
+	 * @param {string} query The query this phase matches.
+	 * @param {string} corpus The corpus from which the phrases where retrieved.
 	 */
-	constructor(words, frequency, query = undefined, corpus = undefined) {
+	constructor(words, frequency, query, corpus) {
 		this.words = words;
-		this.text = words.length == 0 ? "" : words.map(w => w.text || "").join(" ");
+		this.text = words.map(w => w.text || "").join(" ");
 		this.frequency = frequency;
 		this.query = query;
 		this.corpus = corpus;
+		this.id = this.corpus + "\n" + this.text;
 	}
 
 }
@@ -399,17 +409,6 @@ export class PhraseCollection {
 	 * @returns {PhraseCollection} The collection.
 	 */
 	static from(phrases) {
-		let c = new PhraseCollection();
-		c.addAll(phrases);
-		return c;
-	}
-	/**
-	 * Creates a new PhraseCollection of the given phrases.
-	 *
-	 * @param {Phrase[]} phrases The phrases of the collection.
-	 * @returns {PhraseCollection} The collection.
-	 */
-	static of(...phrases) {
 		let c = new PhraseCollection();
 		c.addAll(phrases);
 		return c;
@@ -478,9 +477,6 @@ export class PhraseCollection {
 		}
 
 		return this._total;
-	}
-	set totalFrequency(value) {
-		if (value === undefined) this._total = undefined;
 	}
 
 	_getSorted() {

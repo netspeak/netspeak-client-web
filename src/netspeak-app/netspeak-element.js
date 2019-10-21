@@ -2,12 +2,43 @@ import { PolymerElement, html as html_tag } from '../../node_modules/@polymer/po
 import { NetspeakNavigator } from './netspeak-navigator.js';
 
 
+export const html = html_tag;
+
+/**
+ * A version of the usual `html` tag which uses raw strings.
+ *
+ * @param {TemplateStringsArray} strings
+ * @param {any[]} values
+ */
+export const htmlR = (strings, ...values) => {
+	/** @type {any} */
+	const newStrings = [...strings.raw];
+	newStrings.raw = strings.raw;
+	return html_tag(newStrings, ...values);
+};
+
+/**
+ * This allows you to insert arbitrary strings into your Polymer templates.
+ *
+ * @param {string} htmlSource
+ */
+export function innerHTML(htmlSource) {
+	// @ts-ignore
+	return html_tag([htmlSource]);
+}
+
+
 /**
  * @typedef LocalizationJson
  * @property {Object<string, string>} [template]
  * @property {any} [custom]
  *
- * @typedef {Function & { is: string, importMeta?: any }} PolymerConstructor
+ * @typedef {Function & PolymerConstructorProperties} PolymerConstructor
+ *
+ * @typedef PolymerConstructorProperties
+ * @property {string} is The HTML tag name of the custom HTML element.
+ * @property {any} [importMeta] The `import.meta` of the file of this class.
+ * @property {boolean} [noDefaultLocalization] Whether the element does not have a default localization.
  */
 
 /**
@@ -28,10 +59,12 @@ export function loadLocalization(constructor) {
 		const is = constructor.is;
 		/** @type {{ url: string }} */
 		const meta = constructor.importMeta;
+		/** @type {boolean} */
+		const noDefaultLocalization = !!constructor.noDefaultLocalization;
 
 		if (meta && meta.url && is) {
 			const currentLang = NetspeakNavigator.currentLanguage;
-			if (currentLang == NetspeakNavigator.defaultLanguage) {
+			if (!noDefaultLocalization && currentLang == NetspeakNavigator.defaultLanguage) {
 				promise = Promise.resolve(false);
 			} else {
 				const url = new URL(meta.url);
@@ -90,15 +123,6 @@ export class NetspeakElement extends PolymerElement {
 				}
 			}
 		}).catch(e => { /* ignore all errors. */ });
-
-		this.styleCode();
-	}
-
-	/**
-	 * The method called after the element was removed from the DOM.
-	 */
-	disconnectedCallback() {
-		super.disconnectedCallback();
 	}
 
 	/**
@@ -108,29 +132,29 @@ export class NetspeakElement extends PolymerElement {
 	 * If Prism is not defined, then this method will do nothing.
 	 */
 	styleCode() {
-		if (!window.Prism) return;
-
-		this.shadowRoot.querySelectorAll("code[class*=\"language-\"]:not([highlighted])").forEach(e => {
-			window.Prism.highlightElement(e);
-			e.setAttribute("highlighted", "");
-		});
+		highlightCode(this.shadowRoot);
 	}
 }
 
-export const html = html_tag;
-
 /**
- * A version of the usual `html` tag which uses raw strings.
+ * Highlights all code elements which follow the PrismJS language-xxxx convention.
  *
- * @param {TemplateStringsArray} strings
- * @param {any[]} values
+ * This will not affect elements which are highlighted already.
+ * If Prism is not defined, then this method will do nothing.
+ *
+ * @param {DocumentFragment | Element} container
  */
-export const htmlR = (strings, ...values) => {
-	/** @type {any} */
-	const newStrings = [...strings.raw];
-	newStrings.raw = strings.raw;
-	return html_tag(newStrings, ...values);
-};
+export function highlightCode(container) {
+	if (!window.Prism || !container) return;
+
+	const selector = ["code[class*=\"language-\"]", "pre[class*=\"language-\"] > code"]
+		.map(s => s + ":not([highlighted])").join(",");
+
+	container.querySelectorAll(selector).forEach(e => {
+		window.Prism.highlightElement(e);
+		e.setAttribute("highlighted", "");
+	});
+}
 
 /**
  *
@@ -138,7 +162,4 @@ export const htmlR = (strings, ...values) => {
  */
 export function registerElement(constructor) {
 	window.customElements.define(constructor.is, constructor);
-
-	// preload localization
-	loadLocalization(constructor);
 }

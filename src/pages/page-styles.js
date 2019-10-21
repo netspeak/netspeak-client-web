@@ -4,7 +4,6 @@ export const styles = html`
 <style>
 	div.article {
 		padding: 3em 1em;
-		font-size: 14px;
 	}
 
 	/*
@@ -139,7 +138,7 @@ export const styles = html`
 		word-break: normal;
 		word-wrap: normal;
 		line-height: 1.5;
-		font-size: 13px;
+		font-size: 90%;
 
 		-moz-tab-size: 4;
 		-o-tab-size: 4;

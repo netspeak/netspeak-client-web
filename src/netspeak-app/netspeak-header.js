@@ -12,7 +12,6 @@ class NetspeakHeader extends NetspeakElement {
 			:host {
 				background: #323232;
 				display: block;
-				height: 64px;
 				padding: 0;
 				border-bottom: 1px solid #727272;
 				position: relative;
@@ -20,7 +19,7 @@ class NetspeakHeader extends NetspeakElement {
 
 			#content {
 				max-width: 800px;
-				padding: 16px;
+				padding: 8px 16px;
 				box-sizing: border-box;
 				margin: 0 auto;
 			}
