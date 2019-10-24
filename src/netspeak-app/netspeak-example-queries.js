@@ -15,8 +15,8 @@ const exampleQueries = {
 		"gap": "mind... the g?p",
 	},
 	"web-de": {
-		"q-mark": "Wie benutzt ? das",
-		"dots": "",
+		"q-mark": "was ? das",
+		"dots": "was ... hier ab",
 		"option-set": "wie [ nützlich praktisch ]",
 		// "hash": "and knows #much", // this feature isn't yet implemented on the server-side
 		"order": "{ mehr zeig mir }",
