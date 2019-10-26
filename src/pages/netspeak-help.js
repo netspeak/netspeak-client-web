@@ -381,11 +381,6 @@ export class NetspeakHelp extends NetspeakElement {
 							<li>Google Protobuf:
 								<a href="api/NetspeakMessages.proto">NetspeakMessages.proto</a>
 							</li>
-							<li>Protostuff (
-								<a href="http://code.google.com/p/protostuff/wiki/JsonSerialization#java_v2protoc_schema" target="_blank">Java
-									classes</a> ):
-								<a href="api/netspeak-java-v2protoc-schema.properties">netspeak-java-v2protoc-schema.properties</a>
-							</li>
 						</ul>
 					</div>
 				</div>
