@@ -740,18 +740,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		<style>
 
-			:host {
-				--item-even-background-color: #FAFAFA;
-				--item-odd-background-color: #FFF;
-				--item-even-hover-background-color: #EEE;
-				--item-odd-hover-background-color: #EEE;
-
-				--options-background-color: #F4F4F4;
-			}
-
 			#result-list>div {
 				background-color: #FFF;
-				border-top: var(--result-item-border, 1px solid #CCC);
 			}
 
 			#result-list>div:first-child {
@@ -759,30 +749,42 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			}
 
 			#result-list>div:nth-child(2n) {
-				background-color: var(--item-even-background-color);
+				--item-background-color: #F7F7F7;
 			}
 			#result-list>div:nth-child(2n+1) {
-				background-color: var(--item-odd-background-color);
+				--item-background-color: #FFF;
 			}
-			#result-list>div:nth-child(2n):hover {
-				background-color: var(--item-even-hover-background-color);
+			#result-list>div[options-visible],
+			#result-list>div:hover {
+				--item-background-color: #e2ebf1;
 			}
-			#result-list>div:nth-child(2n+1):hover {
-				background-color: var(--item-odd-hover-background-color);
+			#result-list>div {
+				background-color: var(--item-background-color);
 			}
 
-			#result-list>div:nth-child(2n) div.options {
-				background: linear-gradient(var(--item-even-background-color) 0px, var(--options-background-color) 24px);
+			#result-list>div div.options {
+				background: linear-gradient(rgb(247, 247, 247), rgb(247, 247, 247) 40px);
+				border-bottom: 1px solid #CCC;
+				position: relative;
 			}
-			#result-list>div:nth-child(2n+1) div.options {
-				background: linear-gradient(var(--item-odd-background-color) 0px, var(--options-background-color) 24px);
-			}
-			#result-list>div:nth-child(2n):hover div.options {
-				background: linear-gradient(var(--item-even-hover-background-color) 0px, var(--options-background-color) 24px);
-			}
-			#result-list>div:nth-child(2n+1):hover div.options {
-				background: linear-gradient(var(--item-odd-hover-background-color) 0px, var(--options-background-color) 24px);
-			}
+			/*#result-list>div div.options::before {
+				--size: 16px;
+
+				content: "";
+				display: block;
+				width: var(--size);
+				height: var(--size);
+				position: absolute;
+
+				top: calc(var(--size) / -2 - 1px);
+				left: calc(50% - var(--size));
+				background: linear-gradient(45deg, transparent 50%, var(--item-background-color) 50%);
+				transform: scaleX(1) rotate(135deg);
+
+				border: 1px solid #CCC;
+				border-bottom: none;
+				border-left: none;
+			}*/
 
 
 			#result-list table {
