@@ -44,7 +44,7 @@ export class NetspeakHelp extends NetspeakElement {
 
 				<p>The REST interface has the following base URL:</p>
 
-				<pre><code>http://api.netspeak.org/netspeak4/search?</code></pre>
+				<pre><code>https://api.netspeak.org/netspeak4/search?</code></pre>
 
 				<p>The table below shows the currently supported parameters:</p>
 
@@ -355,22 +355,22 @@ export class NetspeakHelp extends NetspeakElement {
 
 				<ul>
 					<li>
-						<a href="http://api.netspeak.org/netspeak3/search?query=hello*">http://api.netspeak.org/netspeak3/search?query=hello*</a>
+						<a href="https://api.netspeak.org/netspeak4/search?query=hello%20*">https://api.netspeak.org/netspeak4/search?query=hello%20*</a>
 					</li>
 					<li>
-						<a href="http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30">http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30</a>
+						<a href="https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30">https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30</a>
 					</li>
 					<li>
-						<a href="http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30&amp;nmin=2&amp;nmax=3">http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30&amp;nmin=2&amp;nmax=3</a>
+						<a href="https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30&amp;nmin=2&amp;nmax=3">https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30&amp;nmin=2&amp;nmax=3</a>
 					</li>
 					<li>
-						<a href="http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30&amp;nmin=2&amp;nmax=3&amp;format=json">http://api.netspeak.org/netspeak3/search?query=hello*&amp;topk=30&amp;nmin=2&amp;nmax=3&amp;format=json</a>
+						<a href="https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30&amp;nmin=2&amp;nmax=3&amp;format=json">https://api.netspeak.org/netspeak4/search?query=hello%20*&amp;topk=30&amp;nmin=2&amp;nmax=3&amp;format=json</a>
 					</li>
 				</ul>
 
 				<p> When using JSON as a result format you will need its schema since Netspeak uses the
-					<a href="http://code.google.com/p/protobuf/" target="_blank">Google Protobuf</a> library and
-					<a href="http://code.google.com/p/protostuff/" target="_blank">Protostuff</a> for JSON serialization. Below you can
+					<a href="https://code.google.com/p/protobuf/" target="_blank">Google Protobuf</a> library and
+					<a href="https://code.google.com/p/protostuff/" target="_blank">Protostuff</a> for JSON serialization. Below you can
 					find the Proto schema of Netspeak's Protobuf messages
 					and the Protostuff configurations for generating Java classes and GWT overlays. </p>
 
