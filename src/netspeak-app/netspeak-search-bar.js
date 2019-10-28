@@ -113,6 +113,12 @@ export class NetspeakSearchBar extends NetspeakElement {
 				observer: '_historyHiddenChanged',
 			},
 
+			infoVisibleByDefault: {
+				type: Boolean,
+				value: false,
+				notify: true
+			}
+
 		};
 	}
 	static get template() {
@@ -345,6 +351,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this.initialExamplesLimit = this.initialExamplesLimit;
 		/** @type {boolean} */
 		this.historyHidden = this.historyHidden;
+		/** @type {boolean} */
+		this.infoVisibleByDefault = this.infoVisibleByDefault;
 	}
 
 	/**
@@ -373,7 +381,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			// @ts-ignore
 			this.query = e.detail.query;
 		});
-		this._setExampleQueriesVisibility(true);
+		this._setExampleQueriesVisibility(this.infoVisibleByDefault);
 	}
 
 	/**
@@ -406,6 +414,11 @@ export class NetspeakSearchBar extends NetspeakElement {
 		try {
 			const focusInput = Boolean(this._focusInput);
 			this._focusInput = false;
+
+			// hide examples if they weren't used
+			if (this._exampleQueries && this._exampleQueries.clickCounter === 0) {
+				this._setExampleQueriesVisibility(false);
+			}
 
 			this.dispatchChangeEvent("queryChange", newValue, oldValue);
 

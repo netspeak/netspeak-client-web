@@ -52,7 +52,7 @@ export class NetspeakSearch extends NetspeakElement {
 
 		<div id="wrapper">
 			<netspeak-corpus-selector></netspeak-corpus-selector>
-			<netspeak-search-bar></netspeak-search-bar>
+			<netspeak-search-bar info-visible-by-default></netspeak-search-bar>
 		</div>
 		`;
 	}

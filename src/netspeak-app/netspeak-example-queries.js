@@ -148,6 +148,13 @@ export class NetspeakExampleQueries extends NetspeakElement {
 				this._renderExamples();
 			}
 		});
+
+		/**
+		 * A counter for how many examples have been selected using this element.
+		 *
+		 * @type {number}
+		 */
+		this.clickCounter = 0;
 	}
 
 	/**
@@ -189,6 +196,8 @@ export class NetspeakExampleQueries extends NetspeakElement {
 	}
 
 	_querySelected(query) {
+		this.clickCounter++;
+
 		this.dispatchEvent(new CustomEvent("query-selected", {
 			detail: { query },
 			bubbles: false,
