@@ -6,7 +6,6 @@ import '../netspeak-app/netspeak-corpus-selector.js';
 export class NetspeakSearch extends NetspeakElement {
 	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-search'; }
-	static get properties() { return {}; }
 	static get template() {
 		return html`
 
@@ -28,78 +27,6 @@ export class NetspeakSearch extends NetspeakElement {
 				--result-font-family: 'Verdana', 'Geneva', sans-serif;
 			}
 
-			/*
-			 * INFO
-			 */
-
-			#info {
-				background-color: #EEE;
-				border: 1px solid #BBB;
-				box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
-				clear: both;
-				position: relative;
-
-				margin-top: 2em;
-			}
-
-			#info #quick-examples {
-				padding: .5em 1em;
-				position: relative;
-			}
-
-			#info .example-container {
-				clear: both;
-				position: relative;
-			}
-
-			#info .example-container::after {
-				clear: both;
-				content: " ";
-				display: table;
-				position: relative;
-				width: 100%;
-			}
-
-			#info .example-container a {
-				color: #333;
-			}
-
-			#info .example,
-			#info .explanation {
-				padding: .25em 0;
-			}
-
-			#info .example {
-				float: left;
-			}
-
-			#info .explanation {
-				float: right;
-				width: 50%;
-			}
-
-			#info .example > span {
-				cursor: pointer;
-				text-decoration: none;
-			}
-			#info .example > span:hover {
-				text-decoration: underline;
-			}
-
-			.highlight-red,
-			.token.q-mark,
-			.token.asterisk,
-			.token.plus {
-				color: #c5000b;
-			}
-
-			.highlight-blue,
-			.token.order-set,
-			.token.option-set,
-			.token.dict-set {
-				color: #2d7db3;
-			}
-
 			@media screen and (max-width: 750px) {
 
 				#wrapper {
@@ -119,30 +46,8 @@ export class NetspeakSearch extends NetspeakElement {
 					margin: 0 .5em 2em auto;
 				}
 
-				/*
-				 * INFO
-				 */
-				#info {
-					margin-left: .5em;
-					margin-right: .5em;
-				}
-
 			}
 
-			@media screen and (max-width: 500px) {
-
-				#info .example,
-				#info .explanation {
-					float: none;
-					display: block;
-					width: auto;
-				}
-
-				#info .explanation>* {
-					padding-left: .5em;
-				}
-
-			}
 		</style>
 
 		<div id="wrapper">
@@ -179,6 +84,9 @@ export class NetspeakSearch extends NetspeakElement {
 
 			this.updateUrl();
 		});
+		window.addEventListener("hashchange", () => {
+			this.initializeSettingsFromUrl();
+		});
 
 		this.initializeSettingsFromUrl();
 		this.loadHistory();
@@ -192,8 +100,8 @@ export class NetspeakSearch extends NetspeakElement {
 		const query = params.get("q");
 		const corpus = params.get("corpus");
 
-		if (corpus) this.corpusSelector.value = corpus;
-		if (query) this.searchBar.query = query;
+		if (corpus != null) this.corpusSelector.value = corpus;
+		if (query != null) this.searchBar.query = query;
 	}
 
 	/**
@@ -207,7 +115,10 @@ export class NetspeakSearch extends NetspeakElement {
 		params.set("q", query);
 		params.set("corpus", corpus);
 
-		location.hash = params.toString();
+		const newUrl = location.href.replace(/#[\s\S]*$/, "") + "#" + params.toString();
+		if (newUrl !== location.href) {
+			history.pushState(null, "", newUrl);
+		}
 	}
 
 	/**
