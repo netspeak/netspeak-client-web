@@ -275,9 +275,11 @@ export function startScrollToUrlHash() {
 		if (hash !== lastHash || !lastElement) {
 			lastElement = null;
 
-			lastElement = shadyQuerySelector(document, "#" + hash);
-			if (lastElement) {
-				lastElement.scrollIntoView();
+			if (hash) {
+				lastElement = shadyQuerySelector(document, "#" + hash);
+				if (lastElement) {
+					lastElement.scrollIntoView();
+				}
 			}
 		}
 		lastHash = hash;
