@@ -118,14 +118,6 @@ export const styles = html`
 
 
 	/*
-	 * SEARCH BAR
-	 */
-
-	netspeak-search-bar {
-		font-size: medium;
-	}
-
-	/*
 	 * CODE
 	 */
 
