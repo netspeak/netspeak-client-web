@@ -203,7 +203,10 @@ export function debounce(func, wait, immediate) {
  */
 export function textContent(html) {
 	// copied from PrismJS' markup definition
-	return html.replace(/<\/?(?!\d)[^\s>/=$<%]+(?:\s(?:\s*[^\s>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g, "");
+	html = html.replace(/<\/?(?!\d)[^\s>/=$<%]+(?:\s(?:\s*[^\s>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g, "");
+	const div = document.createElement("div");
+	div.innerHTML = html;
+	return div.textContent;
 }
 
 /**
@@ -286,4 +289,3 @@ export function startScrollToUrlHash() {
 
 	}, 16);
 }
-

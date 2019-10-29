@@ -85,13 +85,13 @@ export class Snippets {
 				// cache hit
 				fetched = this._cache.get(url);
 			} else {
-				fetched = fetch(url);
+				fetched = fetch(url).then(res => res.json());
 				if (this.caching) {
 					this._cache.add(url, fetched);
 				}
 			}
 
-			return fetched.then(res => res.json());
+			return fetched;
 		} catch (error) {
 			return Promise.reject(error);
 		}

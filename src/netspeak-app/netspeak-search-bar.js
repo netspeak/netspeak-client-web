@@ -915,22 +915,22 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			}
 
 
-			#result-list div.options .example {
-				font-size: 80%;
+			#result-list div.options .examples-list {
+				font-size: 90%;
 				word-break: break-word;
 			}
 
-			#result-list div.options .example em {
+			#result-list div.options .examples-list em {
 				font-weight: bold;
 			}
 
-			#result-list div.options .example a {
+			#result-list div.options .examples-list a {
 				color: inherit;
 				opacity: .7;
 				padding: 0 .5em;
 			}
 
-			#result-list div.options .example a::after {
+			#result-list div.options .examples-list a::after {
 				content: "\\21F1";
 				display: inline-block;
 				transform: rotate(90deg);
@@ -1156,7 +1156,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		// examples
 		const examplesContainer = appendNewElements(options, "DIV.examples-container");
-		appendNewElements(examplesContainer, "div.examples");
+		const examplesList = appendNewElements(examplesContainer, "div.examples-list");
 
 		const loadMoreExamplesContainer = appendNewElements(examplesContainer, "div.load-more-examples");
 
@@ -1181,15 +1181,17 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				button.style.display = null;
 
 				for (const example of examples) {
-					const p = appendNewElements(examplesContainer, "DIV", "P");
+					const p = appendNewElements(examplesList, "DIV", "P");
 					p.innerHTML = example.snippet;
 					appendNewElements(p, "A").setAttribute("href", example.source);
 				}
-			}).catch(() => {
+			}).catch(e => {
+				console.error(e);
+
 				loadingIcon.style.display = "none";
 				button.style.display = "none";
 
-				const p = appendNewElements(examplesContainer, "DIV", "P");
+				const p = appendNewElements(examplesList, "DIV", "P");
 				p.textContent = "Failed to load examples.";
 			});
 		}
@@ -1200,40 +1202,49 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 	}
 
 	/**
-	 * Returns a function which will return a new page of example every time it is invoked.
+	 * Returns a function which will return a new examples every time it is invoked.
 	 *
 	 * @param {Phrase} phrase
-	 * @param {number} pageSize
+	 * @param {number} requestCount
 	 * @returns {() => Promise<Snippet[]>}
 	 *
 	 * @typedef {{ snippet: string; source: string }} Snippet
 	 */
-	_createExampleSupplier(phrase, pageSize) {
+	_createExampleSupplier(phrase, requestCount) {
 		const pastExamples = new Set([""]);
 
 		/** @type {Snippet[]} */
 		const snippetsBuffer = [];
 
 		let internalPage = 0;
-		let internalPageSize = pageSize * 2;
+		let internalPageSize = 100;
 		const snippetsApi = this.snippetsApi;
+
+		let startTime = -1;
+		const timeout = 5000; // ms
 
 		/**
 		 * @returns {Promise<Snippet[]>}
 		 */
 		function loadSnippets() {
-			if (snippetsBuffer.length >= pageSize) {
-				return Promise.resolve(snippetsBuffer.splice(0, pageSize));
+			if (snippetsBuffer.length >= requestCount) {
+				return Promise.resolve(snippetsBuffer.splice(0, requestCount));
+			}
+			if (snippetsBuffer.length > 0 && (new Date().valueOf() - startTime) > timeout) {
+				// return all of them early if we take too long
+				return Promise.resolve(snippetsBuffer.splice(0, snippetsBuffer.length));
 			}
 
 			// load and buffer snippets
 			return snippetsApi.search({
 				query: phrase.text,
 				size: internalPageSize,
-				from: internalPageSize * internalPage
+				from: internalPageSize * internalPage++
 			}).then(res => {
 				for (const { snippet, target_uri } of res.results) {
 					const text = textContent(snippet).toLowerCase();
+					if (text.indexOf(phrase.text.toLowerCase()) === -1)
+						continue;
 
 					// The basic idea behind this id is that most duplicate examples are equal character for character,
 					// so a simple (and fast) hash lookup is sufficient.
@@ -1241,10 +1252,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 					// humans, some additional transformation are performed.
 					const id = text.replace(/\d+/g, "0");
 
-					// To be added to the buffer, the queried snippet has to both:
-					//  1) contain the phrase text,
-					//  2) not be a duplicate of a previous example.
-					if (text.includes(phrase.text.toLowerCase()) && !pastExamples.has(id)) {
+					// To be added to the buffer, the queried snippet has to not be a duplicate of a previous example.
+					if (!pastExamples.has(id)) {
 						pastExamples.add(id);
 						snippetsBuffer.push({
 							snippet: snippet + "...",
@@ -1257,7 +1266,10 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			});
 		}
 
-		return loadSnippets;
+		return () => {
+			startTime = new Date().valueOf();
+			return loadSnippets();
+		};
 	}
 
 	/**
