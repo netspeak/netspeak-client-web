@@ -50,7 +50,7 @@ export class NetspeakHelp extends NetspeakElement {
 				</p>
 
 
-				<h3 id="examples">Examples</h1>
+				<h3 id="examples">Examples</h3>
 
 				<div class="group-box">
 					<span class="group-title" id="example-1">Find one word</span>
@@ -112,7 +112,7 @@ export class NetspeakHelp extends NetspeakElement {
 					<span class="group-title" id="example-7">Compare phrases</span>
 					<div class="group-content">
 						<p id="example-7-desc">Use the pipe sign between phrases to get a comparison</p>
-						<netspeak-search-bar query="waiting ? ? response | waiting ? response" initial-limit="10" history-hidden></				netspeak-search-bar>
+						<netspeak-search-bar query="waiting ? ? response | waiting ? response" initial-limit="10" history-hidden></netspeak-search-bar>
 					</div>
 				</div>
 
