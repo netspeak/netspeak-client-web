@@ -1,4 +1,4 @@
-import { html, htmlR, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
+import { html, htmlR, NetspeakElement, registerElement, loadLocalization } from "../netspeak-app/netspeak-element.js";
 import { NetspeakNavigator } from '../netspeak-app/netspeak-navigator.js';
 import { styles } from './page-styles.js';
 import { startScrollToUrlHash } from "../netspeak-app/util.js";
@@ -7,13 +7,40 @@ import "../netspeak-app/netspeak-search-bar.js";
 export class NetspeakHelp extends NetspeakElement {
 	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-help'; }
-	static get properties() { return {}; }
 	static get template() {
 		return html`${styles}
+			<style>
+				#toc ul {
+					padding: 0;
+				}
+				#toc li {
+					list-style: none;
+					padding: 0;
+					clear: both;
+				}
+				#toc li span.icon {
+					background-image: url("../img/expand-arrow.svg");
+					height: 20px;
+					width: 20px;
+					opacity: .7;
+					display: inline-block;
+					float: left;
+					margin-right: 10px;
+				}
+				#toc li.h2 {
+					margin: .5em 0 .25em 0;
+					font-size: 110%;
+				}
+				#toc li.h3 {
+					padding-left: 30px;
+				}
+			</style>
+
 			<div class="article">
 
 				<h1 id="help">Help</h1>
 
+				<div id="toc"></div>
 
 
 				<h2 id="how">How Netspeak works</h2>
@@ -109,7 +136,7 @@ export class NetspeakHelp extends NetspeakElement {
 				<p>Netspeak can be accessed programmatically via a REST interface and a Java API. </p>
 
 
-				<h3>REST Interface</h3>
+				<h3 id="rest-interface">REST Interface</h3>
 
 				<p>The REST interface has the following base URL:</p>
 
@@ -455,7 +482,7 @@ export class NetspeakHelp extends NetspeakElement {
 				</div>
 
 
-				<h3>Java API</h3>
+				<h3 id="java-api">Java API</h3>
 
 				<p>The Java API calls the REST interface and processes the JSON response string, returning Java objects. The example
 					code below demonstrates the basic usage of the library.</p>
@@ -490,6 +517,41 @@ export class NetspeakHelp extends NetspeakElement {
 		super.connectedCallback();
 
 		this.styleCode();
+		this.generateTOC();
+
+		// update the TOC after the localization has been loaded.
+		loadLocalization(NetspeakHelp).then(json => {
+			if (json) {
+				this.generateTOC();
+			}
+		});
+	}
+
+	generateTOC() {
+		if (!this.shadowRoot) return;
+
+		let container = this.shadowRoot.querySelector("#toc");
+		container.innerHTML = "";
+		container = container.appendChild(document.createElement("ul"));
+
+		for (const h of this.shadowRoot.querySelectorAll("h2[id], h3[id]")) {
+			const id = h.id;
+
+			if (h.parentElement.tagName.toLowerCase() !== "a") {
+				const a = document.createElement("a");
+				a.href = "#" + id;
+				h.replaceWith(a);
+				a.appendChild(h);
+			}
+
+			const li = container.appendChild(document.createElement("li"));
+			li.className = h.tagName.toLowerCase();
+			const liIcon = li.appendChild(document.createElement("span"));
+			liIcon.className = "icon";
+			const liLink = li.appendChild(document.createElement("a"));
+			liLink.href = "#" + id;
+			liLink.textContent = h.textContent;
+		}
 	}
 }
 
