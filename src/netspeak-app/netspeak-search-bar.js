@@ -776,8 +776,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			}
 
 			#result-list>div div.options {
-				background: linear-gradient(rgb(247, 247, 247), rgb(247, 247, 247) 40px);
+				background: rgb(247, 247, 247);
 				border-bottom: 1px solid #CCC;
+				border-top: 1px solid #CCC;
 				position: relative;
 			}
 			/*#result-list>div div.options::before {
