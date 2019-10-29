@@ -8,7 +8,8 @@
   ],
   "extraDependencies": [
     "node_modules/@webcomponents/webcomponentsjs/**/*.js",
-    "node_modules/@webcomponents/webcomponentsjs/**/*.map"
+    "node_modules/@polymer/polymer/**/*.js",
+    "polymer-fix.js"
   ],
   "builds": [
     {
@@ -19,9 +20,6 @@
         "transformModulesToAmd": true
       },
       "css": {
-        "minify": true
-      },
-      "html": {
         "minify": true
       },
       "bundle": false
