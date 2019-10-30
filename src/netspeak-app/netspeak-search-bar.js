@@ -129,6 +129,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 			:host {
 				display: block;
 				font-size: 1em;
+
+				--border-color: #BBB;
 			}
 
 			/*
@@ -137,9 +139,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			#box {
 				display: block;
-				border: 1px solid #BBB;
-				border-bottom: none;
-				box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
+				border: 1px solid var(--border-color);
 				font-family: var(--input-font-family, inherit);
 			}
 
@@ -190,7 +190,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 				position: absolute;
 				background-color: white;
 				box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
-				border: 1px solid #BBB;
+				border: 1px solid var(--border-color);
 				width: 15em;
 				margin-left: -15em;
 				z-index: 10;
@@ -199,7 +199,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			#drop-down .option {
 				padding: .5em 1em;
-				border-bottom: 1px solid #BBB;
+				border-bottom: 1px solid var(--border-color);
 				cursor: pointer;
 			}
 
@@ -220,12 +220,10 @@ export class NetspeakSearchBar extends NetspeakElement {
 			 */
 
 			#result-wrapper {
-				border-top: var(--result-border-top, 1px solid #BBB);
-				border-right: var(--result-border-right, 1px solid #BBB);
-				border-bottom: var(--result-border-bottom, 1px solid #BBB);
-				border-left: var(--result-border-left, 1px solid #BBB);
+				border-right: var(--result-border-right, 1px solid var(--border-color));
+				border-bottom: var(--result-border-bottom, 1px solid var(--border-color));
+				border-left: var(--result-border-left, 1px solid var(--border-color));
 				font-family: var(--result-font-family, inherit);
-				margin-top: .25em;
 			}
 
 			/*
@@ -908,7 +906,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				padding: 1em;
 				background-color: var(--options-background-color);
 				color: #444;
-				/*box-shadow: 0 4px 32px rgba(0, 0, 0, .1) inset; */
 			}
 
 			#result-list [options-visible] div.options {
@@ -954,7 +951,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			 */
 
 			#load-more-button {
-				border-top: 1px solid #BBB;
+				border-top: 1px solid var(--border-color);
 				cursor: pointer;
 				position: relative;
 				margin: 0;
