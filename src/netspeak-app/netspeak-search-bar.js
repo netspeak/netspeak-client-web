@@ -117,7 +117,13 @@ export class NetspeakSearchBar extends NetspeakElement {
 				type: Boolean,
 				value: false,
 				notify: true
-			}
+			},
+
+			clickableItems: {
+				type: Boolean,
+				value: false,
+				notify: true
+			},
 
 		};
 	}
@@ -131,6 +137,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 				font-size: 1em;
 
 				--border-color: #BBB;
+				--left-right-padding: 0;
+				--left-right-border-style: solid;
 			}
 
 			/*
@@ -139,7 +147,9 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			#box {
 				display: block;
-				border: 1px solid var(--border-color);
+				padding: 0 var(--left-right-padding);
+				border: 1px var(--border-color);
+				border-style: solid var(--left-right-border-style);
 				font-family: var(--input-font-family, inherit);
 			}
 
@@ -184,8 +194,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 			 * DROP DOWN
 			 */
 
-			#drop-down-positioner {}
-
 			#drop-down {
 				position: absolute;
 				background-color: white;
@@ -220,9 +228,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 			 */
 
 			#result-wrapper {
-				border-right: var(--result-border-right, 1px solid var(--border-color));
-				border-bottom: var(--result-border-bottom, 1px solid var(--border-color));
-				border-left: var(--result-border-left, 1px solid var(--border-color));
+				border: 1px var(--border-color);
+				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
 				font-family: var(--result-font-family, inherit);
 			}
 
@@ -351,6 +358,14 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this.historyHidden = this.historyHidden;
 		/** @type {boolean} */
 		this.infoVisibleByDefault = this.infoVisibleByDefault;
+		/** @type {boolean} */
+		this.clickableItems = this.clickableItems;
+
+		this.addEventListener("clickable-items-changed", () => {
+			if (this._resultList) {
+				this._resultList.clickableItems = this.clickableItems;
+			}
+		});
 	}
 
 	/**
@@ -711,6 +726,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			dd.focus();
 		} else {
 			container.removeAttribute("history-visible");
+			// @ts-ignore
 			container.querySelector("#drop-down").blur();
 		}
 	}
@@ -741,6 +757,10 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			},
 			"formatter": {
 				type: PhraseFormatter,
+				notify: true
+			},
+			"clickableItems": {
+				type: Boolean,
 				notify: true
 			}
 		};
@@ -779,6 +799,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				border-top: 1px solid #CCC;
 				position: relative;
 			}
+			#result-list>div:last-child div.options {
+				border-bottom: none;
+			}
 			/*#result-list>div div.options::before {
 				--size: 16px;
 
@@ -800,14 +823,14 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 
 			#result-list table {
-				margin: var(--result-item-data-margin, 0);
-				display: block;
+				padding: 0 var(--left-right-padding);
+				width: 100%;
 			}
 
 			#result-list table td:first-child {
 				width: 100%;
 				background-repeat: no-repeat;
-				background-position-x: 100%;
+				background-position-x: calc(100% + 1px);
 				background-image: url("/src/img/frequency-bar.svg");
 			}
 
@@ -981,6 +1004,22 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				background-image: url('/src/img/load-more.svg');
 			}
 
+			/*
+			 * Clickability changes
+			 */
+
+			#result-list.clickable table {
+				cursor: pointer;
+				padding: 0;
+			}
+			#result-list.clickable table td:first-child {
+				padding: 0 var(--left-right-padding);
+				height: calc(var(--icon-size) + 2 * var(--icon-padding));
+			}
+			#result-list.clickable table tr td:not(:first-child) {
+				display: none;
+			}
+
 		</style>
 
 		<div id="container">
@@ -1006,6 +1045,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		this.phrases = [];
 		/** @type {Map<string, Phrase>} */
 		this.pinnedPhrases = new Map();
+		/** @type {boolean} */
+		this.clickableItems = this.clickableItems;
 
 		this.snippetsApi = Snippets.getInstance();
 		this.formatter = PhraseFormatter.getInstance();
@@ -1035,6 +1076,18 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				cancelable: false,
 			}));
 		});
+		this.addEventListener("clickable-items-changed", () => this._updateClickability());
+		this._updateClickability();
+	}
+
+	_updateClickability() {
+		if (!this._resultList) return;
+
+		if (this.clickableItems) {
+			this._resultList.classList.add("clickable");
+		} else {
+			this._resultList.classList.remove("clickable");
+		}
 	}
 
 	clear() {
@@ -1093,7 +1146,13 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		const element = document.createElement("div");
 		this._setResultElementPhrase(element, phrase);
 
-		const tr = appendNewElements(element, "TABLE", "TBODY", "TR");
+		const table = appendNewElements(element, "TABLE");
+		table.addEventListener("click", () => {
+			if (this.clickableItems) {
+				this._toggleResultElementOptions(element);
+			}
+		});
+		const tr = appendNewElements(table, "TBODY", "TR");
 
 		const td = appendNewElements(tr, "TD");
 
@@ -1293,7 +1352,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		const td = element.querySelector("td");
 
 		const relativeFreq = phrase.frequency / collection.maxFrequency;
-		td.style.backgroundSize = (relativeFreq * .618 * 100) + "% 100%";
+		td.style.backgroundSize = `${relativeFreq * .618 * 100}% 100%`;
 
 		const text = this.formatter.formatText(phrase, collection);
 		const freq = this.formatter.formatFrequency(phrase, collection);

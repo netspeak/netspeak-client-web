@@ -1,7 +1,7 @@
 import { html, htmlR, NetspeakElement, registerElement, loadLocalization } from "../netspeak-app/netspeak-element.js";
 import { NetspeakNavigator } from '../netspeak-app/netspeak-navigator.js';
 import { styles } from './page-styles.js';
-import { startScrollToUrlHash } from "../netspeak-app/util.js";
+import { startScrollToUrlHash, startClickableSearchBars } from "../netspeak-app/util.js";
 import "../netspeak-app/netspeak-search-bar.js";
 
 export class NetspeakHelp extends NetspeakElement {
@@ -525,6 +525,8 @@ export class NetspeakHelp extends NetspeakElement {
 				this.generateTOC();
 			}
 		});
+
+		startClickableSearchBars();
 	}
 
 	generateTOC() {

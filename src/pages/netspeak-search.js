@@ -1,4 +1,5 @@
 import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
+import { startClickableSearchBars } from "../netspeak-app/util.js";
 import '../netspeak-app/netspeak-search-bar.js';
 import '../netspeak-app/netspeak-corpus-selector.js';
 
@@ -35,11 +36,10 @@ export class NetspeakSearch extends NetspeakElement {
 
 				netspeak-search-bar {
 					--icon-size: 20px;
-					--icon-padding: 6px;
-					--result-item-data-margin: 0 .5em;
+					--icon-padding: 5px;
+					--left-right-padding: .5em;
 					--input-margin: .5em;
-					--result-border-right: none;
-					--result-border-left: none;
+					--left-right-border-style: none;
 				}
 
 				netspeak-corpus-selector {
@@ -84,12 +84,12 @@ export class NetspeakSearch extends NetspeakElement {
 
 			this.updateUrl();
 		});
-		window.addEventListener("hashchange", () => {
-			this.initializeSettingsFromUrl();
-		});
+		window.addEventListener("hashchange", () => this.initializeSettingsFromUrl());
 
 		this.initializeSettingsFromUrl();
 		this.loadHistory();
+
+		startClickableSearchBars();
 	}
 
 	/**

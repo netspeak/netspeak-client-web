@@ -53,8 +53,8 @@ export class NetspeakExampleQueries extends NetspeakElement {
 
 			#info {
 				background-color: #F8F8F8;
-				border: 1px solid var(--border-color);
-				border-top: none;
+				border: 1px var(--border-color);
+				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
 				clear: both;
 				position: relative;
 			}
@@ -114,10 +114,6 @@ export class NetspeakExampleQueries extends NetspeakElement {
 					float: none;
 					display: block;
 					width: auto;
-				}
-
-				.explanation>* {
-					padding-left: .5em;
 				}
 
 			}

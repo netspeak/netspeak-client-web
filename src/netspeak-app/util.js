@@ -258,6 +258,27 @@ function shadyQuerySelector(element, selector) {
 }
 
 /**
+ * Queries all children of the given element matching the given selector.
+ *
+ * @param {ParentNode} element The parent HTML element.
+ * @param {string} selector The selector.
+ * @returns {(T & Element)[]} The matching elements.
+ * @template T
+ */
+function shadyQuerySelectorAll(element, selector) {
+	const result = Array.from(element.querySelectorAll(selector));
+
+	element.querySelectorAll(irregularTagSelector).forEach(e => {
+		if (e.shadowRoot && e.shadowRoot.querySelectorAll) {
+			result.push(...(shadyQuerySelectorAll(e.shadowRoot, selector)));
+		}
+	});
+
+	// @ts-ignore
+	return result;
+}
+
+/**
  * An array of plain old HTML tag names.
  *
  * @readonly
@@ -288,4 +309,25 @@ export function startScrollToUrlHash() {
 		lastHash = hash;
 
 	}, 16);
+}
+
+let clickableStarted = false;
+/**
+ * Starts a process which will set all Netspeak search bars to clickable (mobile mode) depending on the page size.
+ */
+export function startClickableSearchBars() {
+	function updateClickablity() {
+		const clickableItems = window.innerWidth <= 500;
+		/** @type {import("./netspeak-search-bar").NetspeakSearchBar[]} */
+		const searchBars = shadyQuerySelectorAll(document, "netspeak-search-bar");
+		for (const searchBar of searchBars) {
+			searchBar.clickableItems = clickableItems;
+		}
+	}
+
+	updateClickablity();
+
+	if (clickableStarted) return;
+	clickableStarted = true;
+	window.addEventListener("resize", updateClickablity);
 }
