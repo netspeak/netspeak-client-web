@@ -1,9 +1,8 @@
 {
     "template": {
         "help": "Hilfe",
-        "terms": "AGB",
 
         "contact": "Kontakt",
-        "impressum-and-privacy": "Impressum\u00A0/\u00A0Datenschutz"
+        "impressum-and-privacy": "Impressum\u00A0/\u00A0AGB\u00A0/\u00A0Datenschutz"
     }
 }

@@ -175,7 +175,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 			#box button.btn-img {
 				padding-top: .5em;
 				padding-bottom: .5em;
-				display: table;
 			}
 
 			#box #example-queries-button>* {
@@ -239,6 +238,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			div#errors {
 				display: block;
+				border: 1px var(--border-color);
+				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
 			}
 
 			div#errors>p {
@@ -288,11 +289,11 @@ export class NetspeakSearchBar extends NetspeakElement {
 			</table>
 		</div>
 
+		<div id="errors" style="display: none"></div>
+
 		<netspeak-example-queries corpus$="{{corpus}}"></netspeak-example-queries>
 
 		<div id="result-wrapper" style="display: none">
-
-			<div id="errors"></div>
 
 			<netspeak-search-bar-result-list></netspeak-search-bar-result-list>
 
@@ -568,19 +569,22 @@ export class NetspeakSearchBar extends NetspeakElement {
 		// wrapper
 		/** @type {HTMLDivElement} */
 		const wrapper = this.shadowRoot.querySelector("#result-wrapper");
-		let showWrapper = !this._resultList.isEmpty;
 
 		// output errors
 		/** @type {HTMLElement} */
 		const errors = this.shadowRoot.querySelector("#errors");
-		errors.innerHTML = '';
 		if (this.errorMessage) {
-			appendNewElements(errors, "P").innerHTML = String(this.errorMessage);
-			showWrapper = true;
-		}
+			errors.style.display = null;
+			errors.innerHTML = '';
+			appendNewElements(errors, "P").textContent = String(this.errorMessage);
 
-		// wrapper
-		wrapper.style.display = showWrapper ? "block" : "none";
+			// the wrapper should stay as is
+		} else {
+			errors.style.display = "none";
+
+			// wrapper
+			wrapper.style.display = !this._resultList.isEmpty ? "block" : "none";
+		}
 
 		if (focusInput && this._queryInputElement) {
 			this._queryInputElement.focus();

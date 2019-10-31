@@ -46,15 +46,15 @@ class NetspeakFooter extends NetspeakElement {
 	}
 
 	.bullet {
-		padding: 0 12px;
+		padding: 0 5px;
 	}
 
 	.pipe {
-		padding: 0 24px;
+		padding: 0 15px;
 	}
 
 
-	@media screen and (max-width: 1000px) {
+	@media screen and (max-width: 750px) {
 		:host {
 			padding: 2em;
 		}
@@ -78,16 +78,14 @@ class NetspeakFooter extends NetspeakElement {
 
 <div>
 	<div id="webis-copyright">
-		Copyright &copy; 2019 <a href="https://webis.de" target="_blank">Webis group</a>
+		&copy; 2019 <a href="https://webis.de" target="_blank">Webis group</a>
 		<span class="bullet">&bullet;</span>
 		<a href="https://webis.de/people.html" target="_blank" id="contact">Contact</a>
 		<span class="bullet">&bullet;</span>
-		<a href="https://webis.de/impressum.html" target="_blank" id="impressum-and-privacy">Impressum&nbsp;/&nbsp;Privacy&nbsp;policy</a>
+		<a href="https://webis.de/impressum.html" target="_blank" id="impressum-and-privacy">Impressum&nbsp;/&nbsp;Terms&nbsp;/&nbsp;Privacy</a>
 	</div>
 	<div id="netspeak-points">
 		<a href="[[getPageUrl('help')]]" id="help">Help</a>
-		<span class="bullet">&bullet;</span>
-		<a href="[[getPageUrl('terms')]]" id="terms">Terms</a>
 	</div>
 	<div id="language-section">
 		<span class="pipe">|</span>
