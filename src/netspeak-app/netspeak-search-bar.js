@@ -175,7 +175,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 			#box button.btn-img {
 				padding-top: .5em;
 				padding-bottom: .5em;
-				display: table;
 			}
 
 			#box #example-queries-button>* {
