@@ -12,15 +12,15 @@ const exampleQueries = {
 		"option-set": "it's [ great well ]",
 		"hash": "and knows #much",
 		"order": "{ more show me }",
-		"gap": "mind... the g?p",
+		"gap": "m...d ? g?p",
 	},
 	"web-de": {
 		"q-mark": "was ? das",
 		"dots": "was ... hier ab",
 		"option-set": "wie [ nützlich praktisch ]",
 		// "hash": "and knows #much", // this feature isn't yet implemented on the server-side
-		"order": "{ mehr zeig mir }",
-		"gap": "M?t zur Lü...e",
+		"order": "{ rum richtig }",
+		"gap": "M?t ? Lü...e",
 	},
 };
 

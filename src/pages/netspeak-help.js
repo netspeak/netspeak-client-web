@@ -43,6 +43,16 @@ export class NetspeakHelp extends NetspeakElement {
 				<div id="toc"></div>
 
 
+
+				<h2 id="contact">Contact</h2>
+
+				<p>
+					<span id="email">Email:</span>
+					<a href="mailto:info@netspeak.org">info@netspeak.org</a>
+				</p>
+
+
+
 				<h2 id="how">How Netspeak works</h2>
 
 				<p id="how-desc">
@@ -115,15 +125,6 @@ export class NetspeakHelp extends NetspeakElement {
 						<netspeak-search-bar query="waiting ? ? response | waiting ? response" initial-limit="10" history-hidden></netspeak-search-bar>
 					</div>
 				</div>
-
-
-
-				<h2 id="contact">Contact</h2>
-
-				<p>
-					<span id="email">Email:</span>
-					<a href="mailto:info@netspeak.org">info@netspeak.org</a>
-				</p>
 
 
 
@@ -536,7 +537,7 @@ export class NetspeakHelp extends NetspeakElement {
 		container.innerHTML = "";
 		container = container.appendChild(document.createElement("ul"));
 
-		for (const h of this.shadowRoot.querySelectorAll("h2[id], h3[id]")) {
+		for (const h of this.shadowRoot.querySelectorAll("h2[id]")) {
 			const id = h.id;
 
 			if (h.parentElement.tagName.toLowerCase() !== "a") {
