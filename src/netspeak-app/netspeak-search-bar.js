@@ -1,4 +1,4 @@
-import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
+import { html, NetspeakElement, registerElement, loadLocalization } from "./netspeak-element.js";
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
 import { Snippets } from "./snippets.js";
 import { appendNewElements, textContent, createNextFrameInvoker } from "./util.js";
@@ -744,6 +744,7 @@ export class NetspeakSearchBar extends NetspeakElement {
  * - Querying and displaying examples
  */
 class NetspeakSearchBarResultList extends NetspeakElement {
+	static get importMeta() { return import.meta; }
 	static get is() { return "netspeak-search-bar-result-list"; }
 	static get properties() {
 		return {
@@ -802,24 +803,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			#result-list>div:last-child div.options {
 				border-bottom: none;
 			}
-			/*#result-list>div div.options::before {
-				--size: 16px;
-
-				content: "";
-				display: block;
-				width: var(--size);
-				height: var(--size);
-				position: absolute;
-
-				top: calc(var(--size) / -2 - 1px);
-				left: calc(50% - var(--size));
-				background: linear-gradient(45deg, transparent 50%, var(--item-background-color) 50%);
-				transform: scaleX(1) rotate(135deg);
-
-				border: 1px solid #CCC;
-				border-bottom: none;
-				border-left: none;
-			}*/
 
 
 			#result-list table {
@@ -1022,12 +1005,11 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		</style>
 
-		<div id="container">
-			<div id="result-list"></div>
-			<button id="load-more-button" style="display: none;">
-				<span class="load-more-img"></span>
-			</button>
-		</div>
+		<div id="result-list"></div>
+
+		<button id="load-more-button" style="display: none;">
+			<span class="load-more-img"></span>
+		</button>
 		`;
 	}
 
@@ -1229,7 +1211,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		// load examples function
 		const exampleSupplier = this._createExampleSupplier(phrase, this.examplePageSize);
-		function loadMoreExamples() {
+		const loadMoreExamples = () => {
 			loadingIcon.style.display = null;
 			button.style.display = "none";
 
@@ -1249,9 +1231,11 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				button.style.display = "none";
 
 				const p = appendNewElements(examplesList, "DIV", "P");
-				p.textContent = "Failed to load examples.";
+				this.localMessage("failed-to-load-examples", "Failed to load examples.").then(msg => {
+					p.textContent = msg;
+				});
 			});
-		}
+		};
 		// load examples right now.
 		loadMoreExamples();
 

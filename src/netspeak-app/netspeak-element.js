@@ -31,6 +31,7 @@ export function innerHTML(htmlSource) {
 /**
  * @typedef LocalizationJson
  * @property {Object<string, string>} [template]
+ * @property {Object<string, string>} [messages]
  * @property {any} [custom]
  *
  * @typedef {Function & PolymerConstructorProperties} PolymerConstructor
@@ -123,6 +124,32 @@ export class NetspeakElement extends PolymerElement {
 				}
 			}
 		}).catch(e => { /* ignore all errors. */ });
+	}
+
+	/**
+	 * Returns the message of the given key in the current language.
+	 *
+	 * The returned promise is guaranteed to resolve successfully.
+	 *
+	 * @param {string} key
+	 * @param {string} defaultValue
+	 * @returns {Promise<string>}
+	 */
+	localMessage(key, defaultValue) {
+		return loadLocalization(this.constructor).then(json => {
+			if (json && json.messages) {
+				if (key in json.messages) {
+					return json.messages[key];
+				} else {
+					// to make debugging a little easier
+					console.warn(`There is no key '${key}' in the localization.`);
+				}
+			}
+			return defaultValue;
+		}).catch(e => {
+			console.error(e);
+			return defaultValue;
+		});
 	}
 
 	/**

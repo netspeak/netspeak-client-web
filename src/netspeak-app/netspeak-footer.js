@@ -5,7 +5,6 @@ import { NetspeakNavigator } from './netspeak-navigator.js';
 class NetspeakFooter extends NetspeakElement {
 	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-footer'; }
-	static get properties() { return {}; }
 	static get template() {
 		return html`
 <style>
