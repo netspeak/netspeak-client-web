@@ -310,24 +310,3 @@ export function startScrollToUrlHash() {
 
 	}, 16);
 }
-
-let clickableStarted = false;
-/**
- * Starts a process which will set all Netspeak search bars to clickable (mobile mode) depending on the page size.
- */
-export function startClickableSearchBars() {
-	function updateClickablity() {
-		const clickableItems = window.innerWidth <= 500;
-		/** @type {import("./netspeak-search-bar").NetspeakSearchBar[]} */
-		const searchBars = shadyQuerySelectorAll(document, "netspeak-search-bar");
-		for (const searchBar of searchBars) {
-			searchBar.clickableItems = clickableItems;
-		}
-	}
-
-	updateClickablity();
-
-	if (clickableStarted) return;
-	clickableStarted = true;
-	window.addEventListener("resize", updateClickablity);
-}

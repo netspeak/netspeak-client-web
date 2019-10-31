@@ -1,5 +1,4 @@
 import { html, NetspeakElement, registerElement } from "../netspeak-app/netspeak-element.js";
-import { startClickableSearchBars } from "../netspeak-app/util.js";
 import '../netspeak-app/netspeak-search-bar.js';
 import '../netspeak-app/netspeak-corpus-selector.js';
 
@@ -88,8 +87,6 @@ export class NetspeakSearch extends NetspeakElement {
 
 		this.initializeSettingsFromUrl();
 		this.loadHistory();
-
-		startClickableSearchBars();
 	}
 
 	/**

@@ -1,4 +1,4 @@
-import { html, NetspeakElement, registerElement, loadLocalization } from "./netspeak-element.js";
+import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
 import { Snippets } from "./snippets.js";
 import { appendNewElements, textContent, createNextFrameInvoker } from "./util.js";
@@ -40,7 +40,7 @@ const sharedStyles = html`
 			background-color: transparent;
 			border: none;
 			cursor: pointer;
-			display: block;
+			display: inline-block;
 			margin: 0;
 			opacity: .5;
 			padding: var(--icon-padding, 4px);
@@ -56,11 +56,18 @@ const sharedStyles = html`
 			background-position: center;
 			background-repeat: no-repeat;
 			background-size: contain;
-			display: block;
-			margin: auto;
+			display: inline-block;
+			margin: 0;
 			padding: 0;
 			width: var(--icon-size, 16px);
 			height: var(--icon-size, 16px);
+		}
+
+		.btn-img>span.btn-text {
+			display: inline-block;
+			line-height: var(--icon-size, 16px);
+			padding: 0;
+			vertical-align: top;
 		}
 
 	</style>
@@ -114,12 +121,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 			},
 
 			infoVisibleByDefault: {
-				type: Boolean,
-				value: false,
-				notify: true
-			},
-
-			clickableItems: {
 				type: Boolean,
 				value: false,
 				notify: true
@@ -359,14 +360,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this.historyHidden = this.historyHidden;
 		/** @type {boolean} */
 		this.infoVisibleByDefault = this.infoVisibleByDefault;
-		/** @type {boolean} */
-		this.clickableItems = this.clickableItems;
-
-		this.addEventListener("clickable-items-changed", () => {
-			if (this._resultList) {
-				this._resultList.clickableItems = this.clickableItems;
-			}
-		});
 	}
 
 	/**
@@ -763,10 +756,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			"formatter": {
 				type: PhraseFormatter,
 				notify: true
-			},
-			"clickableItems": {
-				type: Boolean,
-				notify: true
 			}
 		};
 	}
@@ -776,12 +765,23 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		<style>
 
-			#result-list>div {
-				background-color: #FFF;
+			*::-moz-selection {
+				text-shadow: none !important;
+				background-color: rgba(32, 64, 255, .8);
+				color: #FFF;
+			}
+			*::selection {
+				text-shadow: none !important;
+				background-color: rgba(32, 64, 255, .8);
+				color: #FFF;
 			}
 
-			#result-list>div:first-child {
-				border-top: none;
+
+			#result-list>div {
+				background-color: var(--item-background-color);
+				display: table;
+				width: 100%;
+				padding: 0;
 			}
 
 			#result-list>div:nth-child(2n) {
@@ -794,37 +794,34 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			#result-list>div:hover {
 				--item-background-color: #e2ebf1;
 			}
-			#result-list>div {
-				background-color: var(--item-background-color);
-			}
-
-			#result-list>div div.options {
-				background: rgb(247, 247, 247);
-				border-bottom: 1px solid #CCC;
-				border-top: 1px solid #CCC;
-				position: relative;
-			}
-			#result-list>div:last-child div.options {
-				border-bottom: none;
-			}
 
 
-			#result-list table {
-				padding: 0 var(--left-right-padding);
-				width: 100%;
-			}
+			/**
+			 * div.phrase-container
+			 */
 
-			#result-list table td:first-child {
-				width: 100%;
+			#result-list .phrase-container {
 				background-repeat: no-repeat;
 				background-position-x: calc(100% + 1px);
+				background-position-y: -2px;
 				background-image: url("/src/img/frequency-bar.svg");
+
+				cursor: pointer;
+				padding: 0 var(--left-right-padding);
+				width: 100%;
+				box-sizing: border-box;
 			}
+			#result-list .phrase-container::after {
+				content: "";
+				clear: both;
+				display: block;
+			}
+
 
 			#result-list span.text,
 			#result-list span.freq {
 				text-shadow: 0 1px 1px #FFF;
-				padding: var(--result-item-data-text-padding, .25em .5em);
+				padding: .3em .5em;
 			}
 
 			#result-list span.text {
@@ -839,25 +836,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			#result-list span.freq>span.percentage {
 				display: inline-block;
 				padding-left: .5em;
-				width: 3.5em;
+				width: 4em;
 			}
-
-
-			*::-moz-selection {
-				text-shadow: none !important;
-				background-color: rgba(32, 64, 255, .8);
-				color: #FFF;
-			}
-
-			*::selection {
-				text-shadow: none !important;
-				background-color: rgba(32, 64, 255, .8);
-				color: #FFF;
-			}
-
-			/*
-			 * SYNTAX HIGHLIGHTING
-			 */
 
 			#result-list span.text span {
 				color: #333;
@@ -878,83 +858,93 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				color: #2d7db3;
 			}
 
-			/*
-			 * PIN
+
+			/**
+			 * div.options
 			 */
+
+			#result-list .options {
+				background: rgb(247, 247, 247);
+				border-bottom: 1px solid #CCC;
+				border-top: 1px solid #CCC;
+				color: #444;
+
+				position: relative;
+			}
+			#result-list>div:last-child .options {
+				border-bottom: none;
+			}
+
+
+			/*
+			 * div.buttons
+			 */
+
+			#result-list .options .buttons {
+				text-align: right;
+				padding: 0 var(--left-right-padding);
+			}
 
 			#result-list .pinned>span.btn-img {
 				background-image: url("/src/img/pin.svg");
 			}
-
 			#result-list [pinned] .pinned {
 				opacity: 1;
 			}
+
+			#result-list .copy>span.btn-img {
+				background-image: url("/src/img/pin.svg");
+			}
+
 
 			/*
 			 * EXAMPLES
 			 */
 
-			#result-list .examples>span.btn-img {
-				background-image: url("/src/img/plus.svg");
-			}
-
-			#result-list [options-visible] .examples>span.btn-img {
-				background-image: url("/src/img/minus.svg");
-			}
-
 			#result-list .loading {
 				cursor: default;
 				opacity: 1;
 			}
-
 			#result-list .loading>span.btn-img {
 				background-image: url("/src/img/loading.svg");
 			}
 
-
-			#result-list div.options {
-				padding: 1em;
-				background-color: var(--options-background-color);
-				color: #444;
+			#result-list .options .examples-container {
+				padding: 0 1em 1em 1em;
 			}
-
-			#result-list [options-visible] div.options {
-				display: block;
-			}
-
-
-			#result-list div.options .examples-list {
+			#result-list .options .examples-list {
 				font-size: 90%;
 				word-break: break-word;
 			}
 
-			#result-list div.options .examples-list em {
+			#result-list .options .examples-list em {
 				font-weight: bold;
 			}
 
-			#result-list div.options .examples-list a {
+			#result-list .options .examples-list a {
 				color: inherit;
 				opacity: .7;
 				padding: 0 .5em;
 			}
 
-			#result-list div.options .examples-list a::after {
+			#result-list .options .examples-list a::after {
 				content: "\\21F1";
 				display: inline-block;
 				transform: rotate(90deg);
 			}
 
-			#result-list div.options .load-more {
+			#result-list .options .load-more {
 				cursor: pointer;
 				display: block;
 				position: relative;
 				width: 100%;
 			}
 
-			#result-list div.options .load-more>* {
+			#result-list .options .load-more>* {
 				margin-left: auto;
 				margin-top: auto;
 			}
+
 
 			/*
 			 * LOAD MORE
@@ -974,11 +964,11 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				background-color: #EEE;
 			}
 
-			*:hover>span.load-more-img {
+			#load-more-button:hover>.load-more-img {
 				opacity: 1;
 			}
 
-			span.load-more-img {
+			#load-more-button .load-more-img {
 				opacity: .5;
 				display: block;
 				width: 4em;
@@ -989,22 +979,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				background-size: contain;
 				background-repeat: no-repeat;
 				background-image: url('/src/img/load-more.svg');
-			}
-
-			/*
-			 * Clickability changes
-			 */
-
-			#result-list.clickable table {
-				cursor: pointer;
-				padding: 0;
-			}
-			#result-list.clickable table td:first-child {
-				padding: 0 var(--left-right-padding);
-				height: calc(var(--icon-size) + 2 * var(--icon-padding));
-			}
-			#result-list.clickable table tr td:not(:first-child) {
-				display: none;
 			}
 
 		</style>
@@ -1031,8 +1005,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		this.phrases = [];
 		/** @type {Map<string, Phrase>} */
 		this.pinnedPhrases = new Map();
-		/** @type {boolean} */
-		this.clickableItems = this.clickableItems;
 
 		this.snippetsApi = Snippets.getInstance();
 		this.formatter = PhraseFormatter.getInstance();
@@ -1062,19 +1034,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				cancelable: false,
 			}));
 		});
-		this.addEventListener("clickable-items-changed", () => this._updateClickability());
-		this._updateClickability();
 	}
 
-	_updateClickability() {
-		if (!this._resultList) return;
-
-		if (this.clickableItems) {
-			this._resultList.classList.add("clickable");
-		} else {
-			this._resultList.classList.remove("clickable");
-		}
-	}
 
 	clear() {
 		this.phrases = [];
@@ -1132,26 +1093,13 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		const element = document.createElement("div");
 		this._setResultElementPhrase(element, phrase);
 
-		const table = appendNewElements(element, "TABLE");
-		table.addEventListener("click", () => {
-			if (this.clickableItems) {
-				this._toggleResultElementOptions(element);
-			}
+		const phraseContainer = appendNewElements(element, "div.phrase-container");
+		phraseContainer.addEventListener("click", () => {
+			this._toggleResultElementOptions(element);
 		});
-		const tr = appendNewElements(table, "TBODY", "TR");
 
-		const td = appendNewElements(tr, "TD");
-
-		appendNewElements(td, "DIV", "SPAN.text");
-		appendNewElements(td, "SPAN.freq");
-
-		const examplesBtn = appendNewElements(tr, "TD", "SPAN.btn-img.examples");
-		examplesBtn.onclick = () => this._toggleResultElementOptions(element);
-		appendNewElements(examplesBtn, "SPAN.btn-img");
-
-		const pinningBtn = appendNewElements(tr, "TD", "SPAN.btn-img.pinned");
-		pinningBtn.onclick = () => this._toggleResultElementPinned(element);
-		appendNewElements(pinningBtn, "SPAN.btn-img");
+		appendNewElements(phraseContainer, "div", "span.text");
+		appendNewElements(phraseContainer, "span.freq");
 
 		this._setResultElementStats(element, phrase, collection);
 		return element;
@@ -1190,14 +1138,36 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 	/**
 	 * @param {HTMLElement} element
-	 * @returns {HTMLElement}
 	 */
 	_addResultElementOptions(element) {
 		const phrase = this._getResultElementPhrase(element);
 
 		const options = appendNewElements(element, "DIV.options");
 
+		// buttons
+		const buttons = appendNewElements(options, "div.buttons");
+
+		// pin button
+		const copyBtn = appendNewElements(buttons, "SPAN.btn-img.copy");
+		copyBtn.onclick = () => console.log(`Copy "${phrase.text}"`);
+		appendNewElements(copyBtn, "SPAN.btn-img");
+		appendNewElements(copyBtn, "SPAN.btn-text").textContent = "Copy";
+
+		// pin button
+		const pinningBtn = appendNewElements(buttons, "SPAN.btn-img.pinned");
+		pinningBtn.onclick = () => this._toggleResultElementPinned(element);
+		appendNewElements(pinningBtn, "SPAN.btn-img");
+		appendNewElements(pinningBtn, "SPAN.btn-text").textContent = "Pin";
+
 		// examples
+		this._addResultElementOptionsExamples(options, phrase);
+	}
+
+	/**
+	 * @param {HTMLElement} options
+	 * @param {Phrase} phrase
+	 */
+	_addResultElementOptionsExamples(options, phrase) {
 		const examplesContainer = appendNewElements(options, "DIV.examples-container");
 		const examplesList = appendNewElements(examplesContainer, "div.examples-list");
 
@@ -1242,8 +1212,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		};
 		// load examples right now.
 		loadMoreExamples();
-
-		return options;
 	}
 
 	/**
@@ -1337,17 +1305,18 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 	 * @param {NewPhraseCollection} collection
 	 */
 	_setResultElementStats(element, phrase, collection) {
-		const td = element.querySelector("td");
+		/** @type {HTMLDivElement} */
+		const phraseContainer = element.querySelector(".phrase-container");
 
 		const relativeFreq = phrase.frequency / collection.maxFrequency;
-		td.style.backgroundSize = `${relativeFreq * .618 * 100}% 100%`;
+		phraseContainer.style.backgroundSize = `${relativeFreq * .618 * 100}% 130%`;
 
 		const text = this.formatter.formatText(phrase, collection);
 		const freq = this.formatter.formatFrequency(phrase, collection);
 		const percent = this.formatter.formatPercentage(phrase, collection);
 
-		td.querySelector(".text").innerHTML = text;
-		td.querySelector(".freq").innerHTML = `${freq}<span class="percentage">${percent}</span>`;
+		phraseContainer.querySelector(".text").innerHTML = text;
+		phraseContainer.querySelector(".freq").innerHTML = `${freq}<span class="percentage">${percent}</span>`;
 	}
 
 	/**
