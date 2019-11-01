@@ -18,7 +18,7 @@ class NetspeakHeader extends NetspeakElement {
 
 			#content {
 				max-width: 800px;
-				padding: 8px 16px;
+				padding: 19px 16px;
 				box-sizing: border-box;
 				margin: 0 auto;
 			}
