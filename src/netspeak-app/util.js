@@ -210,6 +210,16 @@ export function textContent(html) {
 }
 
 /**
+ * Encodes the given string such that it's a text literal.
+ *
+ * @param {string} html
+ * @returns {string}
+ */
+export function encode(html) {
+	return html.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+}
+
+/**
  * Returns a function which will execute the given function only once in the next frame.
  *
  * @param {() => void} func
