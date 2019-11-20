@@ -13,10 +13,11 @@ export class NetspeakSearch extends NetspeakElement {
 		<style>
 			:host {
 				display: block;
+				max-width: 500px;
 			}
 
 			#wrapper {
-				padding: 3em 1em;
+				padding: 3em 0;
 				position: relative;
 			}
 
@@ -28,7 +29,7 @@ export class NetspeakSearch extends NetspeakElement {
 				--result-font-family: 'Verdana', 'Geneva', sans-serif;
 			}
 
-			@media screen and (max-width: 750px) {
+			@media screen and (max-width: 500px) {
 
 				#wrapper {
 					padding: 3em 0;
