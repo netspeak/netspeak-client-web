@@ -320,3 +320,48 @@ export function startScrollToUrlHash() {
 
 	}, 16);
 }
+
+/**
+ * Creates a new ClipboardJS instance and returns a promise according to the `success` or `error` event.
+ *
+ * @param {string | Element} selector
+ * @param {string | ((elem: Element) => string)} text
+ * @returns {Promise<import("clipboard")>}
+ */
+export function createClipboardButton(selector, text) {
+	if (typeof ClipboardJS === "undefined") {
+		// load the library
+		return new Promise((resolve, reject) => {
+			const script = document.createElement("script");
+			script.async = true;
+			script.src = "https://unpkg.com/clipboard@2/dist/clipboard.min.js";
+
+			script.onload = () => {
+				document.body.removeChild(script);
+				resolve();
+			};
+			script.onerror = () => {
+				document.body.removeChild(script);
+				reject();
+			};
+
+			document.body.appendChild(script);
+		}).then(() => {
+			if (typeof ClipboardJS === "undefined") {
+				throw new Error("Unable to load ClipboardJS");
+			}
+		}).then(() => {
+			return createClipboardButton(selector, text);
+		});
+	}
+
+	return Promise.resolve(new ClipboardJS(selector, {
+		text(e) {
+			if (typeof text === "function") {
+				return text(e);
+			} else {
+				return text;
+			}
+		}
+	}));
+}

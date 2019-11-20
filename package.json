@@ -9,7 +9,8 @@
     "lint": "npx eslint ./"
   },
   "dependencies": {
-    "@polymer/polymer": "^3.0.0"
+    "@polymer/polymer": "^3.0.0",
+    "@types/clipboard": "^2.0.1"
   },
   "devDependencies": {
     "@polymer/test-fixture": "^4.0.2",

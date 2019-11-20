@@ -1,7 +1,7 @@
 import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
 import { Snippets } from "./snippets.js";
-import { appendNewElements, textContent, createNextFrameInvoker } from "./util.js";
+import { appendNewElements, textContent, createNextFrameInvoker, createClipboardButton } from "./util.js";
 import { NetspeakNavigator } from "./netspeak-navigator.js";
 import "./netspeak-example-queries.js";
 
@@ -894,7 +894,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			}
 
 			#result-list .copy>span.btn-img {
-				background-image: url("/src/img/pin.svg");
+				background-image: url("/src/img/copy.svg");
 			}
 
 
@@ -1148,17 +1148,26 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		// buttons
 		const buttons = appendNewElements(options, "div.buttons");
 
+
+
 		// pin button
 		const copyBtn = appendNewElements(buttons, "SPAN.btn-img.copy");
-		copyBtn.onclick = () => console.log(`Copy "${phrase.text}"`);
+		//copyBtn.onclick = () => console.log(`Copy "${phrase.text}"`);
 		appendNewElements(copyBtn, "SPAN.btn-img");
-		appendNewElements(copyBtn, "SPAN.btn-text").textContent = "Copy";
+		const copyText = appendNewElements(copyBtn, "SPAN.btn-text");
+		this.localMessage("copy", "Copy").then(msg => {
+			copyText.textContent = msg;
+		});
+		createClipboardButton(copyBtn, phrase.text);
 
 		// pin button
 		const pinningBtn = appendNewElements(buttons, "SPAN.btn-img.pinned");
 		pinningBtn.onclick = () => this._toggleResultElementPinned(element);
 		appendNewElements(pinningBtn, "SPAN.btn-img");
-		appendNewElements(pinningBtn, "SPAN.btn-text").textContent = "Pin";
+		const pinningText = appendNewElements(pinningBtn, "SPAN.btn-text");
+		this.localMessage("pin", "Pin").then(msg => {
+			pinningText.textContent = msg;
+		});
 
 		// examples
 		this._addResultElementOptionsExamples(options, phrase);
