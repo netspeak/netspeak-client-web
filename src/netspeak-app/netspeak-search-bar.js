@@ -1218,14 +1218,25 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			loadingIcon.style.display = null;
 			button.style.display = "none";
 
-			exampleSupplier().then(examples => {
-				loadingIcon.style.display = "none";
-				button.style.display = null;
+			const examplePromise = exampleSupplier();
+			examplePromise.then(examples => {
+				if (examples === false) {
+					loadingIcon.style.display = "none";
+					button.style.display = "none";
 
-				for (const example of examples) {
 					const p = appendNewElements(examplesList, "DIV", "P");
-					p.innerHTML = example.snippet;
-					appendNewElements(p, "A").setAttribute("href", example.source);
+					this.localMessage("no-examples-found", "No examples found.").then(msg => {
+						p.textContent = msg;
+					});
+				} else {
+					loadingIcon.style.display = "none";
+					button.style.display = null;
+
+					for (const example of examples) {
+						const p = appendNewElements(examplesList, "DIV", "P");
+						p.innerHTML = example.snippet;
+						appendNewElements(p, "A").setAttribute("href", example.source);
+					}
 				}
 			}).catch(e => {
 				console.error(e);
@@ -1248,7 +1259,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 	 *
 	 * @param {Phrase} phrase
 	 * @param {number} requestCount
-	 * @returns {() => Promise<Snippet[]>}
+	 * @returns {() => Promise<Snippet[] | false>}
 	 *
 	 * @typedef {{ snippet: string; source: string }} Snippet
 	 */
@@ -1265,8 +1276,11 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		let startTime = -1;
 		const timeout = 5000; // ms
 
+		// whether the snippet API doesn't have any more examples
+		let noFurtherExamples = false;
+
 		/**
-		 * @returns {Promise<Snippet[]>}
+		 * @returns {Promise<Snippet[] | false>}
 		 */
 		function loadSnippets() {
 			if (snippetsBuffer.length >= requestCount) {
@@ -1276,6 +1290,13 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				// return all of them early if we take too long
 				return Promise.resolve(snippetsBuffer.splice(0, snippetsBuffer.length));
 			}
+			if (noFurtherExamples) {
+				if (snippetsBuffer.length) {
+					return Promise.resolve(snippetsBuffer.splice(0, snippetsBuffer.length));
+				} else {
+					return Promise.resolve(false);
+				}
+			}
 
 			// load and buffer snippets
 			return snippetsApi.search({
@@ -1283,6 +1304,10 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				size: internalPageSize,
 				from: internalPageSize * internalPage++
 			}).then(res => {
+				if (res.results.length === 0) {
+					noFurtherExamples = true;
+				}
+
 				for (const { snippet, target_uri } of res.results) {
 					const text = textContent(snippet).toLowerCase();
 					if (text.indexOf(phrase.text.toLowerCase()) === -1)
