@@ -19,16 +19,29 @@ body {
     font-size: 13px;
 }
 
-@media screen and (max-width: 750px) {
+@media screen and (max-width: 500px) {
     body {
-        font-size: 15px;
+        font-size: 14px;
     }
 }
 
 div#content {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 600px;
+    margin: 0 64px;
     padding: 0;
+}
+
+@media screen and (max-width: 628px /* 500px + 64px * 2 */) {
+    div#content {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media screen and (max-width: 500px) {
+    div#content {
+        margin: 0;
+    }
 }
 
 div#footer {

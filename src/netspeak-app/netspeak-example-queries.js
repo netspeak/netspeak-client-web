@@ -57,33 +57,28 @@ export class NetspeakExampleQueries extends NetspeakElement {
 				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
 				clear: both;
 				position: relative;
-			}
-
-			#quick-examples {
 				padding: .5em 1em;
-				position: relative;
 			}
 
-			.example-container {
-				clear: both;
-				position: relative;
-				padding: .1em 0;
-			}
-
-			.example-container::after {
-				clear: both;
-				content: " ";
-				display: table;
-				position: relative;
+			table {
 				width: 100%;
+				padding: 0;
+				margin: 0;
+				border: none;
+				border-collapse: none;
+				border-spacing: 0;
+			}
+			tr {
+				padding: 0;
+			}
+			td {
+				padding: .125em 0;
 			}
 
 			.example {
-				float: left;
+				white-space: nowrap;
 			}
-
 			.explanation {
-				float: right;
 				width: 50%;
 			}
 
@@ -109,18 +104,42 @@ export class NetspeakExampleQueries extends NetspeakElement {
 
 			@media screen and (max-width: 500px) {
 
+				.spacer {
+					display: none;
+				}
+
+				tr {
+					display: block;
+					padding: .2em 0
+				}
+
 				.example,
 				.explanation {
-					float: none;
-					display: block;
+					display: inline-block;
 					width: auto;
+					padding: 0;
+				}
+
+				.example {
+					color: #222;
+					font-size: 105%;
+				}
+
+				.explanation {
+					color: #666;
+					font-size: 100%;
+				}
+				.explanation::before {
+					content: "–";
+					display: inline;
+					padding: 0 .5em;
 				}
 
 			}
 		</style>
 
 		<div id="info">
-			<div id="quick-examples"></div>
+			<table></table>
 		</div>
 		`;
 	}
@@ -168,8 +187,8 @@ export class NetspeakExampleQueries extends NetspeakElement {
 
 		const examples = exampleQueries[this.corpus] || exampleQueries[defaultCorpus];
 
-		const container = this.shadowRoot.querySelector("#quick-examples");
-		container.innerHTML = "";
+		const table = this.shadowRoot.querySelector("table");
+		table.innerHTML = "";
 
 		// @ts-ignore
 		const highlight = code => Prism.highlight(code, Prism.languages['netspeak-query'], 'netspeak-query');
@@ -177,15 +196,15 @@ export class NetspeakExampleQueries extends NetspeakElement {
 		for (const exampleKey in examples) {
 			const query = examples[exampleKey];
 
-			const exContainer = container.appendChild(document.createElement("div"));
-			exContainer.className = "example-container";
+			const tr = table.appendChild(document.createElement("tr"));
 
-			exContainer.innerHTML = `
-				<div class="example"><span>${highlight(query)}</span></div>
-				<div class="explanation">${highlight(this._localization[exampleKey])}</div>
+			tr.innerHTML = `
+				<td class="example"><span>${highlight(query)}</span></td>
+				<td class="spacer"></td>
+				<td class="explanation">${highlight(this._localization[exampleKey])}</td>
 			`;
 
-			exContainer.querySelector(".example > span").addEventListener("click", () => {
+			tr.querySelector(".example > span").addEventListener("click", () => {
 				this._querySelected(query);
 			});
 		}

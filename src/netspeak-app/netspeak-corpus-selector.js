@@ -1,5 +1,6 @@
 import { html, loadLocalization, NetspeakElement, registerElement } from './netspeak-element.js';
 import { Netspeak } from "./netspeak.js";
+import { encode } from './util.js';
 
 
 export class NetspeakCorpusSelector extends NetspeakElement {
@@ -82,14 +83,14 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 	/**
 	 * Creates an instance of NetspeakCorpusSelector.
 	 *
-	 * @param {Netspeak} api The Netspeak API point to query the displayed corpora.
-	 * @param {LabelProvider} labelProvider The label provider of the selector.
+	 * @param {Netspeak} [api] The Netspeak API point to query the displayed corpora.
+	 * @param {LabelProvider} [labelProvider] The label provider of the selector.
 	 */
-	constructor(api = new Netspeak(), labelProvider = LabelProvider.getDefault()) {
+	constructor(api, labelProvider) {
 		super();
 
-		this.api = api;
-		this.labelProvider = labelProvider;
+		this.api = api || Netspeak.getInstance();
+		this.labelProvider = labelProvider || LabelProvider.getDefault();
 	}
 
 	/**
@@ -102,11 +103,17 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 			const select = this.shadowRoot.querySelector("select");
 			select.innerHTML = "";
 
-			for (let c of corporaInfo.corpora) {
+			for (let corpus of corporaInfo.corpora) {
 				let option = document.createElement("OPTION");
-				option.setAttribute("value", c.key);
-				option.innerHTML = this.labelProvider.getLabel(c, this);
+				option.setAttribute("value", corpus.key);
 				select.appendChild(option);
+
+				this.labelProvider.getLabel(corpus).then(label => {
+					option.innerHTML = label;
+				}).catch(e => {
+					console.error(e);
+					option.textContent = corpus.name;
+				});
 			}
 
 			if (this.value) {
@@ -147,39 +154,26 @@ const localLabels = loadLocalization(NetspeakCorpusSelector).then(json => {
 	}
 	return false;
 });
-let idCounter = 0;
 
 /**
  * A LabelProvider converts corpora into HTML source code.
  */
 export class LabelProvider {
 
-	constructor() { }
-
 	/**
 	 * Provides the label of the given corpus.
 	 *
 	 * @param {import("./netspeak.js").Corpus} corpus The corpus.
-	 * @param {NetspeakCorpusSelector} corpusSelector The corpus selector for which the label is generated.
-	 * @returns {string} The label source code.
+	 * @returns {Promise<string>} The label source code.
 	 */
-	getLabel(corpus, corpusSelector) {
-		const id = `corpus-selector-label-${idCounter++}`;
-		const setLabelText = text => corpusSelector.shadowRoot.querySelector(`#${id}`).textContent = text;
-
-		localLabels.then(labels => {
+	getLabel(corpus) {
+		return localLabels.then(labels => {
 			if (labels && labels[corpus.name]) {
-				setLabelText(labels[corpus.name]);
+				return encode(labels[corpus.name]);
 			} else {
-				setLabelText(corpus.name);
+				return encode(corpus.name);
 			}
-		}).catch(e => {
-			setLabelText(corpus.name);
-			throw e;
 		});
-
-		// create an empty label. The text will be set asynchronously by the above promise logic.
-		return `<span id="${id}"></span>`;
 	}
 
 	/**

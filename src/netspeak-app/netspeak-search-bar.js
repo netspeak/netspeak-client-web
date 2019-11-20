@@ -249,6 +249,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 				display: block;
 				padding: 1em 2em;
 				margin: 0;
+				word-break: break-word;
 			}
 
 			/*
