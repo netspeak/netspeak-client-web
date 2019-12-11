@@ -3,8 +3,7 @@
   "moduleResolution": "none",
   "entrypoint": "*.html",
   "sources": [
-    "src/**",
-    ".nojekyll"
+    "src/**"
   ],
   "extraDependencies": [
     "node_modules/@webcomponents/webcomponentsjs/**/*.js",
