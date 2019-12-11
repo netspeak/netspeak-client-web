@@ -883,7 +883,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 			#result-list .options .buttons {
 				text-align: right;
-				padding: 0 var(--left-right-padding);
+				margin: .25em var(--left-right-padding);
 			}
 
 			#result-list .pinned>span.btn-img {
@@ -1174,10 +1174,21 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		//copyBtn.onclick = () => console.log(`Copy "${phrase.text}"`);
 		appendNewElements(copyBtn, "SPAN.btn-img");
 		const copyText = appendNewElements(copyBtn, "SPAN.btn-text");
-		this.localMessage("copy", "Copy").then(msg => {
+
+		const setTextToCopy = () => this.localMessage("copy", "Copy").then(msg => {
 			copyText.textContent = msg;
 		});
-		createClipboardButton(copyBtn, phrase.text);
+		const setTextToCopied = () => this.localMessage("copied", "Copied").then(msg => {
+			copyText.textContent = msg;
+		});
+		setTextToCopy();
+
+		const text = phrase.text;
+		createClipboardButton(copyBtn, () => {
+			setTextToCopied();
+			setTimeout(() => setTextToCopy(), 3000);
+			return text;
+		});
 
 		// pin button
 		const pinningBtn = appendNewElements(buttons, "SPAN.btn-img.pinned");
