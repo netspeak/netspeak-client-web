@@ -908,7 +908,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			}
 			#result-list .loading>span.btn-img {
 				animation-name: show-via-opacity;
-				animation-duration: 3s;
+				animation-duration: 1s;
 				background-image: url("/src/img/loading.svg");
 			}
 			@keyframes show-via-opacity {
@@ -916,7 +916,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 					opacity: 0;
 				}
 
-				50% {
+				20% {
 					opacity: 0;
 				}
 
