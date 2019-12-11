@@ -30,5 +30,17 @@
 		"no-var": "warn",
 		"prefer-numeric-literals": "error",
 		"prefer-spread": "error"
-	}
+	},
+	"overrides": [
+		{
+			"files": "gulpfile.js",
+			"env": {
+				"browser": false,
+				"node": true
+			},
+			"parserOptions": {
+				"sourceType": "script"
+			}
+		}
+	]
 }
