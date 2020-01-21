@@ -61,6 +61,19 @@ If all tests pass, you can deploy your updated build. Copy the contents of the b
 
 __You changes will then be out there for the world to see, so make sure that everything is working correctly.__
 
+If you don't want to do this manually, use the following command:
+
+```bash
+npm run publish-release
+```
+
+This will do the above steps automatically.
+
+If you want to publish a demo, use this command:
+
+```bash
+npm run publish-demo
+```
 
 ## A word on localization
 
