@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "test": "npm run lint && polymer test",
-    "build": "polymer build",
-    "serve": "npm run build && polymer serve build/default",
+    "build": "npx polymer build",
+    "serve": "npm run build && npx polymer serve build/default",
     "lint": "npx eslint ./",
-    "publish.demo": "npx gulp publishDemo",
-    "publish.release": "npx gulp publishRelease"
+    "publish-demo": "npx gulp publishDemo",
+    "publish-release": "npx gulp publishRelease"
   },
   "dependencies": {
     "@polymer/polymer": "^3.0.0",
@@ -25,6 +25,7 @@
     "eslint": "^5.16.0",
     "gulp": "^4.0.2",
     "mocha": "^5.2.0",
+    "polymer-cli": "^1.9.11",
     "shelljs": "^0.8.3",
     "simple-git": "^1.128.0",
     "wct-mocha": "^1.0.0"

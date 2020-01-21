@@ -10,13 +10,7 @@ It is served using [GitHub pages](https://pages.github.com/) over [netspeak.gith
 
 Before you can start developing make sure you have a recent-ish version of [Node.js](https://nodejs.org) and npm (included as part of Node.js) installed.
 
-Install Polymer globally. (This may require root access):
-
-```bash
-npm i -g polymer-cli
-```
-
-Then, install the dependencies:
+Install the dependencies:
 
 ```bash
 cd path/to/repo
