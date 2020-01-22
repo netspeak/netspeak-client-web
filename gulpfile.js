@@ -5,6 +5,8 @@ const sh = require("shelljs");
 async function publishDemo() {
 	sh.cd(__dirname);
 
+	console.log("Cloning remote repository");
+
 	sh.rm("-rf", "publish");
 	sh.exec("git clone https://github.com/netspeak/netspeak.github.io.git publish");
 	const repo = git(__dirname + "/publish");
@@ -23,6 +25,8 @@ async function publishDemo() {
 		return;
 	}
 
+	console.log("Commit and push");
+
 	await repo.add("*");
 	await repo.commit("Published demo");
 	await repo.push();
@@ -30,6 +34,8 @@ async function publishDemo() {
 
 async function publishRelease() {
 	sh.cd(__dirname);
+
+	console.log("Cloning remote repository");
 
 	sh.rm("-rf", "publish");
 	sh.exec("git clone https://github.com/netspeak/netspeak.github.io.git publish");
@@ -53,6 +59,8 @@ async function publishRelease() {
 		console.log("Nothing changed. No commit will be made.");
 		return;
 	}
+
+	console.log("Commit and push");
 
 	await repo.add("*");
 	await repo.commit("Published release");
