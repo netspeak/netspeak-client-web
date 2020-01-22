@@ -148,7 +148,9 @@ export class Snippets {
 			supplier = this._makeTimeoutSupplier(supplier, config.timeout || this.defaultTimeout);
 			supplier = this._makeNonRejectingSupplier(supplier);
 
-			for (let i = config.parallel || 1; i > 0; i--) {
+			let parallel = config.parallel;
+			if (parallel == undefined) parallel = 1;
+			for (let i = parallel; i > 0; i--) {
 				suppliers.push(supplier);
 			}
 		});
@@ -176,15 +178,24 @@ export class Snippets {
 				return Promise.resolve(false);
 			}
 
+			let raceIsOver = false;
 			/** @type {Promise<false>} */
 			const timeoutPromise = new Promise(resolve => {
 				setTimeout(() => {
-					dead = true;
-					resolve(false);
+					if (!raceIsOver) {
+						dead = true;
+						resolve(false);
+					}
 				}, timeout);
 			});
 
-			return Promise.race([supplier(), timeoutPromise]);
+			return Promise.race([supplier(), timeoutPromise]).then(x => {
+				raceIsOver = true;
+				return x;
+			}, x => {
+				raceIsOver = true;
+				throw x;
+			});
 		};
 	}
 
@@ -195,10 +206,15 @@ export class Snippets {
 	 * @returns {SnippetSupplier}
 	 */
 	_makeNonRejectingSupplier(supplier) {
-		return () => supplier().catch(e => {
-			console.log(e);
-			return false;
-		});
+		let rejected = false;
+		return () => {
+			if (rejected) return Promise.resolve(false);
+			return supplier().catch(e => {
+				console.log(e);
+				rejected = true;
+				return false;
+			});
+		};
 	}
 
 	/**
@@ -454,7 +470,7 @@ DEFAULT_SNIPPETS.backends.push(
 	},
 	{
 		backend: new GoogleBooksSnippetBackend(),
-		parallel: 2,
+		parallel: 1,
 		getCount: () => 20
 	}
 );

@@ -1249,7 +1249,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 						const p = appendNewElements(examplesList, "DIV", "P");
 
 						p.innerHTML = emphasize(example.text);
-						appendNewElements(p, "A").setAttribute("href", example.url);
+						const a = appendNewElements(p, "A");
+						a.setAttribute("href", example.url);
+						a.setAttribute("target", "_blank");
 					}
 				}
 			}).catch(e => {
