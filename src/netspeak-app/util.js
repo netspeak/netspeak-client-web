@@ -365,3 +365,31 @@ export function createClipboardButton(selector, text) {
 		}
 	}));
 }
+
+
+/**
+ *
+ * @param {string} str
+ * @returns {string}
+ */
+export function normalizeSpaces(str) {
+	return str.replace(/\s+/g, " ").trim();
+}
+
+/**
+ * Creates a function which given some plain text will return HTML code where the given phrase is emphasized.
+ *
+ * @param {string} phrase
+ * @returns {(text: string) => string}
+ */
+export function createEmphasizer(phrase) {
+	const emphasisRE = new RegExp(phrase.replace(/[\\/(){}[\]|?+*^$.]/g, "\\$&") + "|(<)|(&)", "ig");
+
+	return text => {
+		return text.replace(emphasisRE, (m, lt, amp) => {
+			if (lt) return "&lt;";
+			if (amp) return "&amp;";
+			return `<em>${encode(m)}</em>`;
+		});
+	};
+}

@@ -1,9 +1,9 @@
 import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
-import { Snippets } from "./snippets.js";
-import { appendNewElements, textContent, createNextFrameInvoker, createClipboardButton } from "./util.js";
+import { appendNewElements, createNextFrameInvoker, createClipboardButton, createEmphasizer } from "./util.js";
 import { NetspeakNavigator } from "./netspeak-navigator.js";
 import "./netspeak-example-queries.js";
+import { DEFAULT_SNIPPETS } from "./snippets.js";
 
 
 /**
@@ -1026,7 +1026,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		/** @type {Map<string, Phrase>} */
 		this.pinnedPhrases = new Map();
 
-		this.snippetsApi = Snippets.getInstance();
+		this.snippets = DEFAULT_SNIPPETS;
 		this.formatter = PhraseFormatter.getInstance();
 
 		this.invalidate = createNextFrameInvoker(() => this._render());
@@ -1224,7 +1224,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 
 		// load examples function
-		const exampleSupplier = this._createExampleSupplier(phrase, this.examplePageSize);
+		const exampleSupplier = this.snippets.getSupplier(phrase.text, this.examplePageSize);
+		const emphasize = createEmphasizer(phrase.text);
+
 		const loadMoreExamples = () => {
 			loadingIcon.style.display = null;
 			button.style.display = "none";
@@ -1245,8 +1247,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 					for (const example of examples) {
 						const p = appendNewElements(examplesList, "DIV", "P");
-						p.innerHTML = example.snippet;
-						appendNewElements(p, "A").setAttribute("href", example.source);
+
+						p.innerHTML = emphasize(example.text);
+						appendNewElements(p, "A").setAttribute("href", example.url);
 					}
 				}
 			}).catch(e => {
@@ -1263,91 +1266,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		};
 		// load examples right now.
 		loadMoreExamples();
-	}
-
-	/**
-	 * Returns a function which will return a new examples every time it is invoked.
-	 *
-	 * @param {Phrase} phrase
-	 * @param {number} requestCount
-	 * @returns {() => Promise<Snippet[] | false>}
-	 *
-	 * @typedef {{ snippet: string; source: string }} Snippet
-	 */
-	_createExampleSupplier(phrase, requestCount) {
-		const pastExamples = new Set([""]);
-
-		/** @type {Snippet[]} */
-		const snippetsBuffer = [];
-
-		let internalPage = 0;
-		let internalPageSize = 100;
-		const snippetsApi = this.snippetsApi;
-
-		let startTime = -1;
-		const timeout = 5000; // ms
-
-		// whether the snippet API doesn't have any more examples
-		let noFurtherExamples = false;
-
-		/**
-		 * @returns {Promise<Snippet[] | false>}
-		 */
-		function loadSnippets() {
-			if (snippetsBuffer.length >= requestCount) {
-				return Promise.resolve(snippetsBuffer.splice(0, requestCount));
-			}
-			if (snippetsBuffer.length > 0 && (new Date().valueOf() - startTime) > timeout) {
-				// return all of them early if we take too long
-				return Promise.resolve(snippetsBuffer.splice(0, snippetsBuffer.length));
-			}
-			if (noFurtherExamples) {
-				if (snippetsBuffer.length) {
-					return Promise.resolve(snippetsBuffer.splice(0, snippetsBuffer.length));
-				} else {
-					return Promise.resolve(false);
-				}
-			}
-
-			// load and buffer snippets
-			return snippetsApi.search({
-				query: phrase.text,
-				size: internalPageSize,
-				from: internalPageSize * internalPage++
-			}).then(res => {
-				if (res.results.length === 0) {
-					noFurtherExamples = true;
-				}
-
-				for (const { snippet, target_uri } of res.results) {
-					const text = textContent(snippet).toLowerCase();
-					if (text.indexOf(phrase.text.toLowerCase()) === -1)
-						continue;
-
-					// The basic idea behind this id is that most duplicate examples are equal character for character,
-					// so a simple (and fast) hash lookup is sufficient.
-					// To also filter duplicates which are technically different but don't look very different to
-					// humans, some additional transformation are performed.
-					const id = text.replace(/\d+/g, "0");
-
-					// To be added to the buffer, the queried snippet has to not be a duplicate of a previous example.
-					if (!pastExamples.has(id)) {
-						pastExamples.add(id);
-						snippetsBuffer.push({
-							snippet: snippet + "...",
-							source: target_uri
-						});
-					}
-				}
-
-				return loadSnippets();
-			});
-		}
-
-		return () => {
-			startTime = new Date().valueOf();
-			return loadSnippets();
-		};
 	}
 
 	/**
