@@ -1,6 +1,6 @@
 import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
 import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
-import { appendNewElements, createNextFrameInvoker, createClipboardButton, createEmphasizer } from "./util.js";
+import { appendNewElements, createNextFrameInvoker, createClipboardButton, encode } from "./util.js";
 import { NetspeakNavigator } from "./netspeak-navigator.js";
 import "./netspeak-example-queries.js";
 import { DEFAULT_SNIPPETS } from "./snippets.js";
@@ -936,20 +936,17 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				text-align: center;
 			}
 
-			#result-list .options .examples-list em {
-				font-weight: bold;
+			#result-list .options .examples-list .source {
+				padding-left: .25em;
 			}
 
-			#result-list .options .examples-list a {
+			#result-list .options .examples-list .source a {
 				color: inherit;
 				opacity: .7;
-				padding: 0 .5em;
+				text-decoration: none;
 			}
-
-			#result-list .options .examples-list a::after {
-				content: "\\21F1";
-				display: inline-block;
-				transform: rotate(90deg);
+			#result-list .options .examples-list .source a:hover {
+				text-decoration: underline;
 			}
 
 			#result-list .options .load-more {
@@ -1225,7 +1222,8 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 		// load examples function
 		const exampleSupplier = this.snippets.getSupplier(phrase.text, this.examplePageSize);
-		const emphasize = createEmphasizer(phrase.text);
+		const emphasize = this._createEmphasizer(phrase.text, 200);
+		let didSupplyExamples = false;
 
 		const loadMoreExamples = () => {
 			loadingIcon.style.display = null;
@@ -1238,20 +1236,54 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 					button.style.display = "none";
 
 					const p = appendNewElements(examplesList, "DIV", "P");
-					this.localMessage("no-examples-found", "No examples found.").then(msg => {
-						p.textContent = msg;
-					});
+					const i = appendNewElements(p, "I");
+					if (didSupplyExamples) {
+						this.localMessage("no-further-examples-found", "No further examples found.").then(msg => {
+							i.textContent = msg;
+						});
+					} else {
+						this.localMessage("no-examples-found", "No examples found.").then(msg => {
+							i.textContent = msg;
+						});
+					}
 				} else {
 					loadingIcon.style.display = "none";
 					button.style.display = null;
 
 					for (const example of examples) {
-						const p = appendNewElements(examplesList, "DIV", "P");
+						didSupplyExamples = true;
 
+						// add paragraph
+						const p = appendNewElements(examplesList, "DIV", "P");
 						p.innerHTML = emphasize(example.text);
-						const a = appendNewElements(p, "A");
-						a.setAttribute("href", example.url);
-						a.setAttribute("target", "_blank");
+
+						// add source(s) of the example
+						for (const name in example.urls) {
+							const element = example.urls[name];
+
+							const span = appendNewElements(p, "SPAN.source");
+							span.appendChild(document.createTextNode("["));
+
+							const a = appendNewElements(span, "A");
+							a.setAttribute("href", element);
+							a.setAttribute("target", "_blank");
+
+							switch (name) {
+								case "web":
+								case "cache":
+								case "plain":
+									this.localMessage(name, name).then(n => {
+										a.textContent = n;
+									});
+									break;
+
+								default:
+									a.textContent = name;
+									break;
+							}
+
+							span.appendChild(document.createTextNode("]"));
+						}
 					}
 				}
 			}).catch(e => {
@@ -1268,6 +1300,43 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		};
 		// load examples right now.
 		loadMoreExamples();
+	}
+
+	/**
+	 * Creates a function which given some plain text will return HTML code where the given phrase is emphasized.
+	 *
+	 * @param {string} phrase
+	 * @param {number} context The number of characters allowed around the phrase.
+	 * @returns {(text: string) => string}
+	 */
+	_createEmphasizer(phrase, context) {
+		const emphasisRE = new RegExp(phrase.replace(/[\\/(){}[\]|?+*^$.]/g, "\\$&") + "|(<)|(&)", "ig");
+
+		return text => {
+			/** @type {number | undefined} */
+			let index;
+			text.replace(emphasisRE, (m, lt, amp, i) => {
+				if (lt || amp) return "";
+				index = i;
+				return "";
+			});
+
+			if (index != undefined) {
+				if (text.length > index + context) {
+					text = text.substr(0, index + context).replace(/\s+\S*$/, " ...");
+				}
+				if (index > context) {
+					text = text.substr(index - context).replace(/^\S*\s+/, "... ");
+				}
+			}
+
+			return text.replace(emphasisRE, (m, lt, amp, index) => {
+				if (lt) return "&lt;";
+				if (amp) return "&amp;";
+				index = index;
+				return `<strong>${encode(m)}</strong>`;
+			});
+		};
 	}
 
 	/**

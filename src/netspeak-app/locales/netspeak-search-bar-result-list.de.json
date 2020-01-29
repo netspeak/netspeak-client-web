@@ -2,8 +2,13 @@
 	"messages": {
 		"failed-to-load-examples": "Beispiele konnten nicht geladen werden.",
 		"no-examples-found": "Keine Beispiele gefunden.",
+		"no-further-examples-found": "Keine weiteren Beispiele gefunden.",
 		"copy": "Kopieren",
 		"copied": "Kopiert",
-		"pin": "Anheften"
+		"pin": "Anheften",
+
+		"web": "Web",
+		"cache": "Cache",
+		"plain": "Klartext"
 	}
 }

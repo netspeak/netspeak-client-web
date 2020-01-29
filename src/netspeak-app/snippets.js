@@ -4,7 +4,8 @@ import { textContent, normalizeSpaces } from "./util.js";
 /**
  * @typedef Snippet
  * @property {string} text The clean text content of the snippet.
- * @property {string} url The source of the snippet.
+ * @property {{ [source: string]: string }} urls URLs which link to the source of the snippet.
+ * It's possible to declare more than one URL to provide mirror links and alternative sources.
  *
  * @callback SnippetSupplier
  * A generic supplier of snippets.
@@ -15,6 +16,238 @@ import { textContent, normalizeSpaces } from "./util.js";
  * @typedef SnippetBackend
  * @property {(phrase: string, count: number) => SnippetSupplier} getSupplier
  */
+
+
+/**
+ * Creates a new snippet supplier which returns snippets from all given suppliers favouring faster suppliers.
+ *
+ * @param {SnippetSupplier[]} suppliers
+ * @returns {SnippetSupplier}
+ */
+function unfairSupplierCombination(suppliers) {
+	suppliers = [...suppliers];
+	/** @type {boolean[]} */
+	const pendingSuppliers = [];
+	/**
+	 * @type {ResolveFn[]}
+	 *
+	 * @typedef {(value: Snippet[] | false) => void} ResolveFn
+	 */
+	const pendingResolves = [];
+
+	/** @type {Snippet[][]} */
+	const cached = [];
+
+	function resolvePendingResolves() {
+		if (suppliers.length == 0) {
+			pendingResolves.forEach(resolve => {
+				const fromCache = cached.pop();
+				if (fromCache) {
+					resolve(fromCache);
+				} else {
+					resolve(false);
+				}
+			});
+			pendingResolves.length = 0;
+		} else {
+			let fromCache;
+			while (pendingResolves.length && (fromCache = cached.pop())) {
+				const resolve = pendingResolves.splice(0, 1)[0];
+				resolve(fromCache);
+			}
+			if (pendingResolves.length) {
+				callSuppliers();
+			}
+		}
+	}
+
+	function callSuppliers() {
+		for (let i = 0; i < suppliers.length; i++) {
+			const pending = pendingSuppliers[i];
+			if (!pending) {
+				pendingSuppliers[i] = true;
+				const supplier = suppliers[i];
+
+				supplier().then(snippets => {
+					if (snippets) {
+						cached.push(snippets);
+					}
+					return !snippets;
+				}, e => {
+					console.log(e);
+					return true;
+				}).then(empty => {
+					let index = suppliers.indexOf(supplier);
+					if (empty) {
+						suppliers.splice(index, 1);
+						pendingSuppliers.splice(index, 1);
+					} else {
+						pendingSuppliers[index] = false;
+					}
+
+					resolvePendingResolves();
+				});
+			}
+		}
+	}
+
+	return () => {
+		return new Promise(resolve => {
+			pendingResolves.push(resolve);
+			resolvePendingResolves();
+		});
+	};
+}
+
+/**
+ * Creates a new snippet supplier which will always return the exact amount of snippets until the given supplier runs
+ * out of snippets.
+ *
+ * @param {SnippetSupplier} supplier
+ * @param {number} count
+ * @returns {SnippetSupplier}
+ */
+function exactSupplier(supplier, count) {
+	/** Whether all suppliers are empty */
+	let empty = false;
+	/** @type {Snippet[]} */
+	let buffer = [];
+	/**
+	 * @type {ResolveFn[]}
+	 *
+	 * @typedef {(value: Snippet[] | false) => void} ResolveFn
+	 */
+	const pendingResolves = [];
+	let waitingForSupplier = false;
+
+	function resolvePendingResolves() {
+		if (empty) {
+			pendingResolves.forEach(resolve => {
+				if (buffer.length) {
+					resolve(buffer.splice(0, Math.min(count, buffer.length)));
+				} else {
+					resolve(false);
+				}
+			});
+			pendingResolves.length = 0;
+		} else {
+			while (buffer.length >= count && pendingResolves.length) {
+				const resolve = pendingResolves.splice(0, 1)[0];
+				resolve(buffer.splice(0, count));
+			}
+			if (pendingResolves.length) {
+				callSuppliers();
+			}
+		}
+	}
+
+	function callSuppliers() {
+		if (waitingForSupplier) return;
+		waitingForSupplier = true;
+
+		supplier().then(snippets => {
+			waitingForSupplier = false;
+
+			if (snippets) {
+				snippets.forEach(s => buffer.push(s));
+			} else {
+				empty = true;
+			}
+		}, e => {
+			console.error(e);
+
+			waitingForSupplier = false;
+			empty = true;
+		}).then(() => {
+			resolvePendingResolves();
+		});
+	}
+
+	return () => {
+		return new Promise(resolve => {
+			pendingResolves.push(resolve);
+			resolvePendingResolves();
+		});
+	};
+}
+
+/**
+ * Adds a timeout to the given supplier.
+ *
+ * If the given supplier takes longer than the specified timeout, it's assumed that the supplier could not find
+ * more snippets, so an empty array will be returned.
+ *
+ * @param {SnippetSupplier} supplier
+ * @param {number} timeout
+ * @returns {SnippetSupplier}
+ */
+function timeoutSupplier(supplier, timeout) {
+	if (timeout === Infinity) return supplier;
+
+	let dead = false;
+
+	return () => {
+		if (dead) {
+			return Promise.resolve(false);
+		}
+
+		let raceIsOver = false;
+		/** @type {Promise<false>} */
+		const timeoutPromise = new Promise(resolve => {
+			setTimeout(() => {
+				if (!raceIsOver) {
+					dead = true;
+					resolve(false);
+				}
+			}, timeout);
+		});
+
+		return Promise.race([supplier(), timeoutPromise]).then(x => {
+			raceIsOver = true;
+			return x;
+		}, x => {
+			raceIsOver = true;
+			throw x;
+		});
+	};
+}
+
+/**
+ * Returns a new supplier based on the given supplier which will return `false` instead of rejecting.
+ *
+ * @param {SnippetSupplier} supplier
+ * @returns {SnippetSupplier}
+ */
+function nonRejectingSupplier(supplier) {
+	let rejected = false;
+	return () => {
+		if (rejected) return Promise.resolve(false);
+		return supplier().catch(e => {
+			console.log(e);
+			rejected = true;
+			return false;
+		});
+	};
+}
+
+/**
+ * Returns a new supplier based on the given supplier which will return `false` instead of rejecting.
+ *
+ * @param {SnippetSupplier} supplier
+ * @param {(snippet: Snippet) => boolean} filterFn
+ * @returns {SnippetSupplier}
+ */
+function filterSupplier(supplier, filterFn) {
+	return () => {
+		return supplier().then(snippets => {
+			if (snippets) {
+				return snippets.filter(filterFn);
+			}
+			return false;
+		});
+	};
+}
+
 
 export class Snippets {
 
@@ -38,92 +271,13 @@ export class Snippets {
 	 * @returns {SnippetSupplier}
 	 */
 	getSupplier(phrase, count = 6) {
-		const suppliers = this._createSuppliers(phrase, count);
 		const filter = this._createSnippetFilter(phrase);
+		const suppliers = this._createSuppliers(phrase, count).map(s => {
+			return filterSupplier(s, filter);
+		});
 
-		/** Whether all suppliers are empty */
-		let empty = false;
-		/** @type {Snippet[]} */
-		let buffer = [];
-		/**
-		 * @type {ResolveFn[]}
-		 *
-		 * @typedef {(value: Snippet[] | false) => void} ResolveFn
-		 */
-		const pendingResolves = [];
-
-
-		/**
-		 * @param {ResolveFn} resolve
-		 */
-		function resolveWhenEmpty(resolve) {
-			if (buffer.length > count) {
-				resolve(buffer.splice(0, count));
-			} else if (buffer.length) {
-				const b = buffer;
-				buffer = [];
-				resolve(b);
-			} else {
-				resolve(false);
-			}
-		}
-
-		let waitingForSuppliers = false;
-		function callSuppliers() {
-			if (waitingForSuppliers) return;
-			waitingForSuppliers = true;
-
-			/** The total number of snippets returned by the suppliers this round. */
-			let nonEmptySuppliers = 0;
-
-			Promise.all(suppliers.map(supplier => {
-				return supplier().then(snippets => {
-					if (snippets) {
-						// After each supplier resolves, we add all of its snippets to the buffer and check if we can
-						// resolve some pending resolve functions.
-
-						nonEmptySuppliers++;
-						snippets.forEach(s => {
-							if (filter(s)) {
-								buffer.push(s);
-							}
-						});
-
-						while (buffer.length >= count && pendingResolves.length) {
-							const resolve = pendingResolves.splice(0, 1)[0];
-							resolve(buffer.splice(0, count));
-						}
-					}
-				});
-			})).then(() => {
-				waitingForSuppliers = false;
-
-				if (nonEmptySuppliers === 0) {
-					// the suppliers are all empty
-					empty = true;
-					// resolve all pending resolve functions and clear the array
-					pendingResolves.forEach(resolve => resolveWhenEmpty(resolve));
-					pendingResolves.length = 0;
-				} else {
-					// there are still some resolve functions left, so we start again
-					if (pendingResolves.length) callSuppliers();
-				}
-			});
-		}
-
-		return () => {
-			return new Promise(resolve => {
-				if (buffer.length >= count) {
-					// there is enough in the buffer
-					resolve(buffer.splice(0, count));
-				} else if (empty) {
-					resolveWhenEmpty(resolve);
-				} else {
-					pendingResolves.push(resolve);
-					callSuppliers();
-				}
-			});
-		};
+		const unionSupplier = unfairSupplierCombination(suppliers);
+		return exactSupplier(unionSupplier, count);
 	}
 
 	/**
@@ -145,8 +299,8 @@ export class Snippets {
 			}
 
 			let supplier = config.backend.getSupplier(phrase, supplierCount);
-			supplier = this._makeTimeoutSupplier(supplier, config.timeout || this.defaultTimeout);
-			supplier = this._makeNonRejectingSupplier(supplier);
+			supplier = timeoutSupplier(supplier, config.timeout || this.defaultTimeout);
+			supplier = nonRejectingSupplier(supplier);
 
 			let parallel = config.parallel;
 			if (parallel == undefined) parallel = 1;
@@ -156,65 +310,6 @@ export class Snippets {
 		});
 
 		return suppliers;
-	}
-
-	/**
-	 * Adds a timeout to the given supplier.
-	 *
-	 * If the given supplier takes longer than the specified timeout, it's assumed that the supplier could not find
-	 * more snippets, so an empty array will be returned.
-	 *
-	 * @param {SnippetSupplier} supplier
-	 * @param {number} timeout
-	 * @returns {SnippetSupplier}
-	 */
-	_makeTimeoutSupplier(supplier, timeout) {
-		if (timeout === Infinity) return supplier;
-
-		let dead = false;
-
-		return () => {
-			if (dead) {
-				return Promise.resolve(false);
-			}
-
-			let raceIsOver = false;
-			/** @type {Promise<false>} */
-			const timeoutPromise = new Promise(resolve => {
-				setTimeout(() => {
-					if (!raceIsOver) {
-						dead = true;
-						resolve(false);
-					}
-				}, timeout);
-			});
-
-			return Promise.race([supplier(), timeoutPromise]).then(x => {
-				raceIsOver = true;
-				return x;
-			}, x => {
-				raceIsOver = true;
-				throw x;
-			});
-		};
-	}
-
-	/**
-	 * Returns a new supplier based on the given supplier which will return `false` instead of rejecting.
-	 *
-	 * @param {SnippetSupplier} supplier
-	 * @returns {SnippetSupplier}
-	 */
-	_makeNonRejectingSupplier(supplier) {
-		let rejected = false;
-		return () => {
-			if (rejected) return Promise.resolve(false);
-			return supplier().catch(e => {
-				console.log(e);
-				rejected = true;
-				return false;
-			});
-		};
 	}
 
 	/**
@@ -288,8 +383,14 @@ export class NetspeakSnippetsBackend {
 				/** @type {Snippet[]} */
 				const snippets = [];
 
-				res.results.forEach(({ snippet, target_uri }) => {
-					snippets.push({ text: normalizeSpaces(textContent(snippet)), url: target_uri });
+				res.results.forEach(({ snippet, target_uri, uuid, index }) => {
+					const chatNoirUrl = `https://www.chatnoir.eu/cache?uuid=${uuid}&index=${encodeURIComponent(index)}`;
+					const urls = {
+						"web": target_uri,
+						"cache": chatNoirUrl,
+						"plain": `${chatNoirUrl}&plain`,
+					};
+					snippets.push({ text: normalizeSpaces(textContent(snippet)), urls });
 				});
 
 				return snippets;
@@ -440,17 +541,17 @@ export class GoogleBooksSnippetBackend {
 				const snippets = [];
 
 				items.forEach(item => {
-					const url = item.volumeInfo.previewLink;
+					const urls = { "Google Books": item.volumeInfo.previewLink };
 
 					// we use 3 parts of every result
 					if (item.volumeInfo) {
 						if (item.volumeInfo.title)
-							snippets.push({ text: normalizeSpaces(textContent(item.volumeInfo.title)), url });
+							snippets.push({ text: normalizeSpaces(textContent(item.volumeInfo.title)), urls });
 						if (item.volumeInfo.description)
-							snippets.push({ text: normalizeSpaces(textContent(item.volumeInfo.description)), url });
+							snippets.push({ text: normalizeSpaces(textContent(item.volumeInfo.description)), urls });
 					}
 					if (item.searchInfo && item.searchInfo.textSnippet)
-						snippets.push({ text: normalizeSpaces(textContent(item.searchInfo.textSnippet)), url });
+						snippets.push({ text: normalizeSpaces(textContent(item.searchInfo.textSnippet)), urls });
 				});
 
 				return snippets;
