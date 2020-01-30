@@ -8,16 +8,16 @@ It is served using [GitHub pages](https://pages.github.com/) over [netspeak.gith
 
 ## Getting started
 
-Before you can start developing make sure you have a recent-ish version of [Node.js](https://nodejs.org) and npm (included as part of Node.js) installed.
+Before you can start developing make sure you have a recent-ish version of [Node.js](https://nodejs.org) and npm (included as part of Node.js) installed. ([Linux](https://nodejs.org/en/download/package-manager)/[Windows](https://nodejs.org/en/download/))
 
-Install the dependencies:
+Then, install the dependencies:
 
 ```bash
 cd path/to/repo
 npm i
 ```
 
-If you had any problems, check out the official [Polymer install guide](https://www.polymer-project.org/3.0/start/install-3-0).
+An now, you should be ready to rock. As for IDEs, I recommend [VS Code](https://code.visualstudio.com/).
 
 Use the `npm run serve` to build the project and serve the created build.
 
@@ -42,19 +42,6 @@ These features will be copied as is by Polymer in the futile hope that older bro
 This means that it is __your__ responsibility to make sure that the language feature you use compile.
 
 
-## Test
-
-Polymer has it's own test system. All tests are located in the `test/` folder.
-
-To run all tests use the following command:
-
-```bash
-npm test
-```
-
-This will run all unit tests in all of your installed browsers. (Browser windows will pop up and close at a few seconds.)
-
-
 ## Deploy
 
 If all tests pass, you can deploy your updated build. Copy the contents of the build (the files in `build/<build name>/`) to the `master` branch of [`netspeak.github.io`](https://github.com/netspeak/netspeak.github.io) project and push. GitHub pages will take care of the rest and update the website in a few seconds.
@@ -69,13 +56,15 @@ npm run publish-release
 
 This will do the above steps automatically.
 
-If you want to publish a demo, use this command:
+If you want to publish a [demo](https://netspeak.org/demo), use this command:
 
 ```bash
 npm run publish-demo
 ```
 
 ## A word on localization
+
+<details>
 
 The website has its own localization system which is tied to [NetspeakElement](https://github.com/netspeak/netspeak.github.io/blob/develop/src/netspeak-app/netspeak-element.js).
 Every element which extends this class will be assumed to be localized.
@@ -137,9 +126,11 @@ Localized message will be inserted into the shadow DOM asynchronously after the 
 
 _Note:_ Only element with an ID __and__ no child element at the time of the insertion can be localized this way.
 
+</details>
+
 
 ---
 
 ## Contributors
 
-[Michael Schmidt](mailto:mitchi5000.ms@googlemail.com) (2018 - 2019)
+[Michael Schmidt](mailto:mitchi5000.ms@googlemail.com) (2018 - 2020)
