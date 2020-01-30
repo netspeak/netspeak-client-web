@@ -1267,20 +1267,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 							const a = appendNewElements(span, "A");
 							a.setAttribute("href", element);
 							a.setAttribute("target", "_blank");
-
-							switch (name) {
-								case "web":
-								case "cache":
-								case "plain":
-									this.localMessage(name, name).then(n => {
-										a.textContent = n;
-									});
-									break;
-
-								default:
-									a.textContent = name;
-									break;
-							}
+							a.textContent = name;
 
 							span.appendChild(document.createTextNode("]"));
 						}

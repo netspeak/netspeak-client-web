@@ -383,12 +383,9 @@ export class NetspeakSnippetsBackend {
 				/** @type {Snippet[]} */
 				const snippets = [];
 
-				res.results.forEach(({ snippet, target_uri, uuid, index }) => {
-					const chatNoirUrl = `https://www.chatnoir.eu/cache?uuid=${uuid}&index=${encodeURIComponent(index)}`;
+				res.results.forEach(({ snippet, uuid, index }) => {
 					const urls = {
-						"web": target_uri,
-						"cache": chatNoirUrl,
-						"plain": `${chatNoirUrl}&plain`,
+						"ChatNoir": `https://www.chatnoir.eu/cache?uuid=${uuid}&index=${encodeURIComponent(index)}&plain`,
 					};
 					snippets.push({ text: normalizeSpaces(textContent(snippet)), urls });
 				});
