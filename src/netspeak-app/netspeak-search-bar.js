@@ -160,6 +160,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			}
 
 			#box input {
+				background-color: transparent;
 				border: none;
 				display: block;
 				box-sizing: border-box;
@@ -780,7 +781,6 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 			#result-list>div {
 				background-color: var(--item-background-color);
-				display: table;
 				width: 100%;
 				padding: 0;
 			}
