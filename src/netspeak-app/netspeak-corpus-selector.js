@@ -1,6 +1,6 @@
 import { html, loadLocalization, NetspeakElement, registerElement } from './netspeak-element.js';
 import { Netspeak } from "./netspeak.js";
-import { encode } from './util.js';
+import { encode, appendNewElements } from './util.js';
 
 
 export class NetspeakCorpusSelector extends NetspeakElement {
@@ -11,8 +11,7 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 			value: {
 				type: String,
 				notify: true,
-				value: 'web-en',
-				observer: '_valueChange',
+				value: 'web-en'
 			},
 		};
 	}
@@ -25,56 +24,31 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 			}
 
 			#wrapper {
-				background: var(--background, #FFF);
-
-				background-image: url("/src/img/down.svg");
-				background-position: calc(100% - .5em) center;
-				background-repeat: no-repeat;
-
-				box-shadow: 0 2px 1px 0 rgba(0, 0, 0, 0.2);
 				position: relative;
 			}
 
-			#wrapper #img {
-				width: 16px;
-				height: 16px;
-				display: table;
-
-				margin: auto;
-				margin-right: 0;
-				position: absolute;
-			}
-
-			#wrapper>select {
-				-webkit-appearance: none;
-				-moz-appearance: none;
-				appearance: none;
-				border-radius: 0;
-				font-size: 1em;
-				width: 100%;
-
-				cursor: pointer;
-
+			#wrapper .button {
+				background-color: transparent;
+				font-size: inherit;
 				border: 1px solid #BBB;
-				background: transparent;
-				color: var(--color, #000);
-				padding: .5em calc(1em + 16px) .5em 1em;
-				margin: 0;
+				cursor: pointer;
+				display: inline-block;
+				margin-left: .5em;
+				padding: .5em .75em;
 			}
 
-			#wrapper>select>option {
-				background: var(--background, #FFF);
-				color: var(--color, #000);
+			#wrapper .button.selected {
+				background-color: #EEE;
+				border-color: #888;
 			}
 
-			#wrapper>select::-ms-expand {
-				display: none;
+			#wrapper .button:hover {
+				background-color: #EEE;
+				color: #000;
 			}
 		</style>
 
 		<div id="wrapper">
-			<span id="img"></span>
-			<select on-change="_onChange"> </select>
 		</div>
 		`;
 	}
@@ -90,7 +64,9 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 		super();
 
 		this.api = api || Netspeak.getInstance();
-		this.labelProvider = labelProvider || LabelProvider.getDefault();
+		this.labelProvider = labelProvider || new LabelProvider();
+
+		this.addEventListener("value-changed", () => this._setValue(this.value));
 	}
 
 	/**
@@ -100,52 +76,59 @@ export class NetspeakCorpusSelector extends NetspeakElement {
 		super.connectedCallback();
 
 		this.api.queryCorpora().then(corporaInfo => {
-			const select = this.shadowRoot.querySelector("select");
-			select.innerHTML = "";
+			/** @type {HTMLElement} */
+			const wrapper = this.shadowRoot.querySelector("#wrapper");
+			wrapper.innerHTML = "";
 
-			for (let corpus of corporaInfo.corpora) {
-				let option = document.createElement("OPTION");
-				option.setAttribute("value", corpus.key);
-				select.appendChild(option);
+			// sort corpora
+			const defaultSorting = [
+				"web-en",
+				"web-de"
+			];
+
+			corporaInfo.corpora.sort((a, b) => {
+				let indexA = defaultSorting.indexOf(a.key);
+				let indexB = defaultSorting.indexOf(b.key);
+				if (indexA === -1) indexA = defaultSorting.length;
+				if (indexB === -1) indexB = defaultSorting.length;
+				return indexA - indexB;
+			});
+
+			for (const corpus of corporaInfo.corpora) {
+				const value = corpus.key;
+				const button = appendNewElements(wrapper, `button.button[data-value="${value}"]`);
+				button.addEventListener("click", () => {
+					this._setValue(value);
+				});
+
+				const text = appendNewElements(button, "span");
+				text.textContent = corpus.name;
 
 				this.labelProvider.getLabel(corpus).then(label => {
-					option.innerHTML = label;
+					text.innerHTML = label;
 				}).catch(e => {
 					console.error(e);
-					option.textContent = corpus.name;
 				});
 			}
 
-			if (this.value) {
-				select.value = this.value;
-			} else {
-				if (corporaInfo.default) select.value = corporaInfo.default;
-				this.value = select.value;
-			}
+			this._setValue(this.value || corporaInfo.default || "web-en");
 		});
 	}
 
-	_valueChange(newValue, oldValue) {
-		const select = this.shadowRoot.querySelector("select");
-		if (select.value !== newValue) {
-			select.value = newValue;
+	_setValue(value) {
+		if (value !== this.value) {
+			this.value = value;
 		}
 
-		this.dispatchEvent(new CustomEvent("valueChange", {
-			detail: {
-				newValue: newValue,
-				oldValue: oldValue,
-			},
-			bubbles: false,
-			cancelable: false,
-		}));
+		for (const element of this.shadowRoot.querySelectorAll(".selected")) {
+			element.classList.remove("selected");
+		}
+
+		const newSelected = this.shadowRoot.querySelector(`[data-value="${value}"]`);
+		if (newSelected) {
+			newSelected.classList.add("selected");
+		}
 	}
-
-
-	_onChange() {
-		this.value = this.shadowRoot.querySelector("select").value;
-	}
-
 }
 
 const localLabels = loadLocalization(NetspeakCorpusSelector).then(json => {
@@ -176,17 +159,6 @@ export class LabelProvider {
 		});
 	}
 
-	/**
-	 * Returns the default LabelProvider used by the NetspeakCorpusSelector.
-	 *
-	 * @returns {LabelProvider} A label provider.
-	 */
-	static getDefault() {
-		return defaultLabelProvide;
-	}
-
 }
-
-const defaultLabelProvide = new LabelProvider();
 
 registerElement(NetspeakCorpusSelector);

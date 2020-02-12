@@ -78,7 +78,7 @@ export class NetspeakSearch extends NetspeakElement {
 			clearTimeout(this._writeHistoryInterval);
 			this._writeHistoryInterval = setTimeout(() => this.writeHistory(), 500);
 		});
-		this.corpusSelector.addEventListener("valueChange", () => {
+		this.corpusSelector.addEventListener("value-changed", () => {
 			this.searchBar.corpus = this.corpusSelector.value;
 			this.searchBar.queryPhrases();
 
