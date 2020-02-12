@@ -26,10 +26,16 @@ export function newElement(selector = "SPAN") {
 	if (!tagName || tagName == "*") tagName = "SPAN";
 
 	// attributes
+	/** @type {[string, string][]} */
 	const attrs = [];
-	const r = /\[([\w-]+)(?:=("[^"]*"|[^"][^\]]*|))?\]/g;
-	for (let phrase; (phrase = r.exec(selector));)
-		attrs.push([phrase[1], phrase[2] || ""]);
+	const r = /\[([\w-]+)(?:=("[^"]*"|'[^']*'|[^"'\]][^\]]*|))?\]/g;
+	for (let phrase; (phrase = r.exec(selector));) {
+		const name = phrase[1];
+		let value = phrase[2] || "";
+		if (value[0] === "'" || value[0] === '"')
+			value = value.substr(1, value.length - 2);
+		attrs.push([name, value]);
+	}
 	selector = selector.replace(r, "");
 
 	// id, classes
