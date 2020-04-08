@@ -1,5 +1,4 @@
 /**
- *
  * @param {T | T[]} value
  * @returns {T[]}
  * @template T
@@ -146,9 +145,7 @@ export function appendNew(parent, children) {
 			if (child.className) element.className = child.className;
 			if (child.attr) {
 				for (const key in child.attr) {
-					if (child.attr.hasOwnProperty(key)) {
-						element.setAttribute(key, child.attr[key]);
-					}
+					element.setAttribute(key, child.attr[key]);
 				}
 			}
 		}
@@ -161,9 +158,7 @@ export function appendNew(parent, children) {
 		}
 		if ("listener" in child) {
 			for (const key in child.listener) {
-				if (child.listener.hasOwnProperty(key)) {
-					element.addEventListener(key, child.listener[key]);
-				}
+				element.addEventListener(key, child.listener[key]);
 			}
 		}
 
@@ -191,13 +186,17 @@ export function debounce(func, wait, immediate) {
 	let timeout = undefined;
 
 	return /** @type {any} */ (function () {
+		const fnArgs = /** @type {any} */ (arguments);
+		// @ts-ignore
+		const fnThis = this;
+
 		clearTimeout(timeout);
 		timeout = setTimeout(() => {
 			timeout = undefined;
-			if (!immediate) func.apply(this, arguments);
+			if (!immediate) func.apply(fnThis, fnArgs);
 		}, wait);
 
-		if (immediate && timeout === undefined) func.apply(this, arguments);
+		if (immediate && timeout === undefined) func.apply(fnThis, fnArgs);
 	});
 }
 
@@ -260,7 +259,7 @@ export function createNextFrameInvoker(func) {
  * @returns {T & Element | null} The matching element or undefined.
  * @template T
  */
-function shadyQuerySelector(element, selector) {
+export function shadyQuerySelector(element, selector) {
 	const result = element.querySelector(selector);
 	if (result) return /** @type {any} */ (result);
 
@@ -281,7 +280,7 @@ function shadyQuerySelector(element, selector) {
  * @returns {(T & Element)[]} The matching elements.
  * @template T
  */
-function shadyQuerySelectorAll(element, selector) {
+export function shadyQuerySelectorAll(element, selector) {
 	const result = Array.from(element.querySelectorAll(selector));
 
 	element.querySelectorAll(irregularTagSelector).forEach(e => {
@@ -335,6 +334,7 @@ export function startScrollToUrlHash() {
  * @returns {Promise<import("clipboard")>}
  */
 export function createClipboardButton(selector, text) {
+	// @ts-ignore
 	if (typeof ClipboardJS === "undefined") {
 		// load the library
 		return new Promise((resolve, reject) => {
@@ -353,6 +353,7 @@ export function createClipboardButton(selector, text) {
 
 			document.body.appendChild(script);
 		}).then(() => {
+			// @ts-ignore
 			if (typeof ClipboardJS === "undefined") {
 				throw new Error("Unable to load ClipboardJS");
 			}
@@ -361,6 +362,7 @@ export function createClipboardButton(selector, text) {
 		});
 	}
 
+	// @ts-ignore
 	return Promise.resolve(new ClipboardJS(selector, {
 		text(e) {
 			if (typeof text === "function") {

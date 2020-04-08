@@ -14,7 +14,8 @@
 	},
 	"extends": "eslint:recommended",
 	"globals": {
-		"Prism": "readonly"
+		"Prism": "readonly",
+		"ClipboardJS": "readonly"
 	},
 	"rules": {
 		"semi": "error",

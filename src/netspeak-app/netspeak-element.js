@@ -34,7 +34,7 @@ export function innerHTML(htmlSource) {
  * @property {Object<string, string>} [messages]
  * @property {any} [custom]
  *
- * @typedef {Function & PolymerConstructorProperties} PolymerConstructor
+ * @typedef {CustomElementConstructor & PolymerConstructorProperties} PolymerConstructor
  *
  * @typedef PolymerConstructorProperties
  * @property {string} is The HTML tag name of the custom HTML element.
@@ -49,19 +49,20 @@ export function innerHTML(htmlSource) {
  *
  * The returned promise will resolve to `false` if the current language is the default language (en).
  *
- * @param {PolymerConstructor} constructor
+ * @param {Function} constructor
  * @returns {Promise<LocalizationJson | false>}
  */
 export function loadLocalization(constructor) {
 	let promise = localizationCache.get(constructor);
 
 	if (!promise) {
+		const temp = /** @type {any} */ (constructor);
 		/** @type {string} */
-		const is = constructor.is;
+		const is = temp.is;
 		/** @type {{ url: string }} */
-		const meta = constructor.importMeta;
+		const meta = temp.importMeta;
 		/** @type {boolean} */
-		const noDefaultLocalization = !!constructor.noDefaultLocalization;
+		const noDefaultLocalization = !!temp.noDefaultLocalization;
 
 		if (meta && meta.url && is) {
 			const currentLang = NetspeakNavigator.currentLanguage;
@@ -93,7 +94,7 @@ const localizationCache = new Map();
  * A localizable element with support for PrismJS.
  */
 export class NetspeakElement extends PolymerElement {
-
+	
 	constructor() {
 		super();
 

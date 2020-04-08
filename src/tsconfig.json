@@ -3,9 +3,6 @@
 		"target": "ES5",
 		"lib": ["es2015", "dom", "es2016.array.include", "dom.iterable"],
 		"module": "esnext",
-		"removeComments": true,
-		"preserveConstEnums": true,
-		"sourceMap": true,
 
 		"noImplicitAny": false,
 		"noImplicitThis": true,
@@ -13,10 +10,15 @@
 		"strictBindCallApply": true,
 		"strictNullChecks": false,
 		"strictFunctionTypes": true,
-		"strictPropertyInitialization": true,
+		"strictPropertyInitialization": false,
 		"downlevelIteration": true,
 
 		"allowJs": true,
-		"checkJs": true
-	}
+		"checkJs": true,
+		"noEmit": true
+	},
+	"include": [
+		"netspeak-app/**/*.js",
+		"pages/**/*.js",
+	]
 }
