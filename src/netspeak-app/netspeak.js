@@ -11,7 +11,7 @@ export function normalizeQuery(query) {
 	if (!query) return "";
 
 	// normalize white spaces
-	return query.replace(/[\s\uFEFF\xA0]+/g, " ").replace(/^ | $/g, "");
+	return query.replace(/[\s\uFEFF\xA0]+/g, " ").trim();
 }
 
 

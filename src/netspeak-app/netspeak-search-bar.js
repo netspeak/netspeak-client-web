@@ -249,7 +249,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 				background-color: #EAA;
 				color: #300;
 				display: block;
-				padding: 1em 2em;
+				padding: 1em;
 				margin: 0;
 				word-break: break-word;
 			}
@@ -271,8 +271,13 @@ export class NetspeakSearchBar extends NetspeakElement {
 			div#warnings>p {
 				color: #420;
 				display: block;
-				margin: 1em 2em;
+				margin: 1em;
 				word-break: break-word;
+			}
+
+			div#warnings span.suggestion:hover {
+				cursor: pointer;
+				text-decoration: underline;
 			}
 
 			/*
@@ -363,6 +368,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this.netspeakApi = Netspeak.getInstance();
 
 		this._queriedPhrases = new PhraseCollection();
+		this._queryCount = 0;
 
 		// for typing purposes
 		/** @type {string} */
@@ -402,6 +408,17 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this._exampleQueries = this.shadowRoot.querySelector("netspeak-example-queries");
 		/** @type {NetspeakSearchBarResultList} */
 		this._resultList = this.shadowRoot.querySelector("netspeak-search-bar-result-list");
+
+		this._queryInputElement.onblur = () => {
+			// this is a hack to ignore inputs from blur event.
+			// blur events are dispatched after the input event, so in the exactly wrong order.
+			// to combat this, we will set a flag of 3ms after which it is reset.
+			// input event will be delayed by 1ms to hopefully see the blur flag.
+			this._inputBlurred = true;
+			setTimeout(() => {
+				this._inputBlurred = false;
+			}, 3);
+		};
 
 		this._historyHiddenChanged(this.historyHidden);
 		this._resultList.addEventListener("load-more", () => this._loadMoreItems());
@@ -459,10 +476,25 @@ export class NetspeakSearchBar extends NetspeakElement {
 		if (this.readonly) return;
 
 		const query = e.target.value;
+		const counter = this._queryCount;
 
-		this._focusInput = true;
-		if (query != this.query) this.query = query;
-		else this.queryPhrases();
+		setTimeout(() => {
+			if (this._queryCount !== counter) {
+				// too slow
+				return;
+			}
+			if (this._inputBlurred) {
+				// blurred
+				return;
+			}
+
+			this._focusInput = true;
+			if (query != this.query) {
+				this.query = query;
+			} else {
+				this.queryPhrases();
+			}
+		}, 1);
 	}
 	_queryInputKeyUp(e) {
 		if (this.slowSearch || this.readonly) return;
@@ -483,6 +515,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 	 * @param {QueryPhrasesOptions} [options={}]
 	 */
 	queryPhrases(options = {}) {
+		this._queryCount++;
+
 		const searchOptions = options.searchOptions || {};
 
 		// request
@@ -607,10 +641,40 @@ export class NetspeakSearchBar extends NetspeakElement {
 					// TODO: Add REAL support for suggestion for all-lower-case indexes.
 					const lower = word.toLowerCase();
 					if (this.corpus === "web-en" && word !== lower) {
+						const WORD_BOUNDARY = /^[|[\]{}\s]$/;
+						let suggestion = this.query;
+
+						// replace all occurrences
+						let startIndex = 0;
+						while (startIndex < suggestion.length) {
+							const index = suggestion.indexOf(word, startIndex);
+							if (index === -1) break;
+
+							// check boundaries
+							const before = suggestion[index - 1];
+							const after = suggestion[index + word.length];
+							if (before && !WORD_BOUNDARY.test(before)
+								|| after && !WORD_BOUNDARY.test(after)) {
+								startIndex = index + word.length;
+								continue;
+							}
+
+							suggestion = suggestion.slice(0, index) + lower + suggestion.slice(index + word.length);
+							startIndex = index + lower.length;
+						}
+
 						this.localMessage("did-you-mean", "Did you mean ${word}?").then(didYouMeanMessage => {
-							didYouMeanMessage = encode(didYouMeanMessage);
-							p.innerHTML += " " + didYouMeanMessage.replace(/\$\{word\}/g, () => {
-								return `<em>${lower}</em>`;
+							p.appendChild(document.createTextNode(" "));
+							didYouMeanMessage.split(/\$\{word\}/g).forEach((segment, i) => {
+								if (i > 0) {
+									const span = appendNewElements(p, "em", "span");
+									span.className = "suggestion";
+									span.textContent = lower;
+									span.addEventListener("click", () => {
+										this.query = suggestion;
+									});
+								}
+								p.appendChild(document.createTextNode(segment));
 							});
 						});
 					}
