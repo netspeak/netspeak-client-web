@@ -1,5 +1,7 @@
 # [Netspeak](https://netspeak.github.io)
 
+[![Actions Status](https://github.com/netspeak/netspeak-client-web/workflows/Node.js%20CI/badge.svg)](https://github.com/netspeak/netspeak-client-web/actions)
+
 This is the development project of the [netspeak.org](http://netspeak.org) website.
 
 The website is a single page application and uses the [Polymer 3 framework](https://polymer-library.polymer-project.org/3.0/docs/devguide/feature-overview).

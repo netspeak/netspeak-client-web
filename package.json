@@ -3,7 +3,7 @@
   "description": "Netspeak web interface",
   "private": true,
   "scripts": {
-    "test": "npm run lint && npx tsc && cd src && npx tsc",
+    "test": "npx tsc && cd src && npx tsc",
     "build": "npx polymer build",
     "serve": "npm run build && npx polymer serve build/default",
     "lint": "npx eslint ./",
