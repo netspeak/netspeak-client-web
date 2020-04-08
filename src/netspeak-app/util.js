@@ -221,7 +221,7 @@ export function textContent(html) {
  * @returns {string}
  */
 export function encode(html) {
-	return html.replace(/&/g, "&amp;").replace(/</g, "&lt;");
+	return String(html).replace(/&/g, "&amp;").replace(/</g, "&lt;");
 }
 
 /**

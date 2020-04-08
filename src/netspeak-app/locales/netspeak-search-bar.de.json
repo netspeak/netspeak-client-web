@@ -1,5 +1,7 @@
 {
 	"messages": {
+		"invalid-query": "Ihre Eingabe kann nicht verarbeitet werden, weil sie nicht dem Netspeak-Abfragesyntax entspricht. Bitte korrigieren Sie ihre Eingabe.<br><br>Mehr Informationen über den Netspeak-Abfragesyntax find Sie <a href=\"https://netspeak.org/help.html?lang=de#how\" target=\"_blank\">hier</a>.",
+		"full-details": "Alle Details",
 		"unknown-word": "Unbekanntes Wort ${word}.",
 		"did-you-mean": "Meinten Sie ${word}?"
 	}

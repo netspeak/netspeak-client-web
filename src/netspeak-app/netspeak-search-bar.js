@@ -525,8 +525,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 		}
 
 		searchResult.then(result => {
-			console.log(result);
-
 			this._onSearchSuccess(result, request, append);
 		}).catch(reason => {
 			this._onSearchError(reason, request, append);
@@ -628,7 +626,23 @@ export class NetspeakSearchBar extends NetspeakElement {
 		if (this.errorMessage) {
 			errors.style.display = null;
 			errors.innerHTML = '';
-			appendNewElements(errors, "P").textContent = String(this.errorMessage);
+			Promise.all([
+				this.localMessage("invalid-query",
+					`Your input cannot be processed because it does not follow the Netspeak query syntax.
+					Please correct your input.
+					<br><br>
+					More information about the Netpspeak query syntax can be found
+					<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
+				),
+				this.localMessage("full-details", "Full details"),
+			]).then(([invalidQuery, fullDetails]) => {
+				appendNewElements(errors, "P").innerHTML = `${invalidQuery}
+				<br>
+				<br>
+				<details><summary>${encode(fullDetails)}</summary>
+					<p>${encode(String(this.errorMessage))}</p>
+				</details>`;
+			});
 
 			// the wrapper should stay as is
 		} else {
