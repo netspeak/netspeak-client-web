@@ -497,13 +497,18 @@ export class NetspeakSearchBar extends NetspeakElement {
 		let searchResult;
 		if (!normalizeQuery(request.query)) {
 			// note that this optimization will also catch the first empty query from the polymer query change event.
-			searchResult = Promise.resolve(/** @type {import("./netspeak").NetspeakSearchResult} */([]));
+			searchResult = Promise.resolve(/** @type {import("./netspeak").NetspeakSearchResult} */({
+				phrases: [],
+				unknownWords: []
+			}));
 		} else {
 			searchResult = this.netspeakApi.search(request, searchOptions);
 		}
 
-		searchResult.then(phrases => {
-			this._onSearchSuccess(phrases, request, append);
+		searchResult.then(result => {
+			console.log(result);
+			
+			this._onSearchSuccess(result, request, append);
 		}).catch(reason => {
 			this._onSearchError(reason, request, append);
 		});
@@ -511,22 +516,22 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 	/**
 	 *
-	 * @param {import("./netspeak").NetspeakSearchResult} phrases
+	 * @param {import("./netspeak").NetspeakSearchResult} result
 	 * @param {{ query: string, corpus: string, focusInput: boolean }} request
 	 * @param {boolean} append
 	 */
-	_onSearchSuccess(phrases, request, append = false) {
+	_onSearchSuccess(result, request, append = false) {
 		if (this.query !== request.query) return; // too late
 
-		let newPhrases = phrases.length;
+		let newPhrases = result.phrases.length;
 		this.errorMessage = "";
 		if (append) {
-			newPhrases = this._queriedPhrases.addAll(phrases);
+			newPhrases = this._queriedPhrases.addAll(result.phrases);
 		} else {
-			this._queriedPhrases = PhraseCollection.from(phrases);
+			this._queriedPhrases = PhraseCollection.from(result.phrases);
 		}
 
-		this._resultList.showLoadMore = !phrases.complete && newPhrases > 0;
+		this._resultList.showLoadMore = !result.complete && newPhrases > 0;
 
 		this.update(request.focusInput);
 	}

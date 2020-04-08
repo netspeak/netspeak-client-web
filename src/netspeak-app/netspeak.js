@@ -47,7 +47,10 @@ export function normalizeQuery(query) {
  */
 
 /**
- * @typedef {Phrase[] & { complete?: boolean }} NetspeakSearchResult
+ * @typedef NetspeakSearchResult
+ * @property {Phrase[]} phrases The phrases returned by the API.
+ * @property {boolean | undefined} [complete]
+ * @property {string[]} unknownWords A list of unknown words returned by the API.
  */
 
 
@@ -75,8 +78,8 @@ export class Netspeak {
 	 * It indicates whether the phrase array is complete, so that no additional phrases can be obtained by increasing `topk` or deceasing `maxfreq`.
 	 * If the value is not set or `undefined`, it is not certain whether there are still phrases matching the query.
 	 *
-	 * @param {NetspeakSearchRequest} request A request specifying the the options of the Netspeak API.
-	 * @param {NetspeakSearchOptions} [options]
+	 * @param {Readonly<NetspeakSearchRequest>} request A request specifying the the options of the Netspeak API.
+	 * @param {Readonly<NetspeakSearchOptions>} [options]
 	 * @returns {Promise<NetspeakSearchResult>}
 	 */
 	search(request, options = {}) {
@@ -89,6 +92,7 @@ export class Netspeak {
 
 		try {
 			// copy request
+			/** @type {NetspeakSearchRequest} */
 			const req = Object.assign({}, request);
 
 			// configure request
@@ -132,7 +136,13 @@ export class Netspeak {
 					return new Phrase(words, phrase["2"], query, corpus);
 				});
 
-				return phrases;
+				/** @type {string[]} */
+				const unknownWords = json["5"] || [];
+
+				return {
+					phrases,
+					unknownWords,
+				};
 			});
 		} catch (error) {
 			return Promise.reject(error);
@@ -147,12 +157,13 @@ export class Netspeak {
 	 * To guarantees this, there might be as much as request.topk requests to the Netspeak API.
 	 *
 	 * @private
-	 * @param {NetspeakSearchRequest} request A request specifying the the options of the Netspeak API.
+	 * @param {Readonly<NetspeakSearchRequest>} request A request specifying the the options of the Netspeak API.
 	 * @param {NetspeakSearchOptions} options
 	 * @returns {Promise<NetspeakSearchResult>}
 	 */
 	_fillSearch(request, options) {
 		// copy request
+		/** @type {NetspeakSearchRequest} */
 		const req = Object.assign({}, request);
 
 		try {
@@ -165,40 +176,55 @@ export class Netspeak {
 			delete options.topkMode;
 
 			const goal = req.topk;
-			const totalPhrases = /** @type {Phrase[] & { complete: boolean }} */ ([]);
-			totalPhrases.complete = false;
+
+			/** @type {NetspeakSearchResult & { complete: boolean }} */
+			const result = {
+				phrases: [],
+				complete: false,
+				unknownWords: []
+			};
+			/** @type {Record<string, true>} */
+			const unknownWordsSet = {};
 
 			/**
 			 * A "recursive" function to continue loading phrases until a certain number of phases has been loaded or
 			 * there are no more phrases left.
 			 *
-			 * @returns {Promise<Phrase[] & { complete: boolean }>}
+			 * @returns {Promise<NetspeakSearchResult & { complete: boolean }>}
 			 */
 			const fill = () => {
-				req.topk = goal - totalPhrases.length + 1; // + 1 to check for completeness
+				req.topk = goal - result.phrases.length + 1; // + 1 to check for completeness
 
-				return this.search(req, options).then(phrases => {
+				return this.search(req, options).then(({ phrases, unknownWords }) => {
 					// append new phrases
-					totalPhrases.splice(phrases.length, 0, ...phrases);
+					result.phrases.push(...phrases);
+
+					// add new unknown words
+					unknownWords.forEach(word =>{
+						if (!unknownWordsSet[word]) {
+							unknownWordsSet[word] = true;
+							unknownWords.push(word);
+						}
+					});
 
 					// no new phrases
 					if (phrases.length === 0) {
-						totalPhrases.complete = true;
-						return totalPhrases;
+						result.complete = true;
+						return result;
 					}
 
 					// queried more than necessary -> done & incomplete
-					if (totalPhrases.length > goal) {
-						totalPhrases.complete = false;
-						totalPhrases.splice(goal, goal - totalPhrases.length);
-						return totalPhrases;
+					if (result.phrases.length > goal) {
+						result.complete = false;
+						result.phrases.splice(goal, goal - result.phrases.length);
+						return result;
 					}
 
 					// there are still phrases left to query
 
 					// adjust maxFreq
 					const newMaxFreq = phrases[phrases.length - 1].frequency;
-					request.maxfreq = request.maxfreq === newMaxFreq ? newMaxFreq - 1 : newMaxFreq;
+					req.maxfreq = req.maxfreq === newMaxFreq ? newMaxFreq - 1 : newMaxFreq;
 
 					return fill();
 				});
