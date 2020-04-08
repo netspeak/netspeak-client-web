@@ -77,6 +77,7 @@ const sharedStyles = html`
  * The Netspeak search bar can query and display phrases queried using the Netspeak API.
  */
 export class NetspeakSearchBar extends NetspeakElement {
+	static get importMeta() { return import.meta; }
 	static get is() { return 'netspeak-search-bar'; }
 	static get properties() {
 		return {
@@ -254,8 +255,25 @@ export class NetspeakSearchBar extends NetspeakElement {
 			}
 
 			/*
-			 * RESULT
+			 * WARNINGS
 			 */
+
+			div#warnings {
+				display: table;
+				box-sizing: border-box;
+				width: 100%;
+
+				background-color: #EDA;
+				border: 1px var(--border-color);
+				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
+			}
+
+			div#warnings>p {
+				color: #420;
+				display: block;
+				margin: 1em 2em;
+				word-break: break-word;
+			}
 
 			/*
 			 * PRELOAD IMAGES
@@ -293,6 +311,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 		</div>
 
 		<div id="errors" style="display: none"></div>
+		<div id="warnings" style="display: none"></div>
 
 		<netspeak-example-queries corpus$="{{corpus}}"></netspeak-example-queries>
 
@@ -507,7 +526,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 		searchResult.then(result => {
 			console.log(result);
-			
+
 			this._onSearchSuccess(result, request, append);
 		}).catch(reason => {
 			this._onSearchError(reason, request, append);
@@ -524,6 +543,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 		if (this.query !== request.query) return; // too late
 
 		let newPhrases = result.phrases.length;
+		/** @type {string[]} */
+		this.unknownWords = result.unknownWords;
 		this.errorMessage = "";
 		if (append) {
 			newPhrases = this._queriedPhrases.addAll(result.phrases);
@@ -557,6 +578,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 		console.error(message, request);
 
 		this.errorMessage = message;
+		this.unknownWords = [];
 		this.update(request.focusInput);
 	}
 
@@ -569,6 +591,36 @@ export class NetspeakSearchBar extends NetspeakElement {
 		// wrapper
 		/** @type {HTMLDivElement} */
 		const wrapper = this.shadowRoot.querySelector("#result-wrapper");
+
+		// output unknown words
+		/** @type {HTMLElement} */
+		const warnings = this.shadowRoot.querySelector("#warnings");
+		if (this.unknownWords && this.unknownWords.length > 0) {
+			warnings.style.display = null;
+			warnings.innerHTML = '';
+			this.localMessage("unknown-word", "Unknown word ${word}.").then(unknownWordMessage => {
+				unknownWordMessage = encode(unknownWordMessage);
+				this.unknownWords.forEach(word => {
+					const p = appendNewElements(warnings, "P");
+					p.innerHTML = unknownWordMessage.replace(/\$\{word\}/g, () => {
+						return `<em>${word}</em>`;
+					});
+
+					// TODO: Add REAL support for suggestion for all-lower-case indexes.
+					const lower = word.toLowerCase();
+					if (this.corpus === "web-en" && word !== lower) {
+						this.localMessage("did-you-mean", "Did you mean ${word}?").then(didYouMeanMessage => {
+							didYouMeanMessage = encode(didYouMeanMessage);
+							p.innerHTML += " " + didYouMeanMessage.replace(/\$\{word\}/g, () => {
+								return `<em>${lower}</em>`;
+							});
+						});
+					}
+				});
+			});
+		} else {
+			warnings.style.display = "none";
+		}
 
 		// output errors
 		/** @type {HTMLElement} */

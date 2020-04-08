@@ -1,0 +1,6 @@
+{
+	"messages": {
+		"unknown-word": "Unbekanntes Wort ${word}.",
+		"did-you-mean": "Meinten Sie ${word}?"
+	}
+}
