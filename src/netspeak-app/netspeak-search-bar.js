@@ -627,7 +627,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 		// output unknown words
 		/** @type {HTMLElement} */
 		const warnings = this.shadowRoot.querySelector("#warnings");
-		if (this.unknownWords && this.unknownWords.length > 0) {
+		this.unknownWords = (this.unknownWords || []).filter(Boolean);
+		if (this.unknownWords.length > 0) {
 			warnings.style.display = null;
 			warnings.innerHTML = '';
 			this.localMessage("unknown-word", "Unknown word ${word}.").then(unknownWordMessage => {
