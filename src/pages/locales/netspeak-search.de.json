@@ -1,15 +1,15 @@
 {
-    "template": {
-        "explanation-qmark-1": "Das",
-        "explanation-qmark-2": "findet ein Wort.",
-        "explanation-dots-1": "Die",
-        "explanation-dots-2": "finden mehrere Wörter.",
-        "explanation-option-1": "Die",
-        "explanation-option-2": "vergleichen Alternativen.",
-        "explanation-synonym-1": "Das",
-        "explanation-synonym-2": "findet ähnliche Wörter.",
-        "explanation-order-1": "Die",
-        "explanation-order-2": "prüfen die Reihenfolge.",
-        "explanation-space": "Das Leerzeichen is wichtig."
-    }
+	"template": {
+		"explanation-qmark-1": "Das",
+		"explanation-qmark-2": "findet ein Wort.",
+		"explanation-dots-1": "Die",
+		"explanation-dots-2": "finden mehrere Wörter.",
+		"explanation-option-1": "Die",
+		"explanation-option-2": "vergleichen Alternativen.",
+		"explanation-synonym-1": "Das",
+		"explanation-synonym-2": "findet ähnliche Wörter.",
+		"explanation-order-1": "Die",
+		"explanation-order-2": "prüfen die Reihenfolge.",
+		"explanation-space": "Das Leerzeichen is wichtig."
+	}
 }
