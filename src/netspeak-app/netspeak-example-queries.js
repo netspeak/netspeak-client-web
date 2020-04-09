@@ -53,8 +53,6 @@ export class NetspeakExampleQueries extends NetspeakElement {
 
 			#info {
 				background-color: #F8F8F8;
-				border: 1px var(--border-color);
-				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
 				clear: both;
 				position: relative;
 				padding: .5em 1em;

@@ -135,12 +135,15 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 		<style>
 			:host {
-				display: block;
-				font-size: 1em;
-
 				--border-color: #BBB;
 				--left-right-padding: 0;
 				--left-right-border-style: solid;
+
+				display: block;
+				font-size: 1em;
+				border-color: var(--border-color);
+				border-style: solid var(--left-right-border-style) none var(--left-right-border-style);
+				border-width: 1px;
 			}
 
 			/*
@@ -150,8 +153,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			#box {
 				display: block;
 				padding: 0 var(--left-right-padding);
-				border: 1px var(--border-color);
-				border-style: solid var(--left-right-border-style);
+				border-bottom: 1px solid var(--border-color);
 				font-family: var(--input-font-family, inherit);
 			}
 
@@ -230,8 +232,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			 */
 
 			#result-wrapper {
-				border: 1px var(--border-color);
-				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
+				border-bottom: 1px solid var(--border-color);
 				font-family: var(--result-font-family, inherit);
 			}
 
@@ -241,8 +242,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			div#errors {
 				display: block;
-				border: 1px var(--border-color);
-				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
+				border-bottom: 1px solid var(--border-color);
 			}
 
 			div#errors>p {
@@ -264,8 +264,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 				width: 100%;
 
 				background-color: #EDA;
-				border: 1px var(--border-color);
-				border-style: none var(--left-right-border-style) solid var(--left-right-border-style);
+				border-bottom: 1px solid var(--border-color);
 			}
 
 			div#warnings>p {
@@ -278,6 +277,33 @@ export class NetspeakSearchBar extends NetspeakElement {
 			div#warnings span.suggestion:hover {
 				cursor: pointer;
 				text-decoration: underline;
+			}
+
+			/*
+			 * EXAMPLE QUERIES
+			 */
+
+			netspeak-example-queries {
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			/*
+			 * NO PHRASES FOUND
+			 */
+
+			#no-phrases-found-container {
+				border-bottom: 1px solid var(--border-color);
+
+				display: block;
+				font-family: var(--result-font-family, inherit);
+				color: #444;
+				padding: 0 var(--left-right-padding);
+			}
+
+			#no-phrases-found-container p {
+				font-style: italic;
+				padding: .3em .5em;
+				margin: 0;
 			}
 
 			/*
@@ -321,9 +347,11 @@ export class NetspeakSearchBar extends NetspeakElement {
 		<netspeak-example-queries corpus$="{{corpus}}"></netspeak-example-queries>
 
 		<div id="result-wrapper" style="display: none">
-
 			<netspeak-search-bar-result-list></netspeak-search-bar-result-list>
+		</div>
 
+		<div id="no-phrases-found-container" style="display: none">
+			<p id="no-phrases-found">No phrases found.</p>
 		</div>
 
 		<div id="img-pre-loader"></div>
@@ -408,6 +436,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this._exampleQueries = this.shadowRoot.querySelector("netspeak-example-queries");
 		/** @type {NetspeakSearchBarResultList} */
 		this._resultList = this.shadowRoot.querySelector("netspeak-search-bar-result-list");
+		/** @type {NetspeakSearchBarResultList} */
+		this._noPhraseFoundContainer = this.shadowRoot.querySelector("#no-phrases-found-container");
 
 		this._queryInputElement.onblur = () => {
 			// this is a hack to ignore inputs from blur event.
@@ -648,6 +678,13 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 			// wrapper
 			wrapper.style.display = !this._resultList.isEmpty ? "block" : "none";
+		}
+
+		// show "no phrase found" message
+		if (this._resultList.phrases.length === 0 && !this._resultList.showLoadMore && this.query) {
+			this._noPhraseFoundContainer.style.display = null;
+		} else {
+			this._noPhraseFoundContainer.style.display = "none";
 		}
 
 		if (focusInput && this._queryInputElement) {
@@ -978,6 +1015,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 			#result-list span.text {
 				float: left;
+			}
+			#result-list [pinned] span.text {
+				font-weight: bold;
 			}
 
 			#result-list span.freq {
