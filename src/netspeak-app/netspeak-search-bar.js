@@ -630,57 +630,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 		this.unknownWords = (this.unknownWords || []).filter(Boolean);
 		if (this.unknownWords.length > 0) {
 			warnings.style.display = null;
-			warnings.innerHTML = '';
-			this.localMessage("unknown-word", "Unknown word ${word}.").then(unknownWordMessage => {
-				unknownWordMessage = encode(unknownWordMessage);
-				this.unknownWords.forEach(word => {
-					const p = appendNewElements(warnings, "P");
-					p.innerHTML = unknownWordMessage.replace(/\$\{word\}/g, () => {
-						return `<em>${word}</em>`;
-					});
-
-					// TODO: Add REAL support for suggestion for all-lower-case indexes.
-					const lower = word.toLowerCase();
-					if (this.corpus === "web-en" && word !== lower) {
-						const WORD_BOUNDARY = /^[|[\]{}\s]$/;
-						let suggestion = this.query;
-
-						// replace all occurrences
-						let startIndex = 0;
-						while (startIndex < suggestion.length) {
-							const index = suggestion.indexOf(word, startIndex);
-							if (index === -1) break;
-
-							// check boundaries
-							const before = suggestion[index - 1];
-							const after = suggestion[index + word.length];
-							if (before && !WORD_BOUNDARY.test(before)
-								|| after && !WORD_BOUNDARY.test(after)) {
-								startIndex = index + word.length;
-								continue;
-							}
-
-							suggestion = suggestion.slice(0, index) + lower + suggestion.slice(index + word.length);
-							startIndex = index + lower.length;
-						}
-
-						this.localMessage("did-you-mean", "Did you mean ${word}?").then(didYouMeanMessage => {
-							p.appendChild(document.createTextNode(" "));
-							didYouMeanMessage.split(/\$\{word\}/g).forEach((segment, i) => {
-								if (i > 0) {
-									const span = appendNewElements(p, "em", "span");
-									span.className = "suggestion";
-									span.textContent = lower;
-									span.addEventListener("click", () => {
-										this.query = suggestion;
-									});
-								}
-								p.appendChild(document.createTextNode(segment));
-							});
-						});
-					}
-				});
-			});
+			this._updateWarnings(warnings, this.unknownWords);
 		} else {
 			warnings.style.display = "none";
 		}
@@ -690,24 +640,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 		const errors = this.shadowRoot.querySelector("#errors");
 		if (this.errorMessage) {
 			errors.style.display = null;
-			errors.innerHTML = '';
-			Promise.all([
-				this.localMessage("invalid-query",
-					`Your input cannot be processed because it does not follow the Netspeak query syntax.
-					Please correct your input.
-					<br><br>
-					More information about the Netpspeak query syntax can be found
-					<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
-				),
-				this.localMessage("full-details", "Full details"),
-			]).then(([invalidQuery, fullDetails]) => {
-				appendNewElements(errors, "P").innerHTML = `${invalidQuery}
-				<br>
-				<br>
-				<details><summary>${encode(fullDetails)}</summary>
-					<p>${encode(String(this.errorMessage))}</p>
-				</details>`;
-			});
+			this._updateErrorMessage(errors, this.errorMessage);
 
 			// the wrapper should stay as is
 		} else {
@@ -720,6 +653,88 @@ export class NetspeakSearchBar extends NetspeakElement {
 		if (focusInput && this._queryInputElement) {
 			this._queryInputElement.focus();
 		}
+	}
+	/**
+	 * @param {HTMLElement} container
+	 * @param {readonly string[]} unknownWords Must be non-empty
+	 */
+	_updateWarnings(container, unknownWords) {
+		container.innerHTML = '';
+		this.localMessage("unknown-word", "Unknown word ${word}.").then(unknownWordMessage => {
+			unknownWordMessage = encode(unknownWordMessage);
+			unknownWords.forEach(word => {
+				const p = appendNewElements(container, "P");
+				p.innerHTML = unknownWordMessage.replace(/\$\{word\}/g, () => {
+					return `<em>${word}</em>`;
+				});
+
+				// TODO: Add REAL support for suggestion for all-lower-case indexes.
+				const lower = word.toLowerCase();
+				if (this.corpus === "web-en" && word !== lower) {
+					const WORD_BOUNDARY = /^[|[\]{}\s]$/;
+					let suggestion = this.query;
+
+					// replace all occurrences
+					let startIndex = 0;
+					while (startIndex < suggestion.length) {
+						const index = suggestion.indexOf(word, startIndex);
+						if (index === -1) break;
+
+						// check boundaries
+						const before = suggestion[index - 1];
+						const after = suggestion[index + word.length];
+						if (before && !WORD_BOUNDARY.test(before)
+							|| after && !WORD_BOUNDARY.test(after)) {
+							startIndex = index + word.length;
+							continue;
+						}
+
+						suggestion = suggestion.slice(0, index) + lower + suggestion.slice(index + word.length);
+						startIndex = index + lower.length;
+					}
+
+					this.localMessage("did-you-mean", "Did you mean ${word}?").then(didYouMeanMessage => {
+						p.appendChild(document.createTextNode(" "));
+						didYouMeanMessage.split(/\$\{word\}/g).forEach((segment, i) => {
+							if (i > 0) {
+								const span = appendNewElements(p, "em", "span");
+								span.className = "suggestion";
+								span.textContent = lower;
+								span.addEventListener("click", () => {
+									this.query = suggestion;
+								});
+							}
+							p.appendChild(document.createTextNode(segment));
+						});
+					});
+				}
+			});
+		});
+	}
+	/**
+	 * @param {HTMLElement} container
+	 * @param {string | Error} details
+	 */
+	_updateErrorMessage(container, details) {
+		container.innerHTML = '';
+
+		Promise.all([
+			this.localMessage("invalid-query",
+				`Your input cannot be processed because it does not follow the Netspeak query syntax.
+					Please correct your input.
+					<br><br>
+					More information about the Netpspeak query syntax can be found
+					<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
+			),
+			this.localMessage("full-details", "Full details"),
+		]).then(([invalidQuery, fullDetails]) => {
+			appendNewElements(container, "P").innerHTML = `${invalidQuery}
+				<br>
+				<br>
+				<details><summary>${encode(fullDetails)}</summary>
+					<p>${encode(String(details))}</p>
+				</details>`;
+		});
 	}
 
 	_loadMoreItems() {

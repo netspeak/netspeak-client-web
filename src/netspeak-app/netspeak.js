@@ -24,7 +24,7 @@ export function normalizeQuery(query) {
 
 /**
  * @typedef CorporaInfo
- * @property {string} default The key of the default corpus.
+ * @property {string | undefined} default The key of the default corpus.
  * @property {Corpus[]} corpora
  */
 
@@ -82,18 +82,17 @@ export class Netspeak {
 	 * @param {Readonly<NetspeakSearchOptions>} [options]
 	 * @returns {Promise<NetspeakSearchResult>}
 	 */
-	search(request, options = {}) {
-		options = Object.assign({}, options);
+	search(request, options) {
+		const opts = /** @type {NetspeakSearchOptions} */(Object.assign({}, options));
 
 		// fill mode
-		if (options.topkMode === "fill") {
-			return this._fillSearch(request, options);
+		if (opts.topkMode === "fill") {
+			return this._fillSearch(request, opts);
 		}
 
 		try {
 			// copy request
-			/** @type {NetspeakSearchRequest} */
-			const req = Object.assign({}, request);
+			const req = /** @type {NetspeakSearchRequest} */(Object.assign({}, request));
 
 			// configure request
 			req.format = "json";
@@ -163,8 +162,7 @@ export class Netspeak {
 	 */
 	_fillSearch(request, options) {
 		// copy request
-		/** @type {NetspeakSearchRequest} */
-		const req = Object.assign({}, request);
+		const req = /** @type {NetspeakSearchRequest} */ (Object.assign({}, request));
 
 		try {
 			// check topk
@@ -200,7 +198,7 @@ export class Netspeak {
 					result.phrases.push(...phrases);
 
 					// add new unknown words
-					unknownWords.forEach(word =>{
+					unknownWords.forEach(word => {
 						if (!unknownWordsSet[word]) {
 							unknownWordsSet[word] = true;
 							unknownWords.push(word);

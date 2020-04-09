@@ -190,8 +190,14 @@ export class NetspeakExampleQueries extends NetspeakElement {
 		const table = this.shadowRoot.querySelector("table");
 		table.innerHTML = "";
 
-		// @ts-ignore
-		const highlight = code => Prism.highlight(code, Prism.languages['netspeak-query'], 'netspeak-query');
+		/**
+		 * @param {string} code
+		 * @returns {string}
+		 */
+		function highlight(code) {
+			// @ts-ignore
+			return Prism.highlight(code, Prism.languages['netspeak-query'], 'netspeak-query');
+		}
 
 		for (const exampleKey in examples) {
 			const query = examples[exampleKey];

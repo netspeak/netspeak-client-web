@@ -94,7 +94,7 @@ const localizationCache = new Map();
  * A localizable element with support for PrismJS.
  */
 export class NetspeakElement extends PolymerElement {
-	
+
 	constructor() {
 		super();
 
@@ -160,7 +160,9 @@ export class NetspeakElement extends PolymerElement {
 	 * If Prism is not defined, then this method will do nothing.
 	 */
 	styleCode() {
-		highlightCode(this.shadowRoot);
+		if (this.shadowRoot) {
+			highlightCode(this.shadowRoot);
+		}
 	}
 }
 

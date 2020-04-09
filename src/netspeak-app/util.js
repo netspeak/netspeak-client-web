@@ -106,7 +106,10 @@ export function appendNew(parent, children) {
 			if (!selector) {
 				throw new Error(`Selector cannot be ${selector}`);
 			}
-			const tag = /^[^.#\s<>=$[\]]+/.exec(selector)[0];
+			const tag = (/^[^.#\s<>=$[\]]+/.exec(selector) || [])[0];
+			if (!tag) {
+				throw new Error("The selector has to include a tag name.");
+			}
 			selector = selector.slice(tag.length);
 			element = document.createElement(tag);
 
@@ -211,7 +214,7 @@ export function textContent(html) {
 	html = html.replace(/<\/?(?!\d)[^\s>/=$<%]+(?:\s(?:\s*[^\s>/=]+(?:\s*=\s*(?:"[^"]*"|'[^']*'|[^\s'">=]+(?=[\s>]))|(?=[\s/>])))+)?\s*\/?>/g, "");
 	const div = document.createElement("div");
 	div.innerHTML = html;
-	return div.textContent;
+	return div.textContent || "";
 }
 
 /**
