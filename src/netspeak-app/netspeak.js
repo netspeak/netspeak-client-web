@@ -3,7 +3,7 @@ import { jsonp } from "./jsonp.js";
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
  *
- * @param {string} query
+ * @param {string | undefined | null} query
  * @returns {string}
  */
 export function normalizeQuery(query) {

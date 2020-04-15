@@ -542,67 +542,84 @@ export class NetspeakSearchBar extends NetspeakElement {
 	/**
 	 * Queries phrases using the Netspeak API adding them to or overwriting the phrases queried before.
 	 *
-	 * @param {QueryPhrasesOptions} [options={}]
+	 * @param {Readonly<QueryPhrasesOptions>} [options={}]
+	 *
+	 * @typedef QueryPhrasesState
+	 * @property {string} query
+	 * @property {string} corpus
+	 * @property {boolean} focusInput
+	 * @property {import("./netspeak").NetspeakSearchRequest} [request]
 	 */
 	queryPhrases(options = {}) {
 		this._queryCount++;
 
-		const searchOptions = options.searchOptions || {};
-
-		// request
-		const request = {
+		/** @type {QueryPhrasesState} */
+		const state = {
 			query: this.query,
 			corpus: this.corpus,
-			focusInput: !!options.focusInput,
+			focusInput: !!this._focusInput
 		};
 
-		// add to history
-		if (request.query && request.corpus) this._addToHistory({ query: request.query, corpus: request.corpus }, true);
+		const query = normalizeQuery(this.query);
+		const corpus = this.corpus;
 
-		const addToRequest = (prop, defaultValue = undefined) => {
-			if (options[prop] != undefined) request[prop] = options[prop];
-			else if (defaultValue !== undefined) request[prop] = defaultValue;
-		};
-		addToRequest("topk", this.initialLimit);
-		addToRequest("maxfreq");
+		/** @type {Promise<import("./netspeak.js").NetspeakSearchResult>} */
+		let searchResult;
+		if (!query || !corpus) {
+			// this optimization will also catch the first empty query from the polymer query change event.
+			searchResult = Promise.resolve({
+				phrases: [],
+				unknownWords: []
+			});
+		} else {
+			// add to history
+			this._addToHistory({ query, corpus }, true);
 
+			/** @type {import("./netspeak").NetspeakSearchRequest} */
+			const request = {
+				// TODO: find a better way to lowercase queries
+				// TODO: remove this hack
+				query: corpus === "web-en" ? query.toLowerCase() : query,
+				corpus,
+			};
+			state.request = request;
 
-		// a more expensive search for the first query
-		if (!this._hadFirstQuery) {
-			this._hadFirstQuery = true;
-			if (!("topkMode" in searchOptions)) {
-				searchOptions.topkMode = "fill";
+			const addToRequest = (prop, defaultValue = undefined) => {
+				if (options[prop] != undefined) request[prop] = options[prop];
+				else if (defaultValue !== undefined) request[prop] = defaultValue;
+			};
+			addToRequest("topk", this.initialLimit);
+			addToRequest("maxfreq");
+
+			const searchOptions = options.searchOptions || {};
+
+			// a more expensive search for the first query
+			if (!this._hadFirstQuery) {
+				this._hadFirstQuery = true;
+				if (!("topkMode" in searchOptions)) {
+					searchOptions.topkMode = "fill";
+				}
 			}
+
+			searchResult = this.netspeakApi.search(request, searchOptions);
 		}
 
 		const append = options.appendMode == "append";
 
-		let searchResult;
-		if (!normalizeQuery(request.query)) {
-			// note that this optimization will also catch the first empty query from the polymer query change event.
-			searchResult = Promise.resolve(/** @type {import("./netspeak").NetspeakSearchResult} */({
-				phrases: [],
-				unknownWords: []
-			}));
-		} else {
-			searchResult = this.netspeakApi.search(request, searchOptions);
-		}
-
 		searchResult.then(result => {
-			this._onSearchSuccess(result, request, append);
+			this._onSearchSuccess(result, state, append);
 		}).catch(reason => {
-			this._onSearchError(reason, request, append);
+			this._onSearchError(reason, state, append);
 		});
 	}
 
 	/**
-	 *
 	 * @param {import("./netspeak").NetspeakSearchResult} result
-	 * @param {{ query: string, corpus: string, focusInput: boolean }} request
+	 * @param {QueryPhrasesState} state
 	 * @param {boolean} append
 	 */
-	_onSearchSuccess(result, request, append = false) {
-		if (this.query !== request.query) return; // too late
+	_onSearchSuccess(result, state, append = false) {
+		if (this.query !== state.query || this.corpus !== state.corpus) return; // too late
 
 		let newPhrases = result.phrases.length;
 		/** @type {string[]} */
@@ -616,32 +633,31 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 		this._resultList.showLoadMore = !result.complete && newPhrases > 0;
 
-		this.update(request.focusInput);
+		this.update(state.focusInput);
 	}
 	/**
-	 *
 	 * @param {string | Error} message
-	 * @param {{ query: string, corpus: string, focusInput: boolean }} request
+	 * @param {QueryPhrasesState} state
 	 * @param {boolean} append
 	 * @param {number} delay
 	 */
-	_onSearchError(message, request, append = false, delay = 1000) {
-		if (this.query !== request.query) return; // too late
+	_onSearchError(message, state, append = false, delay = 1000) {
+		if (this.query !== state.query || this.corpus !== state.corpus) return; // too late
 
 		// delay
 		if (delay > 0) {
-			setTimeout(() => this._onSearchError(message, request, append, 0), delay);
+			setTimeout(() => this._onSearchError(message, state, append, 0), delay);
 			return;
 		}
 
 		// disable load more
 		this._resultList.showLoadMore = false;
 
-		console.error(message, request);
+		console.error(message, state);
 
 		this.errorMessage = message;
 		this.unknownWords = [];
-		this.update(request.focusInput);
+		this.update(state.focusInput);
 	}
 
 	update(focusInput = false) {
@@ -704,47 +720,6 @@ export class NetspeakSearchBar extends NetspeakElement {
 				p.innerHTML = unknownWordMessage.replace(/\$\{word\}/g, () => {
 					return `<em>${word}</em>`;
 				});
-
-				// TODO: Add REAL support for suggestion for all-lower-case indexes.
-				const lower = word.toLowerCase();
-				if (this.corpus === "web-en" && word !== lower) {
-					const WORD_BOUNDARY = /^[|[\]{}\s]$/;
-					let suggestion = this.query;
-
-					// replace all occurrences
-					let startIndex = 0;
-					while (startIndex < suggestion.length) {
-						const index = suggestion.indexOf(word, startIndex);
-						if (index === -1) break;
-
-						// check boundaries
-						const before = suggestion[index - 1];
-						const after = suggestion[index + word.length];
-						if (before && !WORD_BOUNDARY.test(before)
-							|| after && !WORD_BOUNDARY.test(after)) {
-							startIndex = index + word.length;
-							continue;
-						}
-
-						suggestion = suggestion.slice(0, index) + lower + suggestion.slice(index + word.length);
-						startIndex = index + lower.length;
-					}
-
-					this.localMessage("did-you-mean", "Did you mean ${word}?").then(didYouMeanMessage => {
-						p.appendChild(document.createTextNode(" "));
-						didYouMeanMessage.split(/\$\{word\}/g).forEach((segment, i) => {
-							if (i > 0) {
-								const span = appendNewElements(p, "em", "span");
-								span.className = "suggestion";
-								span.textContent = lower;
-								span.addEventListener("click", () => {
-									this.query = suggestion;
-								});
-							}
-							p.appendChild(document.createTextNode(segment));
-						});
-					});
-				}
 			});
 		});
 	}
@@ -757,11 +732,10 @@ export class NetspeakSearchBar extends NetspeakElement {
 
 		Promise.all([
 			this.localMessage("invalid-query",
-				`Your input cannot be processed because it does not follow the Netspeak query syntax.
-					Please correct your input.
-					<br><br>
-					More information about the Netpspeak query syntax can be found
-					<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
+				`Your input is not a valid Netspeak query.
+				<br><br>
+				More information about the Netpspeak query syntax can be found
+				<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
 			),
 			this.localMessage("full-details", "Full details"),
 		]).then(([invalidQuery, fullDetails]) => {
