@@ -749,19 +749,15 @@ export class NetspeakSearchBar extends NetspeakElement {
 			);
 		} else if (details instanceof NetworkError) {
 			// (see jsonp.js for more info on what errors are available)
-			// we can't differentiate between no internet connection and whether Netspeak is down. So to do this, we
-			// just send a non-cached request. If that also fails, we're offline. We can send the request to wherever.
-			message = jsonp("https://api.github.com/orgs/github", 10e3 /* == 10 seconds */).then(() => {
-				// the request got through, so only Netspeak is offline
-				return this.localMessage("netspeak-unreachable-error",
+			if (navigator.onLine) {
+				message = this.localMessage("netspeak-unreachable-error",
 					`The Netspeak server failed to respond. Please retry in a few minutes.`
 				);
-			}, () => {
-				// the website is also offline
-				return this.localMessage("no-connection-error",
+			} else {
+				message = this.localMessage("no-connection-error",
 					`No response form the Netspeak server. Please make sure you have a stable internet connection.`
 				);
-			});
+			}
 		} else {
 			// everything that isn't a networking error or an error from Netspeak itself
 			// is assumed to be caused by the web interface itself. We can't really give any detailed error message
