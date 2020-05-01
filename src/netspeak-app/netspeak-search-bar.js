@@ -4,7 +4,7 @@ import { appendNewElements, createNextFrameInvoker, createClipboardButton, encod
 import { NetspeakNavigator } from "./netspeak-navigator.js";
 import "./netspeak-example-queries.js";
 import { DEFAULT_SNIPPETS } from "./snippets.js";
-import { NetworkError, jsonp } from "./jsonp.js";
+import { NetworkError } from "./jsonp.js";
 
 
 /**
