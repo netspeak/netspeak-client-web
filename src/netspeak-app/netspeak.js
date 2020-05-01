@@ -109,10 +109,16 @@ export class Netspeak {
 
 				// for information on how the JSON object is structured see www.netspeak.org
 
-				if (json["9"]) {
+				const errorCode = json["9"];
+				if (errorCode) {
 					// json["9"]:  error code for any value != 0
 					// json["10"]: error message
-					throw `NetspeakError: ${json["9"]}: ${json["10"]}`;
+					const errorMessage = json["10"];
+					if (errorCode == 1) {
+						throw new NetspeakInvalidQueryError(errorMessage);
+					} else {
+						throw new NetspeakError(errorCode, errorMessage);
+					}
 				}
 
 				// json["4"]: [ // array of phrases
@@ -330,6 +336,26 @@ export class Netspeak {
 }
 
 let defaultNetspeakInstance;
+
+
+export class NetspeakError extends Error {
+	/**
+	 * @param {number | string} errorCode
+	 * @param {string} message
+	 */
+	constructor(errorCode, message) {
+		super("Netspeak error: " + errorCode + ": " + message);
+	}
+}
+export class NetspeakInvalidQueryError extends NetspeakError {
+	/**
+	 * @param {string} message
+	 */
+	constructor(message) {
+		super(1, "Invalid Query: " + message);
+	}
+}
+
 
 export class Word {
 

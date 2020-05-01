@@ -1,9 +1,10 @@
 import { html, NetspeakElement, registerElement } from "./netspeak-element.js";
-import { Netspeak, PhraseCollection, Word, normalizeQuery } from "./netspeak.js";
+import { Netspeak, PhraseCollection, Word, normalizeQuery, NetspeakInvalidQueryError, NetspeakError } from "./netspeak.js";
 import { appendNewElements, createNextFrameInvoker, createClipboardButton, encode } from "./util.js";
 import { NetspeakNavigator } from "./netspeak-navigator.js";
 import "./netspeak-example-queries.js";
 import { DEFAULT_SNIPPETS } from "./snippets.js";
+import { NetworkError, jsonp } from "./jsonp.js";
 
 
 /**
@@ -730,16 +731,51 @@ export class NetspeakSearchBar extends NetspeakElement {
 	_updateErrorMessage(container, details) {
 		container.innerHTML = '';
 
-		Promise.all([
-			this.localMessage("invalid-query",
+		/** @type {Promise<string>} */
+		let message;
+		if (details instanceof NetspeakInvalidQueryError) {
+			message = this.localMessage("invalid-query-error",
 				`Your input is not a valid Netspeak query.
 				<br><br>
 				More information about the Netpspeak query syntax can be found
 				<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
-			),
+			);
+		} else if (details instanceof NetspeakError) {
+			// we got an error from the server which isn't a query error. This means that the user is not at fault
+			// but can't really say anything about what went wrong because the Netspeak server might have failed for
+			// any number of reasons.
+			message = this.localMessage("unknown-server-error",
+				`An error occurred in Netspeak.`
+			);
+		} else if (details instanceof NetworkError) {
+			// (see jsonp.js for more info on what errors are available)
+			// we can't differentiate between no internet connection and whether Netspeak is down. So to do this, we
+			// just send a non-cached request. If that also fails, we're offline. We can send the request to wherever.
+			message = jsonp("https://api.github.com/orgs/github", 10e3 /* == 10 seconds */).then(() => {
+				// the request got through, so only Netspeak is offline
+				return this.localMessage("netspeak-unreachable-error",
+					`The Netspeak server failed to respond. Please retry in a few minutes.`
+				);
+			}, () => {
+				// the website is also offline
+				return this.localMessage("no-connection-error",
+					`No response form the Netspeak server. Please make sure you have a stable internet connection.`
+				);
+			});
+		} else {
+			// everything that isn't a networking error or an error from Netspeak itself
+			// is assumed to be caused by the web interface itself. We can't really give any detailed error message
+			// here because this state will only be reached if the web interface has a bug.
+			message = this.localMessage("client-error",
+				`An error occurred. Please report this to <a href="https://netspeak.org/help.html?lang=en#contact">the maintainers of Netspeak</a> should the error occur repeatedly.`
+			);
+		}
+
+		Promise.all([
+			message,
 			this.localMessage("full-details", "Full details"),
-		]).then(([invalidQuery, fullDetails]) => {
-			appendNewElements(container, "P").innerHTML = `${invalidQuery}
+		]).then(([errorMessage, fullDetails]) => {
+			appendNewElements(container, "P").innerHTML = `${errorMessage}
 				<br>
 				<br>
 				<details><summary>${encode(fullDetails)}</summary>

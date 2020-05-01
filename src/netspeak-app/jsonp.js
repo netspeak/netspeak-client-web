@@ -41,10 +41,12 @@ export function jsonp(url, timeout = 20000) {
 			let timeoutId;
 
 			// callbacks
+			/** @param {any} json */
 			const callbackSuccess = (json) => {
 				removeCallback(id, timeoutId);
 				resolve(json);
 			};
+			/** @param {NetworkError} message */
 			const callbackError = (message) => {
 				removeCallback(id, timeoutId);
 				reject(message);
@@ -55,12 +57,14 @@ export function jsonp(url, timeout = 20000) {
 			url += prefix + 'callback=' + encodeURIComponent(addCallback(id, callbackSuccess));
 
 			// set timeout
-			timeoutId = window.setTimeout(() => callbackError(`TimeoutError for ${url}`), timeout);
+			timeoutId = window.setTimeout(() => {
+				callbackError(new TimeoutError(`Could not reach server after ${timeout / 1000} seconds for ${url}`));
+			}, timeout);
 
 			// create script
 			let script = document.createElement("SCRIPT");
 			script.id = id;
-			script.onerror = () => callbackError(`Unknow error for ${url}`);
+			script.onerror = () => callbackError(new NetworkError(`Unknown networking error for ${url}`));
 			script.setAttribute("async", "true");
 			script.setAttribute("src", url);
 
@@ -70,3 +74,6 @@ export function jsonp(url, timeout = 20000) {
 		}
 	});
 }
+
+export class NetworkError extends Error { }
+export class TimeoutError extends NetworkError { }
