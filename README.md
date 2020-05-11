@@ -19,7 +19,7 @@ cd path/to/repo
 npm i
 ```
 
-An now, you should be ready to rock. As for IDEs, I recommend [VS Code](https://code.visualstudio.com/).
+And now, you should be ready to rock. As for IDEs, I recommend [VS Code](https://code.visualstudio.com/).
 
 Use the `npm run serve` to build the project and serve the created build.
 
