@@ -210,10 +210,16 @@ export class NetspeakSearchBar extends NetspeakElement {
 				font-size: 1em;
 			}
 
-			#drop-down .option {
+			#drop-down .option,
+			#drop-down .status {
 				padding: .5em 1em;
 				border-bottom: 1px solid var(--border-color);
 				cursor: pointer;
+			}
+
+			#drop-down .status {
+				font-style: italic;
+				cursor: unset;
 			}
 
 			#drop-down .option:nth-child(2n) {
@@ -224,7 +230,8 @@ export class NetspeakSearchBar extends NetspeakElement {
 				background-color: #EEE;
 			}
 
-			#drop-down .option:last-child {
+			#drop-down .option:last-child,
+			#drop-down .status:last-child {
 				border-bottom: none;
 			}
 
@@ -914,7 +921,12 @@ export class NetspeakSearchBar extends NetspeakElement {
 			};
 
 			history.forEach(i => newOpt(i.query));
-			if (history.length == 0) newOpt("");
+			if (history.length == 0) {
+				const opt = appendNewElements(dd, "DIV.status");
+				this.localMessage("no-history", "No query history").then(msg => {
+					opt.textContent = msg;
+				});
+			}
 
 			dd.focus();
 		} else {

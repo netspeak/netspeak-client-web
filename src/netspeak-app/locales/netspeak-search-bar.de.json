@@ -7,7 +7,9 @@
 		"netspeak-unreachable-error": "Keine Antwort vom Netspeak-Server. Bitte versuchen Sie es in ein paar Minuten erneut.",
 
 		"full-details": "Alle Details",
-		"unknown-word": "Unbekanntes Wort ${word}."
+		"unknown-word": "Unbekanntes Wort ${word}.",
+
+		"no-history": "Keine vorherigen Abfragen"
 	},
 	"template": {
 		"no-phrases-found": "Keine Phrasen gefunden."
