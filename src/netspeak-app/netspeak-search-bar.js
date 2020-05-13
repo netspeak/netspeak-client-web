@@ -1173,13 +1173,14 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 				width: 100%;
 			}
 
-			#load-more-button:hover {
+			#load-more-button:hover,
+			#load-more-button[disabled] {
 				background-color: #EEE;
 			}
 
 			/* These are for both the result list load-more button and the examples load-more buttons */
 
-			*:hover>span.load-more-img {
+			*:hover:not([disabled]) > span.load-more-img {
 				opacity: 1;
 			}
 			span.load-more-img {
@@ -1240,9 +1241,11 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 		this.addEventListener("show-load-more-changed", () => {
 			if (this._loadMore) {
 				this._loadMore.style.display = this.showLoadMore ? "block" : "none";
+				this._loadMore.removeAttribute("disabled");
 			}
 		});
 		this._loadMore.addEventListener("click", () => {
+			this._loadMore.setAttribute("disabled", "");
 			this.dispatchEvent(new CustomEvent("load-more", {
 				bubbles: false,
 				cancelable: false,
@@ -1260,6 +1263,9 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 
 	_render() {
 		if (!this.isConnected) return;
+
+		// re-enable load more button
+		this._loadMore.removeAttribute("disabled");
 
 		const collection = new NewPhraseCollection(this._getAllPhrasesToRender());
 
