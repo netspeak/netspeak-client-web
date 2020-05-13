@@ -737,7 +737,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			message = this.localMessage("invalid-query-error",
 				`Your input is not a valid Netspeak query.
 				<br><br>
-				More information about the Netpspeak query syntax can be found
+				More information about the Netspeak query syntax can be found
 				<a href="https://netspeak.org/help.html#how" target="_blank">here</a>.`
 			);
 		} else if (details instanceof NetspeakError) {
