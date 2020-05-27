@@ -913,7 +913,7 @@ export class NetspeakSearchBar extends NetspeakElement {
 			// new option function
 			const newOpt = (query) => {
 				const opt = appendNewElements(dd, "DIV.option");
-				opt.innerHTML = query;
+				opt.textContent = query;
 				opt.onclick = () => {
 					this._toggleHistoryDropDown(false);
 					this.query = query;
