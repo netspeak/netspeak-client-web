@@ -1010,7 +1010,7 @@ class NetspeakSearchBarResultList extends NetspeakElement {
 			#result-list .phrase-container {
 				background-repeat: no-repeat;
 				background-position: calc(100% + 1px) -2px;
-				background-image: url("/src/img/frequency-bar.svg");
+				background-image: url("/src/img/frequency-bar.png");
 
 				cursor: pointer;
 				padding: 0 var(--left-right-padding);
