@@ -1,0 +1,55 @@
+.NetspeakHeader {
+	background: #323232;
+	display: block;
+	padding: 0;
+	border-bottom: 1px solid #727272;
+	position: relative;
+}
+
+.NetspeakHeader .content {
+	max-width: 800px;
+	padding: 19px 0;
+	box-sizing: border-box;
+	margin: 0 64px;
+}
+
+.NetspeakHeader .logo {
+	display: block;
+	float: left;
+	height: 32px;
+	width: 121px;
+	background-image: url('../img/netspeak-path-white-121x32.svg');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
+}
+
+.NetspeakHeader .slogan {
+	color: rgba(255, 255, 255, .80);
+	font-size: 10pt;
+	white-space: nowrap;
+	display: block;
+	float: left;
+	font-size: 15px;
+	padding-top: 10px;
+	padding-left: 16px;
+}
+
+@media screen and (max-width: 500px) {
+	.NetspeakHeader {
+		height: 48px;
+	}
+	.NetspeakHeader .content {
+		padding: 0;
+	}
+	.NetspeakHeader .logo {
+		display: block;
+		float: none;
+		margin: auto;
+		height: 48px;
+		width: 182px;
+	}
+	.NetspeakHeader .slogan {
+		display: none;
+	}
+}

@@ -1,0 +1,140 @@
+.NetspeakSearch {
+	font-size: 100%;
+}
+
+.NetspeakSearch>.wrapper {
+	border-left: 1px solid #BBB;
+	border-right: 1px solid #BBB;
+	border-bottom: 1px solid #BBB;
+}
+
+/* Search bar */
+
+.NetspeakSearch>.search-bar-wrapper {
+	border-top: 1px solid #BBB;
+	font-size: 110%;
+}
+
+.NetspeakSearch>.search-bar-wrapper input {
+	background-color: transparent;
+	border: none;
+	display: block;
+	box-sizing: border-box;
+	width: 100%;
+	padding: .5em;
+	line-height: 1.5em;
+	font-family: var(--input-font-family, inherit);
+}
+
+.NetspeakSearch>.search-bar-wrapper .TransparentButton {
+	padding: .5em .25em;
+	--transparent-button-icon-size: 1.25em;
+}
+
+.NetspeakSearch>.search-bar-wrapper input::-ms-clear {
+	display: none;
+}
+
+.NetspeakSearch>.search-bar-wrapper table td:first-child {
+	width: 100%;
+}
+
+.NetspeakSearch>.search-bar-wrapper table, .NetspeakSearch>.search-bar-wrapper tbody, .NetspeakSearch>.search-bar-wrapper tr, .NetspeakSearch>.search-bar-wrapper td {
+	margin: 0;
+	padding: 0;
+	border-spacing: 0;
+}
+
+.NetspeakSearch>.search-bar-wrapper button.btn-img {
+	background-image: none !important;
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	margin: 0;
+	opacity: .5;
+	padding: var(--icon-padding, 4px);
+	position: relative;
+}
+
+.NetspeakSearch>.search-bar-wrapper button.btn-img:hover, .NetspeakSearch>.search-bar-wrapper button.btn-img.selected {
+	opacity: .8;
+}
+
+.NetspeakSearch>.search-bar-wrapper button.btn-img>span.btn-img {
+	background-position: center;
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: inline-block;
+	margin: 0;
+	padding: 0;
+	width: var(--icon-size, 16px);
+	height: var(--icon-size, 16px);
+}
+
+.NetspeakSearch>.search-bar-wrapper .example-queries-button>* {
+	background-image: url("../img/i.svg");
+}
+
+.NetspeakSearch>.search-bar-wrapper .clear-button>* {
+	background-image: url("../img/x.svg");
+}
+
+.NetspeakSearch>.search-bar-wrapper .history-button>* {
+	background-image: url("../img/history.svg");
+}
+
+/* History */
+
+.NetspeakSearch .history-wrapper {
+
+}
+.NetspeakSearch .history-wrapper > button {
+	background-color: transparent;
+	border: none;
+	display: block;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+}
+.NetspeakSearch .history-wrapper > button >div{
+	border-top: 1px solid #DDD;
+	cursor: pointer;
+	padding: .33em .5em;
+}
+.NetspeakSearch .history-wrapper > button:first-child>div {
+	border-top: none;
+}
+.NetspeakSearch .history-wrapper > button>div:hover {
+	text-decoration: underline;
+}
+
+/* Warning & errors */
+
+.NetspeakSearch>.warnings-wrapper {
+	background-color: #EDA;
+}
+
+.NetspeakSearch>.errors-wrapper {
+	background-color: #EAA;
+}
+
+.NetspeakSearch>.warnings-wrapper p, .NetspeakSearch>.errors-wrapper p {
+	margin: 1em;
+}
+
+/* Popup fix */
+
+.NetspeakSearch .popup-overlay {
+	z-index: 1000;
+}
+.NetspeakSearch .popup-content {
+	z-index: 1002 !important;
+}
+
+/* Other */
+
+.NetspeakSearch>.no-phrases-wrapper>p {
+	margin: 0;
+	padding: .3em .5em
+}

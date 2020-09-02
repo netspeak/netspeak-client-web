@@ -1,0 +1,44 @@
+.TransparentButton {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	font: inherit;
+	font-size: 100%;
+	margin: 0;
+	padding: .25em;
+	position: relative;
+}
+
+.TransparentButton:hover>.button-img {
+	opacity: .8;
+}
+
+.TransparentButton.selected>.button-img {
+	opacity: 1;
+}
+
+.TransparentButton:hover>.button-text {
+	opacity: 1;
+}
+
+.TransparentButton>.button-img {
+	background-repeat: no-repeat;
+	background-size: contain;
+	display: inline-block;
+	width: var(--transparent-button-icon-size, 1.25em);
+	height: var(--transparent-button-icon-size, 1.25em);
+	opacity: .5;
+	vertical-align: top;
+}
+
+.TransparentButton>.button-text {
+	display: inline-block;
+	line-height: var(--transparent-button-icon-size, 1.25em);
+	opacity: .8;
+	vertical-align: top;
+}
+
+.TransparentButton>.button-img+.button-text {
+	margin-left: .25em;
+}

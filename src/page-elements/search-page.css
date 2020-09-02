@@ -1,0 +1,25 @@
+#content {
+	max-width: 500px;
+	margin: 0 64px;
+	padding: 3em 0;
+}
+
+#content .NetspeakCorpusSelector {
+	margin: 0 0 2em auto;
+}
+
+@media screen and (max-width: 628px
+/* 500px + 64px * 2 */
+
+) {
+	#content {
+		max-width: 500px;
+		margin: 0 auto;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	#content {
+		margin: 0;
+	}
+}

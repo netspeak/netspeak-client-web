@@ -1,0 +1,141 @@
+.NetspeakResultList *::-moz-selection {
+	text-shadow: none !important;
+	background-color: rgba(32, 64, 255, .8);
+	color: #FFF;
+}
+
+.NetspeakResultList *::selection {
+	text-shadow: none !important;
+	background-color: rgba(32, 64, 255, .8);
+	color: #FFF;
+}
+
+.NetspeakResultList>div {
+	background-color: var(--item-background-color);
+	width: 100%;
+	padding: 0;
+}
+
+.NetspeakResultList>div:nth-child(2n) {
+	--item-background-color: #F7F7F7;
+}
+
+.NetspeakResultList>div:nth-child(2n+1) {
+	--item-background-color: #FFF;
+}
+
+.NetspeakResultList>div[options-visible], .NetspeakResultList>div:hover {
+	--item-background-color: #e2ebf1;
+}
+
+/**
+ * div.phrase-container
+ */
+
+.NetspeakResultList .phrase-container {
+	background-repeat: no-repeat;
+	background-position: calc(100% + 1px) -2px;
+	background-image: url("../img/frequency-bar.png");
+	cursor: pointer;
+	padding: 0 var(--left-right-padding);
+	width: 100%;
+	box-sizing: border-box;
+}
+
+.NetspeakResultList .phrase-container::after {
+	content: "";
+	clear: both;
+	display: block;
+}
+
+.NetspeakResultList span.text, .NetspeakResultList span.freq {
+	text-shadow: 0 1px 1px #FFF;
+	padding: .3em .5em;
+}
+
+.NetspeakResultList span.text {
+	float: left;
+}
+
+.NetspeakResultList span.text.pinned {
+	font-weight: bold;
+}
+
+.NetspeakResultList span.freq {
+	float: right;
+	text-align: right;
+}
+
+.NetspeakResultList span.freq>span.percentage {
+	display: inline-block;
+	padding-left: .5em;
+	width: 4em;
+}
+
+.NetspeakResultList span.text span {
+	color: #333;
+}
+
+.NetspeakResultList span.text span.asterisk, .NetspeakResultList span.text span.q-mark, .NetspeakResultList span.text span.plus, .NetspeakResultList span.text span.regex {
+	color: #c5000b;
+}
+
+.NetspeakResultList span.text span.option-set, .NetspeakResultList span.text span.order-set, .NetspeakResultList span.text span.dict-set, .NetspeakResultList span.text span.option-set-regex, .NetspeakResultList span.text span.order-set-regex {
+	color: #2d7db3;
+}
+
+/**
+ * div.options
+ */
+
+.NetspeakResultList .options {
+	background: rgb(247, 247, 247);
+	border-bottom: 1px solid #CCC;
+	border-top: 1px solid #CCC;
+	color: #444;
+	position: relative;
+}
+
+.NetspeakResultList>div:last-child .options {
+	border-bottom: none;
+}
+
+/*
+ * div.buttons
+ */
+
+.NetspeakResultList .options>.buttons {
+	text-align: right;
+	margin: .25em var(--left-right-padding);
+}
+
+.NetspeakResultList .options>.buttons .TransparentButton {
+	padding: .25em .5em;
+}
+
+/*
+ * EXAMPLES
+ */
+
+.NetspeakResultList .options .examples-container {
+	padding: 0 1em 1em 1em;
+}
+
+.NetspeakResultList .options .examples-list {
+	font-size: 90%;
+	word-break: break-word;
+}
+
+.NetspeakResultList .options .examples-list .source {
+	padding-left: .25em;
+}
+
+.NetspeakResultList .options .examples-list .source a {
+	color: inherit;
+	opacity: .7;
+	text-decoration: none;
+}
+
+.NetspeakResultList .options .examples-list .source a:hover {
+	text-decoration: underline;
+}

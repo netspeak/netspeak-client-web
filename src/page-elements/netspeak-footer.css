@@ -1,0 +1,56 @@
+.NetspeakFooter {
+	display: block;
+	background-color: #F8F8F8;
+	font-size: 90%;
+	color: #666;
+	padding: 2em 3em;
+	line-height: 1.4;
+}
+
+.NetspeakFooter a {
+	color: inherit;
+	text-decoration: none;
+}
+
+.NetspeakFooter a.current-lang {
+	text-decoration: underline;
+}
+
+.NetspeakFooter a:hover {
+	text-decoration: underline;
+}
+
+.NetspeakFooter #netspeak-points {
+	display: inline;
+}
+
+.NetspeakFooter #language-section {
+	display: inline;
+}
+
+.NetspeakFooter #webis-copyright {
+	float: right;
+}
+
+.NetspeakFooter .bullet {
+	padding: 0 5px;
+}
+
+.NetspeakFooter .pipe {
+	padding: 0 15px;
+}
+
+@media screen and (max-width: 750px) {
+	.NetspeakFooter {
+		padding: 2em;
+	}
+	.NetspeakFooter #netspeak-points,.NetspeakFooter  #language-section,.NetspeakFooter  #webis-copyright {
+		display: block;
+		float: none;
+		text-align: center;
+		padding: .5em 0;
+	}
+	.NetspeakFooter .pipe {
+		display: none;
+	}
+}

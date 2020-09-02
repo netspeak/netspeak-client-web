@@ -7,7 +7,6 @@ This is the development project of the [netspeak.org](http://netspeak.org) websi
 The website is a single page application and uses the [Polymer 3 framework](https://polymer-library.polymer-project.org/3.0/docs/devguide/feature-overview).
 It is served using [GitHub pages](https://pages.github.com/) over [netspeak.github.io](https://github.com/netspeak/netspeak.github.io).
 
-
 ## Getting started
 
 Before you can start developing make sure you have a recent-ish version of [Node.js](https://nodejs.org) and npm (included as part of Node.js) installed. ([Linux](https://nodejs.org/en/download/package-manager)/[Windows](https://nodejs.org/en/download/))
@@ -23,13 +22,11 @@ And now, you should be ready to rock. As for IDEs, I recommend [VS Code](https:/
 
 Use the `npm run serve` to build the project and serve the created build.
 
-
 ## Build
 
 After you made some changes, use the `npm run build` command to build the website.
 
 This will create a new folder `build` where all builds are located. The build `default` is the one we want.
-
 
 ### ESNext
 
@@ -41,14 +38,13 @@ This comes at the cost of increased file sizes but that's a good trade for compa
 However! <br>
 Some newer JS features are not ES5 compatible and cannot be compiled.
 These features will be copied as is by Polymer in the futile hope that older browsers might support it.
-This means that it is __your__ responsibility to make sure that the language feature you use compile.
-
+This means that it is **your** responsibility to make sure that the language feature you use compile.
 
 ## Deploy
 
 If all tests pass, you can deploy your updated build. Copy the contents of the build (the files in `build/<build name>/`) to the `master` branch of [`netspeak.github.io`](https://github.com/netspeak/netspeak.github.io) project and push. GitHub pages will take care of the rest and update the website in a few seconds.
 
-__You changes will then be out there for the world to see, so make sure that everything is working correctly.__
+**You changes will then be out there for the world to see, so make sure that everything is working correctly.**
 
 If you don't want to do this manually, use the following command:
 
@@ -87,29 +83,33 @@ The correct JSON file will automatically be loaded. You can use the `loadLocaliz
 Example:
 
 ```js
-import { loadLocalization, NetspeakElement } from '/path/to/netspeak-element.js';
+import { loadLocalization, NetspeakElement } from "/path/to/netspeak-element.js";
 
 class MyElement extends NetspeakElement {
-    static get importMeta() { return import.meta; }
-    static get is() { return 'my-element'; }
-    // properties, template, etc.
+	static get importMeta() {
+		return import.meta;
+	}
+	static get is() {
+		return "my-element";
+	}
+	// properties, template, etc.
 
-    constructor() {
-        super(); // important!
+	constructor() {
+		super(); // important!
 
-        loadLocalization(MyElement).then(json => {
-            if (json === false) {
-                // In this case, the current language is the default language (en).
-                // No localization will be loaded.
-            } else {
-                // do something with the language data.
-            }
-        });
-    }
+		loadLocalization(MyElement).then(json => {
+			if (json === false) {
+				// In this case, the current language is the default language (en).
+				// No localization will be loaded.
+			} else {
+				// do something with the language data.
+			}
+		});
+	}
 }
 ```
 
-__But we can do even MORE!__
+**But we can do even MORE!**
 
 The `NetspeakElement` can also automatically insert the localization into the shadow DOM. To do so, it uses the ID of DOM elements. The JSON files also have to be of the format:
 
@@ -126,10 +126,9 @@ The `NetspeakElement` can also automatically insert the localization into the sh
 
 Localized message will be inserted into the shadow DOM asynchronously after the element has be connected to a host DOM. After this is done, the shadow DOM will not be touched again.
 
-_Note:_ Only element with an ID __and__ no child element at the time of the insertion can be localized this way.
+_Note:_ Only element with an ID **and** no child element at the time of the insertion can be localized this way.
 
 </details>
-
 
 ---
 

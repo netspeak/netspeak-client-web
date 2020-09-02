@@ -1,7 +1,6 @@
 const git = require("simple-git/promise");
 const sh = require("shelljs");
 
-
 async function publishDemo() {
 	sh.cd(__dirname);
 
@@ -12,11 +11,12 @@ async function publishDemo() {
 	const repo = git(__dirname + "/publish");
 	await repo.status(); // verify repo
 
-	sh.exec("npm run build");
+	sh.exec("npm run clean");
+	sh.exec("npm run build:demo");
 
 	sh.rm("-rf", "publish/demo");
 	sh.mkdir("-p", "publish/demo");
-	sh.cp("-r", "./build/default/*", "./publish/demo");
+	sh.cp("-r", "./public/*", "./publish/demo");
 
 	const status = await repo.status();
 
@@ -42,6 +42,7 @@ async function publishRelease() {
 	const repo = git(__dirname + "/publish");
 	await repo.status(); // verify repo
 
+	sh.exec("npm run clean");
 	sh.exec("npm run build");
 
 	sh.cd("./publish");
@@ -51,7 +52,7 @@ async function publishRelease() {
 		}
 	});
 	sh.cd("..");
-	sh.cp("-r", "./build/default/*", "./publish");
+	sh.cp("-r", "./public/*", "./publish");
 
 	const status = await repo.status();
 
@@ -67,8 +68,7 @@ async function publishRelease() {
 	await repo.push();
 }
 
-
 module.exports = {
 	publishDemo,
-	publishRelease
+	publishRelease,
 };

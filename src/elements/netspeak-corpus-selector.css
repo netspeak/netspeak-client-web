@@ -1,0 +1,28 @@
+.NetspeakCorpusSelector {
+	display: table;
+	padding: 0;
+}
+
+.NetspeakCorpusSelector .wrapper {
+	position: relative;
+}
+
+.NetspeakCorpusSelector .wrapper button {
+	background-color: transparent;
+	font-size: inherit;
+	border: 1px solid #BBB;
+	cursor: pointer;
+	display: inline-block;
+	margin-left: .5em;
+	padding: .5em .75em;
+}
+
+.NetspeakCorpusSelector .wrapper button.selected {
+	background-color: #EEE;
+	border-color: #888;
+}
+
+.NetspeakCorpusSelector .wrapper button:hover {
+	background-color: #EEE;
+	color: #000;
+}
