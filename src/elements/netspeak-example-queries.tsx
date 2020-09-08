@@ -1,5 +1,4 @@
 import React from "react";
-import "./netspeak-corpus-selector.css";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 import "./netspeak-example-queries.css";
 import NetspeakQueryText from "./netspeak-query-text";
