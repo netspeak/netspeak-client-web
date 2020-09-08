@@ -11,7 +11,7 @@
     "serve": "gatsby serve",
     "clean": "gatsby clean",
     "lint": "eslint src/**",
-    "test": "echo \"No tests yet.\"",
+    "test": "run build",
     "publish-demo": "npx gulp publishDemo",
     "publish-release": "npx gulp publishRelease"
   },
