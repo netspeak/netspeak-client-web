@@ -10,7 +10,7 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "lint": "eslint src/**",
+    "lint": "eslint --no-error-on-unmatched-pattern src/**",
     "test": "run build",
     "publish-demo": "npx gulp publishDemo",
     "publish-release": "npx gulp publishRelease"
