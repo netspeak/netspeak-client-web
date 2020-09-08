@@ -8,6 +8,7 @@ import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
 import { optional, nextId } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
+import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
 
 interface State {
 	corpusKey: string;
@@ -48,17 +49,15 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			});
 		}, ignoreCanceled);
 
-		window.addEventListener("hashchange", this._onHashUpdateHandler);
+		addHashChangeListener(this._onHashUpdateHandler);
 	}
 	componentWillUnmount(): void {
 		this._corporaPromise?.cancel();
 
-		window.removeEventListener("hashchange", this._onHashUpdateHandler);
+		removeHashChangeListener(this._onHashUpdateHandler);
 	}
 
 	private _onHashUpdateHandler = (): void => {
-		console.log(`new hash: ` + location.hash);
-
 		const pageQuery = getPageParam("q") || "";
 		const pageCorpus = getPageParam("corpus");
 
