@@ -1,5 +1,3 @@
-import { localStorage, navigator } from "./window-helper";
-
 export const supportedLanguages: ReadonlySet<string> = new Set(["en", "de"]);
 export type SupportedLanguage = "en" | "de";
 
@@ -24,13 +22,13 @@ export function createLocalizer<T>(props: LocalizableProps, locales: Locales<T>)
 const currentLangKey = "currentLang";
 
 function detectCurrentLang(): SupportedLanguage | null {
-	if (localStorage?.getItem(currentLangKey)) {
+	if (localStorage.getItem(currentLangKey)) {
 		// stored
 		return localStorage.getItem(currentLangKey) as SupportedLanguage;
 	}
 
 	// match against users languages
-	for (let l of navigator?.languages || []) {
+	for (let l of navigator.languages || []) {
 		l = l.toLowerCase();
 		if (supportedLanguages.has(l)) return l as SupportedLanguage;
 		// reduce e.g. "en-US" to "en"
@@ -49,5 +47,5 @@ export function getCurrentLang(): SupportedLanguage {
 	}
 }
 export function setCurrentLang(lang: SupportedLanguage): void {
-	localStorage?.setItem(currentLangKey, lang);
+	localStorage.setItem(currentLangKey, lang);
 }

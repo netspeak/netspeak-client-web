@@ -8,7 +8,6 @@ import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
 import { optional, nextId } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
-import { location, localStorage } from "../lib/window-helper";
 
 interface State {
 	corpusKey: string;
@@ -34,7 +33,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		currentQuery: "",
 		queryId: nextId(),
 
-		exampleVisibility: (localStorage?.getItem("exampleVisibility") || "peek") as ExampleVisibility,
+		exampleVisibility: (localStorage.getItem("exampleVisibility") || "peek") as ExampleVisibility,
 	};
 
 	componentDidMount(): void {
@@ -58,7 +57,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	}
 
 	private _onHashUpdateHandler = (): void => {
-		console.log(`new hash: ` + location?.hash);
+		console.log(`new hash: ` + location.hash);
 
 		const pageQuery = getPageParam("q") || "";
 		const pageCorpus = getPageParam("corpus");
@@ -92,7 +91,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		setPageParam("q", query);
 	};
 	private _onSetExampleVisibilityHandler = (visibility: ExampleVisibility): void => {
-		localStorage?.setItem("exampleVisibility", visibility);
+		localStorage.setItem("exampleVisibility", visibility);
 		this.setState({
 			exampleVisibility: visibility,
 		});
@@ -136,15 +135,13 @@ function withCorpusKey(corpusKey: string, state?: Readonly<State>): Pick<State, 
 
 function getHashParams(): URLSearchParams {
 	try {
-		return new URLSearchParams((location?.hash || "#").substr(1));
+		return new URLSearchParams((location.hash || "#").substr(1));
 	} catch (error) {
 		return new URLSearchParams("");
 	}
 }
 function setHashParams(params: URLSearchParams): void {
-	if (location) {
-		location.hash = params.toString();
-	}
+	location.hash = params.toString();
 }
 type PageParam = "q" | "corpus";
 function getPageParam(param: PageParam): string | null {
@@ -157,7 +154,7 @@ function setPageParam(param: PageParam, value: string): void {
 }
 
 function loadQueryHistory(corpus: string): QueryHistory {
-	const stored = localStorage?.getItem("queryHistory:" + corpus);
+	const stored = localStorage.getItem("queryHistory:" + corpus);
 	if (stored) {
 		return QueryHistory.fromJSON(stored);
 	} else {
@@ -165,5 +162,5 @@ function loadQueryHistory(corpus: string): QueryHistory {
 	}
 }
 function storyQueryHistory(corpus: string, history: QueryHistory): void {
-	localStorage?.setItem("queryHistory:" + corpus, history.toJSON());
+	localStorage.setItem("queryHistory:" + corpus, history.toJSON());
 }

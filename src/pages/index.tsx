@@ -1,4 +1,5 @@
 import React from "react";
+import dynamic from "../lib/dynamic";
 import SearchPage from "../page-elements/search-page";
 import { Helmet } from "react-helmet";
 import GA from "../page-elements/ga";
@@ -6,7 +7,9 @@ import GA from "../page-elements/ga";
 export default function Home(): JSX.Element {
 	return (
 		<>
-			<SearchPage />
+			{dynamic(() => (
+				<SearchPage />
+			))}
 			<Helmet>
 				<title>Netspeak</title>
 				<meta

@@ -27,6 +27,7 @@ module.exports = {
 		],
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-explicit-any": "off",
+		"no-restricted-globals": "off",
 	},
 	ignorePatterns: ["src/img/**", "*.css", "*.js"],
 };

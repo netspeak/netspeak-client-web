@@ -4,9 +4,8 @@ import { getCurrentLang, Locales, SimpleLocale, createLocalizer, SupplierLocale 
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
 
-const lang = getCurrentLang();
-
 export default function HelpPage(): JSX.Element {
+	const lang = getCurrentLang();
 	const l = createLocalizer({ lang }, locales);
 
 	return (
@@ -20,9 +19,9 @@ export default function HelpPage(): JSX.Element {
 			{l("howP")()}
 
 			<H3 id="examples">{l("examples")}</H3>
-			{l("exampleData").map(data => {
+			{l("exampleData").map((data, i) => {
 				return (
-					<div className="group-box">
+					<div key={i} className="group-box">
 						<div className="group-title">{data.title}</div>
 						<div className="group-content">
 							<P>{data.desc()}</P>
