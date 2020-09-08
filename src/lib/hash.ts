@@ -15,16 +15,18 @@ function callAllListeners(): void {
 // This will add a listener for the "hashchange" event and it will periodically check the hash in case the event didn't
 // fire for some reason (yes, that happens).
 let lastHash: string | undefined = undefined;
-window.addEventListener("hashchange", () => {
-	lastHash = location.hash;
-	callAllListeners();
-});
-setInterval(() => {
-	if (lastHash !== undefined) {
-		const hash = location.hash;
-		if (lastHash !== hash) {
-			lastHash = location.hash;
-			callAllListeners();
+if (typeof window !== "undefined") {
+	window.addEventListener("hashchange", () => {
+		lastHash = location.hash;
+		callAllListeners();
+	});
+	setInterval(() => {
+		if (lastHash !== undefined) {
+			const hash = location.hash;
+			if (lastHash !== hash) {
+				lastHash = location.hash;
+				callAllListeners();
+			}
 		}
-	}
-}, 10);
+	}, 10);
+}
