@@ -5,6 +5,6 @@
  */
 
 module.exports = {
-	pathPrefix: `/demo`,
+	pathPrefix: `/demo`, // useful for publishing demos
 	plugins: [`gatsby-plugin-react-helmet`],
 };
