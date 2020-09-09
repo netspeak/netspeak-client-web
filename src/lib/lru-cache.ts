@@ -96,13 +96,17 @@ export class LRUCache<V> {
 	 * @param defaultValue The default value.
 	 * @returns The cached element of the default value.
 	 */
+	get(key: string, defaultValue: V): V;
+	get(key: string, defaultValue?: V): V | undefined;
 	get(key: string, defaultValue?: V): V | undefined {
 		const node = this._map[key];
-		if (!node) return defaultValue;
-
-		node.remove();
-		this._head.insertAfter(node);
-		return node.obj;
+		if (node) {
+			node.remove();
+			this._head.insertAfter(node);
+			return node.obj;
+		} else {
+			return defaultValue;
+		}
 	}
 
 	/**
