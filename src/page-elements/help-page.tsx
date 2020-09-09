@@ -8,37 +8,41 @@ export default function HelpPage(): JSX.Element {
 	const lang = getCurrentLang();
 	const l = createLocalizer({ lang }, locales);
 
+	const Toc = newToc();
+
 	return (
 		<Page lang={lang} className="HelpPage">
 			<h1 className="article">{l("help")}</h1>
 
-			<H2 id="contact">{l("contact")}</H2>
-			{l("contactP")()}
+			<Toc>
+				{Toc.h2("contact", l("contact"))}
+				{l("contactP")()}
 
-			<H2 id="how">{l("how")}</H2>
-			{l("howP")()}
+				{Toc.h2("how", l("how"))}
+				{l("howP")()}
 
-			<H3 id="examples">{l("examples")}</H3>
-			{l("exampleData").map((data, i) => {
-				return (
-					<div key={i} className="group-box">
-						<div className="group-title">{data.title}</div>
-						<div className="group-content">
-							<P>{data.desc()}</P>
-							<NetspeakSearch
-								lang={lang}
-								corpus="web-en"
-								defaultQuery={data.query}
-								defaultExampleVisibility="hidden"
-								pageSize={10}
-							/>
+				<H3 id="examples">{l("examples")}</H3>
+				{l("exampleData").map((data, i) => {
+					return (
+						<div key={i} className="group-box">
+							<div className="group-title">{data.title}</div>
+							<div className="group-content">
+								<P>{data.desc()}</P>
+								<NetspeakSearch
+									lang={lang}
+									corpus="web-en"
+									defaultQuery={data.query}
+									defaultExampleVisibility="hidden"
+									pageSize={10}
+								/>
+							</div>
 						</div>
-					</div>
-				);
-			})}
+					);
+				})}
 
-			<H3 id="for-developers">{l("devs")}</H3>
-			{l("devsP")()}
+				{Toc.h2("for-developers", l("devs"))}
+				{l("devsP")()}
+			</Toc>
 		</Page>
 	);
 }
@@ -61,6 +65,48 @@ function H3(props: { id: string; children: React.ReactNode }): JSX.Element {
 			{props.children}
 		</h3>
 	);
+}
+
+interface TocFnProps {
+	key?: string | number;
+	className?: string;
+	children?: React.ReactNode;
+}
+interface TocFn {
+	(props: TocFnProps): JSX.Element;
+	h2(id: string, name: string): JSX.Element;
+}
+
+function newToc(): TocFn {
+	const links: { level: number; id: string; name: string }[] = [];
+
+	function fn(props: TocFnProps): JSX.Element {
+		return (
+			<>
+				<div className={"toc" + (props.className ? " " + props.className : "")} key={props.key}>
+					<ul>
+						{links.map(({ level, id, name }) => {
+							return (
+								<li key={id} className={"h" + level}>
+									<span className="icon"></span>
+									<a href={"#" + id} className="article">
+										{name}
+									</a>
+								</li>
+							);
+						})}
+					</ul>
+				</div>
+				{props.children}
+			</>
+		);
+	}
+	fn.h2 = (id: string, name: string): JSX.Element => {
+		links.push({ level: 2, id, name });
+		return <H2 id={id}>{name}</H2>;
+	};
+
+	return fn;
 }
 
 function Email(props: { address: string }): JSX.Element {
