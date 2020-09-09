@@ -4,9 +4,9 @@ import {
 	Phrase,
 	normalizeQuery,
 	Netspeak,
-	NetspeakSearchResult,
 	NetspeakInvalidQueryError,
 	NetspeakError,
+	ReadonlyNetspeakSearchResult,
 } from "../lib/netspeak";
 import { optional, LoadingState, assertNever, delay, url } from "../lib/util";
 import NetspeakExampleQueries from "./netspeak-example-queries";
@@ -189,7 +189,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	};
 	private _handleSearchPromise(
 		normalizedQuery: NormalizedQuery,
-		promise: CancelablePromise<NetspeakSearchResult>
+		promise: CancelablePromise<ReadonlyNetspeakSearchResult>
 	): void {
 		this._delayErrorPromise?.cancel();
 
@@ -209,10 +209,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							result.complete || result.phrases.length === 0
 								? LoadingState.EXHAUSTED
 								: LoadingState.MORE_AVAILABLE,
-						problems: result.unknownWords.map<Problem>(word => ({
-							type: "UnknownWord",
-							word,
-						})),
+						problems: result.unknownWords.map<Problem>(word => ({ type: "UnknownWord", word })),
 					});
 				}
 			},

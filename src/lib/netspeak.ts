@@ -1,5 +1,6 @@
 import { jsonp } from "./jsonp";
 import { constructQueryParams } from "./url";
+import { LRUCache } from "./lru-cache";
 
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
@@ -45,11 +46,17 @@ export interface NetspeakSearchOptions {
 	 */
 	topkMode?: "default" | "fill";
 }
-export interface NetspeakSearchResult {
+
+export interface ReadonlyNetspeakSearchResult {
 	/** The phrases returned by the API. */
+	readonly phrases: readonly Phrase[];
+	readonly complete?: boolean | undefined;
+	/** A list of unknown words returned by the API. */
+	readonly unknownWords: readonly string[];
+}
+export interface NetspeakSearchResult extends ReadonlyNetspeakSearchResult {
 	phrases: Phrase[];
 	complete?: boolean | undefined;
-	/** A list of unknown words returned by the API. */
 	unknownWords: string[];
 }
 
@@ -58,6 +65,7 @@ export class Netspeak {
 	defaultCorpus = Netspeak.defaultCorpus;
 	corpusCaching = true;
 
+	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
 	private _cachedCorpus: Promise<Readonly<CorporaInfo>> | undefined = undefined;
 
 	/**
@@ -73,12 +81,32 @@ export class Netspeak {
 	search(
 		request: Readonly<NetspeakSearchRequest>,
 		options?: Readonly<NetspeakSearchOptions>
-	): Promise<NetspeakSearchResult> {
+	): Promise<ReadonlyNetspeakSearchResult> {
 		// fill mode
 		if (options?.topkMode === "fill") {
 			return this._fillSearch(request, { ...options });
+		} else {
+			const key = JSON.stringify(request);
+			const cached = this._cache.get(key);
+			if (cached !== undefined) {
+				return cached;
+			} else {
+				const uncached = this._uncachedSearch(request);
+				uncached.then(
+					res => {
+						// only cache successful responses
+						this._cache.add(key, Promise.resolve(res));
+					},
+					() => {
+						// just swallow rejections
+					}
+				);
+				return uncached;
+			}
 		}
+	}
 
+	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>): Promise<ReadonlyNetspeakSearchResult> {
 		try {
 			// copy request
 			const req = { ...request };
@@ -201,7 +229,7 @@ export class Netspeak {
 					unknownWords.forEach(word => {
 						if (!unknownWordsSet[word]) {
 							unknownWordsSet[word] = true;
-							unknownWords.push(word);
+							result.unknownWords.push(word);
 						}
 					});
 
