@@ -1,6 +1,6 @@
 import { jsonp } from "./jsonp";
-import { constructQueryParams } from "./url";
 import { LRUCache } from "./lru-cache";
+import { constructQueryParams, noop } from "./util";
 
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
@@ -92,15 +92,10 @@ export class Netspeak {
 				return cached;
 			} else {
 				const uncached = this._uncachedSearch(request);
-				uncached.then(
-					res => {
-						// only cache successful responses
-						this._cache.add(key, Promise.resolve(res));
-					},
-					() => {
-						// just swallow rejections
-					}
-				);
+				uncached.then(res => {
+					// only cache successful responses
+					this._cache.add(key, Promise.resolve(res));
+				}, noop);
 				return uncached;
 			}
 		}
