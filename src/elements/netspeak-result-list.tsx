@@ -348,7 +348,7 @@ function PhraseExample(props: Readonly<{ phrase: Phrase; snippet: Snippet }>): J
 
 		const textParts: JSX.Element[] = [];
 		let key = 0;
-		const pushBefore = (s: string, maxLength: number): void => {
+		const pushBefore = (s: string, maxLength = Infinity): void => {
 			if (s.length > maxLength) {
 				s = s.substr(s.length - maxLength).replace(/^\S*\s+/, "... ");
 			}
@@ -362,17 +362,24 @@ function PhraseExample(props: Readonly<{ phrase: Phrase; snippet: Snippet }>): J
 		};
 
 		const re = getPhraseRegex(phrase.text);
-		const match = re.exec(text);
-		if (!match) {
-			// something went wrong...
-			pushAfter(text, context * 2);
-		} else {
+		let match;
+		while (text && (match = re.exec(text))) {
 			if (match.index > 0) {
-				pushBefore(text.substr(0, match.index), context);
+				if (textParts.length === 0) {
+					pushBefore(text.substr(0, match.index), context);
+				} else {
+					pushBefore(text.substr(0, match.index));
+				}
 			}
 			textParts.push(<strong key={key++}>{match[0]}</strong>);
-			if (match.index + match[0].length < text.length) {
-				pushAfter(text.substr(match.index + match[0].length), context);
+			text = text.substr(match.index + match[0].length);
+		}
+		if (text) {
+			if (textParts.length === 0) {
+				// something went wrong...
+				pushAfter(text, context * 2);
+			} else {
+				pushAfter(text, context);
 			}
 		}
 
