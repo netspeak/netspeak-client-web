@@ -1,0 +1,51 @@
+.LoadMoreButton {
+	background-color: transparent;
+	border: none;
+	display: block;
+	margin: 0;
+	position: relative;
+	padding: 0;
+	width: 100%;
+
+	&:not(.loading) {
+		cursor: pointer;
+
+		& > span {
+			opacity: 0.5;
+			background-image: url("../img/load-more.svg");
+		}
+		&:hover > span {
+			opacity: 1;
+		}
+	}
+
+	& > span {
+		background-position: center;
+		background-size: contain;
+		background-repeat: no-repeat;
+		display: block;
+		height: 2em;
+		margin: auto;
+		padding: 0;
+		width: 4em;
+	}
+
+	&.loading > span {
+		opacity: 0.5;
+		animation-name: fade-in-loading-animation;
+		animation-duration: 1s;
+		background-image: url("../img/loading.svg");
+	}
+
+	@keyframes fade-in-loading-animation {
+		from {
+			opacity: 0;
+		}
+		20% {
+			opacity: 0;
+		}
+		to {
+			opacity: 50%;
+		}
+	}
+}

@@ -1,0 +1,82 @@
+.HelpPage {
+	#content {
+		max-width: 50px;
+		margin: 0 64px;
+		padding: 3em 0;
+	}
+
+	h1.article {
+		font-weight: normal;
+		font-size: 200%;
+		color: #555;
+		margin: 1em 0 2em 0;
+	}
+
+	h2.article {
+		font-weight: normal;
+		font-size: 150%;
+		color: #c5000b;
+		margin: 2em 0 1em 0;
+	}
+
+	h3.article {
+		font-weight: normal;
+		font-size: 125%;
+		color: #c5000b;
+		margin: 2em 0 1em 0;
+	}
+
+	p.article {
+		margin: 1em 0;
+		line-height: 1.4;
+		text-align: justify;
+	}
+
+	a.article {
+		color: #666;
+		cursor: pointer;
+		text-decoration: none;
+	}
+
+	a.article:hover {
+		text-decoration: underline;
+	}
+
+	.group-box {
+		background-color: white;
+		border: 1px solid #bbb;
+		display: block;
+		padding: 1.25em 1em 1em 1em;
+		margin: 2.75em 0 4em 0;
+
+		& > .group-title {
+			line-height: 1em;
+			display: inline-block;
+			position: absolute;
+			margin-top: -1.75em;
+			background-color: white;
+			padding: 0 0.5em;
+			font-size: 110%;
+			color: #c5000b;
+		}
+		& > .group-content {
+			display: block;
+			background-color: white;
+		}
+	}
+
+	@media screen and (max-width: 628px /* 500px + 64px * 2 */) {
+		#content {
+			max-width: 500px;
+			padding: 3em 1em;
+			margin: 0 auto;
+		}
+	}
+
+	@media screen and (max-width: 500px) {
+		#content {
+			padding: 3em 1em;
+			margin: 0;
+		}
+	}
+}

@@ -4,7 +4,7 @@ import { Phrase, WordTypes, Word } from "../lib/netspeak";
 import { Snippet, SnippetSupplier, getPhraseRegex } from "../lib/snippets";
 import { optional, LoadingState, url, delay } from "../lib/util";
 import LoadMoreButton from "./load-more-button";
-import "./netspeak-result-list.css";
+import "./netspeak-result-list.scss";
 import TransparentButton from "./transparent-button";
 import PinImage from "../img/pin.svg";
 import CopyImage from "../img/copy.svg";

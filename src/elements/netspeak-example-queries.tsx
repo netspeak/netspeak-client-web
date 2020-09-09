@@ -1,6 +1,6 @@
 import React from "react";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
-import "./netspeak-example-queries.css";
+import "./netspeak-example-queries.scss";
 import NetspeakQueryText from "./netspeak-query-text";
 
 interface Props extends LocalizableProps {

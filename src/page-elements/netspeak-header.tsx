@@ -1,5 +1,5 @@
 import React from "react";
-import "./netspeak-header.css";
+import "./netspeak-header.scss";
 import { Locales, SimpleLocale, createLocalizer, LocalizableProps } from "../lib/localize";
 import { Link } from "gatsby";
 

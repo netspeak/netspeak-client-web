@@ -1,5 +1,5 @@
 import React from "react";
-import "./help-page.css";
+import "./help-page.scss";
 import { getCurrentLang, Locales, SimpleLocale, createLocalizer, SupplierLocale } from "../lib/localize";
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
@@ -9,7 +9,7 @@ export default function HelpPage(): JSX.Element {
 	const l = createLocalizer({ lang }, locales);
 
 	return (
-		<Page lang={lang}>
+		<Page lang={lang} className="HelpPage">
 			<h1 className="article">{l("help")}</h1>
 
 			<H2 id="contact">{l("contact")}</H2>

@@ -1,6 +1,6 @@
 import React from "react";
 import Prism from "../lib/prism";
-import "./netspeak-query-text.css";
+import "./netspeak-query-text.scss";
 
 interface Props {
 	query: string;

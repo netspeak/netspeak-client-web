@@ -1,5 +1,5 @@
 import React from "react";
-import "./netspeak-corpus-selector.css";
+import "./netspeak-corpus-selector.scss";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 import { Corpus } from "../lib/netspeak";
 

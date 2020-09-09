@@ -1,0 +1,147 @@
+.NetspeakResultList {
+	*::-moz-selection {
+		text-shadow: none !important;
+		background-color: rgba(32, 64, 255, 0.8);
+		color: #fff;
+	}
+
+	*::selection {
+		text-shadow: none !important;
+		background-color: rgba(32, 64, 255, 0.8);
+		color: #fff;
+	}
+
+	& > div {
+		background-color: var(--item-background-color);
+		width: 100%;
+		padding: 0;
+
+		&:nth-child(2n) {
+			--item-background-color: #f7f7f7;
+		}
+		&:nth-child(2n + 1) {
+			--item-background-color: #fff;
+		}
+		&[options-visible],
+		&:hover {
+			--item-background-color: #e2ebf1;
+		}
+	}
+
+	/**
+	 * div.phrase-container
+	 */
+
+	.phrase-container {
+		background-repeat: no-repeat;
+		background-position: calc(100% + 1px) -2px;
+		background-image: url("../img/frequency-bar.png");
+		cursor: pointer;
+		padding: 0 var(--left-right-padding);
+		width: 100%;
+		box-sizing: border-box;
+
+		&::after {
+			content: "";
+			clear: both;
+			display: block;
+		}
+	}
+
+	span.text,
+	span.freq {
+		text-shadow: 0 1px 1px #fff;
+		padding: 0.3em 0.5em;
+	}
+
+	span.text {
+		float: left;
+	}
+
+	span.text.pinned {
+		font-weight: bold;
+	}
+
+	span.freq {
+		float: right;
+		text-align: right;
+	}
+
+	span.freq > span.percentage {
+		display: inline-block;
+		padding-left: 0.5em;
+		width: 4em;
+	}
+
+	span.text span {
+		color: #333;
+
+		&.asterisk,
+		&.q-mark,
+		&.plus,
+		&.regex {
+			color: #c5000b;
+		}
+		&.option-set,
+		&.order-set,
+		&.dict-set,
+		&.option-set-regex,
+		&.order-set-regex {
+			color: #2d7db3;
+		}
+	}
+
+	/**
+	 * div.options
+	 */
+
+	& > div:last-child .options {
+		border-bottom: none;
+	}
+
+	.options {
+		background: rgb(247, 247, 247);
+		border-bottom: 1px solid #ccc;
+		border-top: 1px solid #ccc;
+		color: #444;
+		position: relative;
+
+		/*
+		 * div.buttons
+		 */
+		& > .buttons {
+			text-align: right;
+			margin: 0.25em var(--left-right-padding);
+
+			.TransparentButton {
+				padding: 0.25em 0.5em;
+			}
+		}
+
+		/*
+		 * EXAMPLES
+		 */
+
+		.examples-container {
+			padding: 0 1em 1em 1em;
+		}
+
+		.examples-list {
+			font-size: 90%;
+			word-break: break-word;
+
+			.source {
+				padding-left: 0.25em;
+
+				a {
+					color: inherit;
+					opacity: 0.7;
+					text-decoration: none;
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+		}
+	}
+}

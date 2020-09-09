@@ -1,5 +1,5 @@
 import React from "react";
-import "./search-page.css";
+import "./search-page.scss";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
 import { getCurrentLang } from "../lib/localize";
 import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
@@ -98,7 +98,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 
 	render(): JSX.Element {
 		return (
-			<Page lang={this.lang}>
+			<Page lang={this.lang} className="SearchPage">
 				{optional(this.state.corpora.length > 0, () => (
 					<NetspeakCorpusSelector
 						lang={this.lang}

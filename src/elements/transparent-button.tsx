@@ -1,6 +1,6 @@
 import React from "react";
 import { optional } from "../lib/util";
-import "./transparent-button.css";
+import "./transparent-button.scss";
 
 interface Props {
 	image?: string;

@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "gatsby";
-import "./netspeak-footer.css";
+import "./netspeak-footer.scss";
 import {
 	LocalizableProps,
 	Locales,

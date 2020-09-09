@@ -1,0 +1,45 @@
+.TransparentButton {
+	background-color: transparent;
+	border: none;
+	cursor: pointer;
+	display: inline-block;
+	font: inherit;
+	font-size: 100%;
+	margin: 0;
+	padding: 0.25em;
+	position: relative;
+
+	&:hover {
+		& > .button-img {
+			opacity: 0.8;
+		}
+		& > .button-text {
+			opacity: 1;
+		}
+	}
+
+	&.selected > .button-img {
+		opacity: 1;
+	}
+
+	& > .button-img {
+		background-repeat: no-repeat;
+		background-size: contain;
+		display: inline-block;
+		width: var(--transparent-button-icon-size, 1.25em);
+		height: var(--transparent-button-icon-size, 1.25em);
+		opacity: 0.5;
+		vertical-align: top;
+	}
+
+	& > .button-text {
+		display: inline-block;
+		line-height: var(--transparent-button-icon-size, 1.25em);
+		opacity: 0.8;
+		vertical-align: top;
+	}
+
+	& > .button-img + .button-text {
+		margin-left: 0.25em;
+	}
+}

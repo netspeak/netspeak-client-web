@@ -26,7 +26,7 @@ import NetspeakResultList, {
 } from "./netspeak-result-list";
 import LoadMoreButton from "./load-more-button";
 import { DEFAULT_SNIPPETS } from "../lib/snippets";
-import "./netspeak-search.css";
+import "./netspeak-search.scss";
 import { NetworkError } from "../lib/jsonp";
 import InfoImage from "../img/i.svg";
 import ClearImage from "../img/x.svg";

@@ -1,5 +1,5 @@
 import React from "react";
-import "./load-more-button.css";
+import "./load-more-button.scss";
 
 interface Props {
 	/**

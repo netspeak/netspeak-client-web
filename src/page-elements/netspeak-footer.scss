@@ -1,0 +1,55 @@
+.NetspeakFooter {
+	display: block;
+	background-color: #f8f8f8;
+	font-size: 90%;
+	color: #666;
+	padding: 2em 3em;
+	line-height: 1.4;
+
+	a {
+		color: inherit;
+		text-decoration: none;
+
+		&.current-lang,
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+	#netspeak-points {
+		display: inline;
+	}
+
+	#language-section {
+		display: inline;
+	}
+
+	#webis-copyright {
+		float: right;
+	}
+
+	.bullet {
+		padding: 0 5px;
+	}
+
+	.pipe {
+		padding: 0 15px;
+	}
+
+	@media screen and (max-width: 750px) {
+		& {
+			padding: 2em;
+		}
+		#netspeak-points,
+		#language-section,
+		#webis-copyright {
+			display: block;
+			float: none;
+			text-align: center;
+			padding: 0.5em 0;
+		}
+		.pipe {
+			display: none;
+		}
+	}
+}
