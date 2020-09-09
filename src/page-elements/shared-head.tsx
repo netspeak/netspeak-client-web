@@ -1,9 +1,12 @@
 import React from "react";
+import favicon from "../img/favicon.ico";
 
-export default function GA(): JSX.Element {
+export default function SharedHead(): JSX.Element {
 	return (
-		<script type="text/javascript">
-			{`
+		<>
+			<link rel="icon" href={favicon} />
+			<script type="text/javascript">
+				{`
 			var _gaq = _gaq || [];
 			_gaq.push(['_setAccount', 'UA-19276564-1']);
 			_gaq.push(['_setDomainName', 'none']);
@@ -17,6 +20,7 @@ export default function GA(): JSX.Element {
 				var s = document.getElementsByTagName('script')[0];
 				s.parentNode.insertBefore(ga, s);
 			})();`}
-		</script>
+			</script>
+		</>
 	);
 }

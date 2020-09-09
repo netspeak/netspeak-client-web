@@ -1,8 +1,8 @@
 import React from "react";
-import dynamic from "../lib/dynamic";
 import SearchPage from "../page-elements/search-page";
 import { Helmet } from "react-helmet";
-import GA from "../page-elements/ga";
+import dynamic from "../lib/dynamic";
+import SharedHead from "../page-elements/shared-head";
 
 export default function Home(): JSX.Element {
 	return (
@@ -20,7 +20,7 @@ export default function Home(): JSX.Element {
 					name="description"
 					content="Netspeak helps you to search for words you don't know, yet. It is a new kind of dictionary that contains everything that has ever been written on the web."
 				/>
-				<GA />
+				<SharedHead />
 			</Helmet>
 		</>
 	);
