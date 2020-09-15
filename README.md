@@ -25,23 +25,21 @@ Use the `npm run develop` command to open a local server with a live preview of 
 
 The `npm run build` command will build a static version of the website.
 
-Note: Builds might overlap. Run `npm run clean` before the build command to get a clean build.
+Note: Builds are incremental. Run `npm run clean` before the build command to get a clean build.
 
 ## Deploy
 
-If all tests pass, you can deploy your updated build. Copy the contents of the build (the files in `build/<build name>/`) to the `master` branch of [`netspeak.github.io`](https://github.com/netspeak/netspeak.github.io) project and push. GitHub pages will take care of the rest and update the website in a few seconds.
-
 **You changes will then be out there for the world to see, so make sure that everything is working correctly.**
 
-If you don't want to do this manually, use the following command:
+Use the following command:
 
 ```bash
 npm run publish-release
 ```
 
-This will do the above steps automatically.
+This will rebuild the website and push the build to [`netspeak.github.io`](https://github.com/netspeak/netspeak.github.io) repo automatically. (You have to have push permission for this.) GitHub pages will then deploy everything to `netspeak.org`.
 
-If you want to publish a [demo](https://netspeak.org/demo), use this command:
+If you want to publish a [demo](https://netspeak.org/demo) instead (useful for testing), use this command:
 
 ```bash
 npm run publish-demo
