@@ -4,7 +4,8 @@
 
 This is the development project of the [netspeak.org](http://netspeak.org) website.
 
-The website is served using [GitHub pages](https://pages.github.com/) over [netspeak.github.io](https://github.com/netspeak/netspeak.github.io).
+The website is implemented as [Gatsby](https://www.gatsbyjs.com/) pages in pure TypeScript.
+It is served using [GitHub pages](https://pages.github.com/) over [netspeak.github.io](https://github.com/netspeak/netspeak.github.io).
 
 ## Getting started
 
@@ -44,6 +45,20 @@ If you want to publish a [demo](https://netspeak.org/demo) instead (useful for t
 ```bash
 npm run publish-demo
 ```
+
+## Developer notes
+
+Gatsby will render each page as a [static HTML page](https://www.gatsbyjs.com/docs/glossary/static-site-generator/) that will be [hydrated](https://www.gatsbyjs.com/docs/react-hydration/) on the client.
+
+This basically means that each page will be rendered on the developers computer to create a static HTML page and then on each client again.
+The advantage of this approach is that static parts of a page can be packed into the HTML page instead of being a part of the (compiled) JS library resulting in faster load times for users.
+However, this static generation is a problem for us because we don't have any static content.
+All content on the website is localized.
+
+To work around this, the `dynamic` function is used.
+This function be used to create on empty page for the static site generator that will only be run on the client.
+This means that all client-only variables (e.g. `window`, `location`, ...) will be accessible.
+It's a bit hacky and has some [limitations](https://stackoverflow.com/a/63814668/7595472) but works perfectly for our use case.
 
 ---
 
