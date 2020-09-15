@@ -258,7 +258,14 @@ export function getPhraseRegex(phrase: string): RegExp {
 	phrase = normalizeSpaces(phrase);
 	let value = phraseReCache.get(phrase);
 	if (value === undefined) {
-		value = RegExp(phrase.replace(/[\\/(){}[\]|?+*^$.]/g, "\\$&").replace(/\s+/g, "\\s*"), "i");
+		let source = phrase.replace(/[\\/(){}[\]|?+*^$.]/g, "\\$&").replace(/\s+/g, "\\s*");
+		if (/^\w/.test(phrase)) {
+			source = "\\b" + source;
+		}
+		if (/\w$/.test(phrase)) {
+			source = source + "\\b";
+		}
+		value = RegExp(source, "i");
 		phraseReCache.set(phrase, value);
 	}
 	return value;
