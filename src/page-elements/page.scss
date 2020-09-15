@@ -1,0 +1,34 @@
+html, body, #___gatsby, #gatsby-focus-wrapper, #Page {
+	padding: 0;
+	margin: 0;
+	width: 100%;
+	height: 100%;
+	position: relative;
+}
+
+html {
+	overflow-y: scroll;
+	font-size: 13px;
+}
+
+#Page {
+	background-color: #FFF;
+	border-collapse: collapse;
+	display: table;
+}
+
+@media screen and (max-width: 500px) {
+	html {
+		font-size: 14px;
+	}
+}
+
+* {
+	font-family: "Product Sans", "Noto Sans", "Verdana", sans-serif;
+}
+
+#Page>.footer-wrapper {
+	display: table-row;
+	vertical-align: bottom;
+	height: 1px;
+}

@@ -1,0 +1,72 @@
+.NetspeakExampleQueries {
+	display: block;
+	color: #444;
+
+	.info {
+		background-color: #f8f8f8;
+		clear: both;
+		position: relative;
+		padding: 0.5em 1em;
+	}
+
+	table {
+		width: 100%;
+		padding: 0;
+		margin: 0;
+		border: none;
+		border-collapse: none;
+		border-spacing: 0;
+	}
+	tr {
+		padding: 0;
+	}
+	td {
+		padding: 0.125em 0;
+	}
+
+	.example {
+		white-space: nowrap;
+	}
+
+	.explanation {
+		width: 50%;
+	}
+
+	.example > span {
+		cursor: pointer;
+		text-decoration: none;
+	}
+
+	.example > span:hover {
+		text-decoration: underline;
+	}
+
+	@media screen and (max-width: 500px) {
+		.spacer {
+			display: none;
+		}
+		tr {
+			display: block;
+			padding: 0.2em 0;
+		}
+		.example,
+		.explanation {
+			display: inline-block;
+			width: auto;
+			padding: 0;
+		}
+		.example {
+			color: #222;
+			font-size: 105%;
+		}
+		.explanation {
+			color: #666;
+			font-size: 100%;
+		}
+		.explanation::before {
+			content: "–";
+			display: inline;
+			padding: 0 0.5em;
+		}
+	}
+}

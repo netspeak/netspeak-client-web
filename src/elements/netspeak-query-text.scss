@@ -1,0 +1,15 @@
+.NetspeakQueryText {
+	.token {
+		&.q-mark,
+		&.asterisk,
+		&.plus {
+			color: #c5000b;
+		}
+
+		&.order-set,
+		&.option-set,
+		&.dict-set {
+			color: #2d7db3;
+		}
+	}
+}
