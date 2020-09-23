@@ -325,21 +325,30 @@ export class Snippets {
 	private _createRelevantSnippetFilter(phrase: string): (snippet: Snippet) => boolean {
 		const testRe = getPhraseRegex(phrase);
 
-		const pastExamples = new Set([""]);
+		const pastExamples = new Set<string>([""]);
 
 		return snippet => {
 			const text = snippet.text.toLowerCase();
 
 			// The text has to contain the phrase.
-			if (!testRe.test(text)) return false;
+			if (!testRe.test(text)) {
+				return false;
+			}
+
+			// The test is mostly punctuation.
+			if (text.replace(/[\w\xA0-\uFFFF]+/g, "").length > text.length * 0.5) {
+				return false;
+			}
 
 			// The basic idea behind this id is that most duplicate examples are equal character for character,
 			// so a simple (and fast) hash lookup is sufficient.
 			// To also filter duplicates which are technically different but don't look very different to
 			// humans, some additional transformation are performed.
-			const id = text.replace(/\d+/g, "0");
+			const id = text.replace(/\s+/, "").replace(/\d+/g, "0");
 
-			if (pastExamples.has(id)) return false;
+			if (pastExamples.has(id)) {
+				return false;
+			}
 			pastExamples.add(id);
 			return true;
 		};
