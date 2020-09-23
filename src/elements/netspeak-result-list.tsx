@@ -364,7 +364,12 @@ function PhraseExample(props: Readonly<{ phrase: Phrase; snippet: Snippet }>): J
 		const re = getPhraseRegex(phrase.text);
 		let match;
 		while (text && (match = re.exec(text))) {
-			if (match.index > 0) {
+			if (match.index > context) {
+				// the matches are too far apart
+				pushAfter(text, context);
+				text = "";
+				break;
+			} else if (match.index > 0) {
 				if (textParts.length === 0) {
 					pushBefore(text.substr(0, match.index), context);
 				} else {
