@@ -7,6 +7,7 @@ import {
 	NetspeakInvalidQueryError,
 	NetspeakError,
 	ReadonlyNetspeakSearchResult,
+	Corpus,
 } from "../lib/netspeak";
 import { optional, LoadingState, assertNever, delay, url } from "../lib/util";
 import NetspeakExampleQueries from "./netspeak-example-queries";
@@ -40,8 +41,8 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
-	corpus: string;
-	onCommitQuery?: (query: string, corpus: string) => void;
+	corpus: Corpus;
+	onCommitQuery?: (query: string, corpus: Corpus) => void;
 
 	history?: QueryHistory;
 
@@ -151,7 +152,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			const promise = this.cancelable(
 				Netspeak.instance.search({
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpus.key,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 				})
 			);
@@ -175,7 +176,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			Netspeak.instance.search(
 				{
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpus.key,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},

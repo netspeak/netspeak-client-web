@@ -21,14 +21,14 @@ export function normalizeQuery(query: string | undefined | null): string {
 
 export interface Corpus {
 	/** The unique key (or id) of the corpus. */
-	key: string;
+	readonly key: string;
 	/** The english name of the corpus. */
-	name: string;
-	/** The ISO 639-1 name of the language of the corpus. Only available for Netspeak >= 4. */
-	language?: string;
+	readonly name: string;
+	/** The ISO 639-1 name of the language of the corpus. */
+	readonly language: string;
 }
 export interface CorporaInfo {
-	corpora: Corpus[];
+	readonly corpora: Corpus[];
 }
 export interface NetspeakSearchRequest {
 	query: string;
@@ -286,7 +286,8 @@ export class Netspeak {
 	 * The default host of the Netspeak API.
 	 */
 	static get defaultHostname(): string {
-		return "https://api.netspeak.org/netspeak4/";
+		// TODO: Configure for api.netspeak.org
+		return "http://localhost:8080";
 	}
 
 	static get instance(): Netspeak {
@@ -326,7 +327,14 @@ export class Word {
 	 * @returns The name.
 	 */
 	static nameOfType(type: WordTypes): string {
-		return WordTypes[type];
+		for (const name in WordTypes) {
+			if (Object.prototype.hasOwnProperty.call(WordTypes, name)) {
+				if ((WordTypes[name] as any) === type) {
+					return name;
+				}
+			}
+		}
+		throw new Error(`Could not find name for value ${type}.`);
 	}
 }
 

@@ -43,7 +43,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			this.setState(state => {
 				return {
 					// set the corpus key here if not defined already
-					...withCorpusKey(state.corpusKey || info.default || Netspeak.defaultCorpus, state),
+					...withCorpusKey(state.corpusKey, state),
 					corpora: info.corpora,
 				};
 			});
@@ -69,9 +69,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			queryId: pageQuery === state.pageQuery || pageQuery === state.currentQuery ? state.queryId : nextId(),
 		}));
 	};
-	private _onCorpusSelectedHandler = (corpusKey: string): void => {
-		this.setState(state => withCorpusKey(corpusKey, state));
-		setPageParam("corpus", corpusKey);
+	private _onCorpusSelectedHandler = (corpus: Corpus): void => {
+		this.setState(state => withCorpusKey(corpus.key, state));
+		setPageParam("corpus", corpus.key);
 	};
 	private _onQueryCommitHandler = (query: string): void => {
 		this.setState(state => {
@@ -96,6 +96,10 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		});
 	};
 
+	private _currentCorpus(): Corpus | undefined {
+		return this.state.corpora.find(c => c.key === this.state.corpusKey);
+	}
+
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
@@ -107,19 +111,22 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
-				<div className="search-wrapper">
-					<NetspeakSearch
-						key={this.state.queryId + ";" + this.state.corpusKey}
-						lang={this.lang}
-						corpus={this.state.corpusKey}
-						defaultQuery={this.state.pageQuery}
-						onCommitQuery={this._onQueryCommitHandler}
-						history={this.state.history}
-						defaultExampleVisibility={this.state.exampleVisibility}
-						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
-						pageSize={40}
-					/>
-				</div>
+
+				{optional(this._currentCorpus() !== undefined, () => (
+					<div className="search-wrapper">
+						<NetspeakSearch
+							key={this.state.queryId + ";" + this.state.corpusKey}
+							lang={this.lang}
+							corpus={this._currentCorpus()!}
+							defaultQuery={this.state.pageQuery}
+							onCommitQuery={this._onQueryCommitHandler}
+							history={this.state.history}
+							defaultExampleVisibility={this.state.exampleVisibility}
+							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+							pageSize={40}
+						/>
+					</div>
+				))}
 			</Page>
 		);
 	}
