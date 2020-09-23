@@ -219,9 +219,6 @@ function timeoutSupplier(supplier: SnippetSupplier, timeout: number): SnippetSup
 
 /**
  * Returns a new supplier based on the given supplier which will return `false` instead of rejecting.
- *
- * @param supplier
- * @returns
  */
 function nonRejectingSupplier(supplier: SnippetSupplier): SnippetSupplier {
 	let rejected = false;
@@ -235,18 +232,21 @@ function nonRejectingSupplier(supplier: SnippetSupplier): SnippetSupplier {
 	};
 }
 
-/**
- * Returns a new supplier based on the given supplier which will return `false` instead of rejecting.
- *
- * @param supplier
- * @param filterFn
- * @returns
- */
 function filterSupplier(supplier: SnippetSupplier, filterFn: (snippet: Snippet) => boolean): SnippetSupplier {
 	return () => {
 		return supplier().then(snippets => {
 			if (snippets) {
 				return snippets.filter(filterFn);
+			}
+			return false;
+		});
+	};
+}
+function mapSupplier(supplier: SnippetSupplier, mapFn: (snippet: Snippet) => Snippet): SnippetSupplier {
+	return () => {
+		return supplier().then(snippets => {
+			if (snippets) {
+				return snippets.map(mapFn);
 			}
 			return false;
 		});
@@ -284,13 +284,11 @@ export class Snippets {
 	defaultTimeout = 5000;
 
 	getSupplier(phrase: string, count = 6): SnippetSupplier {
-		const filter = this._createSnippetFilter(phrase);
-		const suppliers = this._createSuppliers(phrase, count).map(s => {
-			return filterSupplier(s, filter);
-		});
+		let supplier = unfairSupplierCombination(this._createSuppliers(phrase, count));
+		supplier = mapSupplier(supplier, this._removeUrlsInText);
+		supplier = filterSupplier(supplier, this._createRelevantSnippetFilter(phrase));
 
-		const unionSupplier = unfairSupplierCombination(suppliers);
-		return exactSupplier(unionSupplier, count);
+		return exactSupplier(supplier, count);
 	}
 
 	/**
@@ -324,7 +322,7 @@ export class Snippets {
 		return suppliers;
 	}
 
-	private _createSnippetFilter(phrase: string): (snippet: Snippet) => boolean {
+	private _createRelevantSnippetFilter(phrase: string): (snippet: Snippet) => boolean {
 		const testRe = getPhraseRegex(phrase);
 
 		const pastExamples = new Set([""]);
@@ -346,7 +344,15 @@ export class Snippets {
 			return true;
 		};
 	}
+
+	private _removeUrlsInText(snippet: Snippet): Snippet {
+		const text = snippet.text.replace(URL_REGEX, "[…]");
+
+		return { text, urls: snippet.urls };
+	}
 }
+
+const URL_REGEX = /(?:https?\s*:\s*\/\s*\/\s*(?:www\s*\.\s*)?|www\s*\.\s*)(?:\w|\s*[-@:%.+~#=]\s*){1,256}\s*\.\s*[a-z0-9()]{1,6}\b[-\w()@:%+.~#/?&=]*/gi;
 
 interface NetspeakSnippetsRequest {
 	query: string;
