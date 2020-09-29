@@ -34,7 +34,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		currentQuery: "",
 		queryId: nextId(),
 
-		exampleVisibility: (localStorage.getItem("exampleVisibility") || "peek") as ExampleVisibility,
+		exampleVisibility: loadExampleVisibility() ?? "peek",
 	};
 
 	componentDidMount(): void {
@@ -90,7 +90,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		setPageParam("q", query);
 	};
 	private _onSetExampleVisibilityHandler = (visibility: ExampleVisibility): void => {
-		localStorage.setItem("exampleVisibility", visibility);
+		storeExampleVisibility(visibility);
 		this.setState({
 			exampleVisibility: visibility,
 		});
@@ -162,4 +162,11 @@ function loadQueryHistory(corpus: string): QueryHistory {
 }
 function storyQueryHistory(corpus: string, history: QueryHistory): void {
 	localStorage.setItem("queryHistory:" + corpus, history.toJSON());
+}
+
+function loadExampleVisibility(): ExampleVisibility | null {
+	return sessionStorage.getItem("exampleVisibility") as ExampleVisibility | null;
+}
+function storeExampleVisibility(value: ExampleVisibility): void {
+	sessionStorage.setItem("exampleVisibility", value);
 }
