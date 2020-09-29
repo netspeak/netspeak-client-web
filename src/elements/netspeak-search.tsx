@@ -25,7 +25,7 @@ import NetspeakResultList, {
 	OnChangeFn,
 } from "./netspeak-result-list";
 import LoadMoreButton from "./load-more-button";
-import { DEFAULT_SNIPPETS } from "../lib/snippets";
+import { DEFAULT_SNIPPETS, toLookaheadSnippetSupplier } from "../lib/snippets";
 import "./netspeak-search.scss";
 import { NetworkError } from "../lib/jsonp";
 import InfoImage from "../img/i.svg";
@@ -282,7 +282,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 						phrase,
 						false,
 						false,
-						new PhraseSnippetState(DEFAULT_SNIPPETS.getSupplier(phrase.text))
+						new PhraseSnippetState(toLookaheadSnippetSupplier(DEFAULT_SNIPPETS.getSupplier(phrase.text)))
 					)
 				);
 			}

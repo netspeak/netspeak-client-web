@@ -1,7 +1,7 @@
 import React from "react";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 import { Phrase, WordTypes, Word } from "../lib/netspeak";
-import { Snippet, SnippetSupplier, getPhraseRegex } from "../lib/snippets";
+import { Snippet, getPhraseRegex, LookaheadSnippetSupplier } from "../lib/snippets";
 import { optional, LoadingState, url, delay } from "../lib/util";
 import LoadMoreButton from "./load-more-button";
 import "./netspeak-result-list.scss";
@@ -12,7 +12,7 @@ import { CancelablePromise, ignoreCanceled, newCancelableCollection } from "../l
 
 export class PhraseSnippetState {
 	constructor(
-		public readonly supplier: SnippetSupplier,
+		public readonly supplier: LookaheadSnippetSupplier,
 		public readonly snippets: readonly Snippet[] = [],
 		public readonly loading: LoadingState = LoadingState.MORE_AVAILABLE
 	) {}
@@ -259,10 +259,10 @@ class PhraseInfo extends React.PureComponent<ItemProps, PhraseInfoState> {
 					change = phraseState =>
 						phraseState.setSnippets(phraseState.snippets.setLoading(LoadingState.EXHAUSTED));
 				} else {
+					const snippets = result.snippets;
+					const loading = result.more ? LoadingState.MORE_AVAILABLE : LoadingState.EXHAUSTED;
 					change = phraseState =>
-						phraseState.setSnippets(
-							phraseState.snippets.setLoading(LoadingState.MORE_AVAILABLE).pushSnippets(result)
-						);
+						phraseState.setSnippets(phraseState.snippets.setLoading(loading).pushSnippets(snippets));
 				}
 				this._change(change);
 			}, ignoreCanceled);
