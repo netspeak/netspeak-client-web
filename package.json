@@ -16,7 +16,8 @@
     "publish-release": "npx gulp publishRelease"
   },
   "dependencies": {
-    "gatsby": "^2.24.50",
+    "@babel/plugin-transform-spread": "^7.12.1",
+    "gatsby": "^2.32.2",
     "gatsby-plugin-react-helmet": "^3.3.10",
     "gatsby-plugin-sass": "^2.3.12",
     "node-sass": "^4.14.1",
