@@ -118,6 +118,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						defaultExampleVisibility={this.state.exampleVisibility}
 						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
 						pageSize={40}
+						autoFocus={true}
 					/>
 				</div>
 			</Page>

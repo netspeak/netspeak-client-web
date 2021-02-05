@@ -49,6 +49,8 @@ interface Props extends LocalizableProps {
 	onSetExampleVisibility?: (value: ExampleVisibility) => void;
 
 	pageSize?: number;
+
+	autoFocus?: boolean;
 }
 interface State {
 	query: string;
@@ -417,6 +419,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 									<NetspeakSearchBar
 										query={this.state.query}
 										onQueryEnter={this._onSearchBarQueryEnterHandler}
+										autoFocus={this.props.autoFocus}
 									/>
 								</td>
 								<td>
