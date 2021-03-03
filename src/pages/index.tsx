@@ -10,6 +10,7 @@ export default function Home(): JSX.Element {
 			{dynamic(() => (
 				<SearchPage />
 			))}
+			<SharedHead />
 			<Helmet>
 				<title>Netspeak</title>
 				<meta
@@ -20,7 +21,6 @@ export default function Home(): JSX.Element {
 					name="description"
 					content="Netspeak helps you to search for words you don't know, yet. It is a new kind of dictionary that contains everything that has ever been written on the web."
 				/>
-				<SharedHead />
 			</Helmet>
 		</>
 	);

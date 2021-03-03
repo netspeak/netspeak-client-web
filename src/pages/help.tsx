@@ -10,9 +10,9 @@ export default function Help(): JSX.Element {
 			{dynamic(() => (
 				<HelpPage />
 			))}
+			<SharedHead />
 			<Helmet>
 				<title>Help - Netspeak</title>
-				<SharedHead />
 			</Helmet>
 		</>
 	);

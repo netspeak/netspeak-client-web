@@ -6,6 +6,8 @@ import { delay } from "../lib/util";
 interface Props {
 	query: string;
 	onQueryEnter: (query: string) => void;
+
+	autoFocus?: boolean;
 }
 interface State {
 	original: string;
@@ -70,6 +72,7 @@ export class NetspeakSearchBar extends React.PureComponent<Props, State> {
 				type="text"
 				className="NetspeakSearchBar"
 				value={this.state.value}
+				autoFocus={this.props.autoFocus}
 				onChange={this._onChangeHandler}
 				onKeyUp={this._oKeyupHandler}
 			/>

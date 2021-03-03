@@ -253,6 +253,60 @@ function mapSupplier(supplier: SnippetSupplier, mapFn: (snippet: Snippet) => Sni
 	};
 }
 
+export interface LookaheadSnippet {
+	snippets: Snippet[];
+	more: boolean;
+}
+export type LookaheadSnippetSupplier = () => Promise<LookaheadSnippet | false>;
+/**
+ * Creates a new lookahead supplier from the given snippet supplier.
+ *
+ * A lookahead supplier will not only yield snippets but also whether there will be more snippets after the current
+ * batch.
+ *
+ * @param supplier
+ */
+export function toLookaheadSnippetSupplier(supplier: SnippetSupplier): LookaheadSnippetSupplier {
+	let done = false;
+	let lookahead: Promise<false | Snippet[]> | undefined;
+
+	function makePromise(
+		current: Promise<false | Snippet[]>,
+		next: Promise<false | Snippet[]>
+	): Promise<false | LookaheadSnippet> {
+		lookahead = next;
+
+		return Promise.all([current, next]).then(([current, next]) => {
+			const more = next !== false;
+			if (!more) {
+				done = true;
+				lookahead = undefined;
+			}
+
+			if (current !== false) {
+				return {
+					more,
+					snippets: current,
+				};
+			} else {
+				return false;
+			}
+		});
+	}
+
+	return (): Promise<false | LookaheadSnippet> => {
+		if (done) {
+			return Promise.resolve(false);
+		} else {
+			if (lookahead) {
+				return makePromise(lookahead, supplier());
+			} else {
+				return makePromise(supplier(), supplier());
+			}
+		}
+	};
+}
+
 const phraseReCache = new Map<string, RegExp>();
 export function getPhraseRegex(phrase: string): RegExp {
 	phrase = normalizeSpaces(phrase);

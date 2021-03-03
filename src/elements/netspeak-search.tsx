@@ -26,7 +26,7 @@ import NetspeakResultList, {
 	OnChangeFn,
 } from "./netspeak-result-list";
 import LoadMoreButton from "./load-more-button";
-import { DEFAULT_SNIPPETS } from "../lib/snippets";
+import { DEFAULT_SNIPPETS, toLookaheadSnippetSupplier } from "../lib/snippets";
 import "./netspeak-search.scss";
 import { NetworkError } from "../lib/jsonp";
 import InfoImage from "../img/i.svg";
@@ -50,6 +50,8 @@ interface Props extends LocalizableProps {
 	onSetExampleVisibility?: (value: ExampleVisibility) => void;
 
 	pageSize?: number;
+
+	autoFocus?: boolean;
 }
 interface State {
 	query: string;
@@ -116,11 +118,6 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	private _setQuery(query: string, commit: boolean): void {
 		this._delayErrorPromise?.cancel();
 		this._delayCommitPromise?.cancel();
-
-		// hide examples if visibility was "peek"
-		if (this.state.examplesVisibility === "peek") {
-			this._setExampleVisibility("hidden");
-		}
 
 		const normalizedQuery = normalizeQuery(query);
 		const changed = normalizedQuery !== this.state.normalizedQuery;
@@ -288,7 +285,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 						phrase,
 						false,
 						false,
-						new PhraseSnippetState(DEFAULT_SNIPPETS.getSupplier(phrase.text))
+						new PhraseSnippetState(toLookaheadSnippetSupplier(DEFAULT_SNIPPETS.getSupplier(phrase.text)))
 					)
 				);
 			}
@@ -353,7 +350,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	};
 	private _onExampleButtonClick = (): void => {
 		// toggle visibility
-		this._setExampleVisibility(this.state.examplesVisibility === "hidden" ? "visible" : "hidden");
+		this._setExampleVisibility(this._areExamplesVisible() ? "hidden" : "visible");
 	};
 	private _onClearButtonClick = (): void => {
 		this._setQuery("", true);
@@ -402,6 +399,13 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		);
 	}
 
+	private _areExamplesVisible(): boolean {
+		return (
+			this.state.examplesVisibility === "visible" ||
+			(this.state.examplesVisibility === "peek" && this.state.normalizedQuery === "")
+		);
+	}
+
 	render(): JSX.Element {
 		const l = createLocalizer(this.props, locales);
 		const { warnings, errors } = this._splitProblems();
@@ -416,12 +420,13 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 									<NetspeakSearchBar
 										query={this.state.query}
 										onQueryEnter={this._onSearchBarQueryEnterHandler}
+										autoFocus={this.props.autoFocus}
 									/>
 								</td>
 								<td>
 									<TransparentButton
 										image={url(InfoImage)}
-										selected={this.state.examplesVisibility !== "hidden"}
+										selected={this._areExamplesVisible()}
 										onClick={this._onExampleButtonClick}
 									/>
 								</td>
@@ -459,7 +464,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					</div>
 				))}
 
-				{optional(this.state.examplesVisibility !== "hidden", () => (
+				{optional(this._areExamplesVisible(), () => (
 					<div className="wrapper examples-wrapper">
 						<NetspeakExampleQueries
 							lang={this.props.lang}
