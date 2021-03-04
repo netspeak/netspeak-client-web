@@ -7,7 +7,6 @@ import {
 	NetspeakInvalidQueryError,
 	NetspeakError,
 	ReadonlyNetspeakSearchResult,
-	Corpus,
 } from "../lib/netspeak";
 import { optional, LoadingState, assertNever, delay, url } from "../lib/util";
 import NetspeakExampleQueries from "./netspeak-example-queries";
@@ -41,8 +40,8 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
-	corpus: Corpus;
-	onCommitQuery?: (query: string, corpus: Corpus) => void;
+	corpusKey: string;
+	onCommitQuery?: (query: string, corpusKey: string) => void;
 
 	history?: QueryHistory;
 
@@ -113,7 +112,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	}
 
 	private _commit(query: string): void {
-		this.props.onCommitQuery?.(query, this.props.corpus);
+		this.props.onCommitQuery?.(query, this.props.corpusKey);
 	}
 	private _setQuery(query: string, commit: boolean): void {
 		this._delayErrorPromise?.cancel();
@@ -149,7 +148,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			const promise = this.cancelable(
 				Netspeak.instance.search({
 					query: normalizedQuery,
-					corpus: this.props.corpus.key,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 				})
 			);
@@ -173,7 +172,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			Netspeak.instance.search(
 				{
 					query: normalizedQuery,
-					corpus: this.props.corpus.key,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},
@@ -248,6 +247,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				details: reason.message,
 			};
 		} else {
+			if (typeof reason === "object") {
+				try {
+					reason = JSON.stringify(reason, undefined, 4);
+				} catch (e) {
+					// noop
+				}
+			}
+
 			return {
 				type: "Unknown",
 				details: String(reason),
@@ -468,7 +475,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					<div className="wrapper examples-wrapper">
 						<NetspeakExampleQueries
 							lang={this.props.lang}
-							corpus={this.props.corpus}
+							corpusKey={this.props.corpusKey}
 							onQueryClicked={this._onExampleQueryClickHandler}
 						/>
 					</div>
@@ -518,7 +525,7 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 		return (
 			<details>
 				<summary>{l("details")}</summary>
-				<p>{text}</p>
+				<pre>{text}</pre>
 			</details>
 		);
 	}

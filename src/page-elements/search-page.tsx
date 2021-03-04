@@ -10,9 +10,24 @@ import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
 
+const KNOWN_CORPORA: readonly Corpus[] = [
+	{
+		key: "web-en",
+		name: "English",
+		language: "en",
+	},
+	{
+		key: "web-de",
+		name: "German",
+		language: "de",
+	},
+];
+const DEFAULT_CORPUS_KEY = "web-en";
+
 interface State {
-	corpusKey: string;
+	currentCorpusKey: string;
 	corpora: readonly Corpus[];
+	unavailableCorpora: ReadonlySet<Corpus>;
 
 	pageQuery: string;
 	currentQuery: string;
@@ -27,8 +42,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	readonly lang = getCurrentLang();
 	private _corporaPromise: CancelablePromise<Readonly<CorporaInfo>> | undefined;
 	state: Readonly<State> = {
-		...withCorpusKey(getPageParam("corpus") || ""),
-		corpora: [],
+		...withCorpus(getPageParam("corpus") || DEFAULT_CORPUS_KEY),
+		corpora: KNOWN_CORPORA,
+		unavailableCorpora: new Set(),
 
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
@@ -39,15 +55,21 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 
 	componentDidMount(): void {
 		this._corporaPromise = new CancelablePromise(Netspeak.instance.queryCorpora());
-		this._corporaPromise.then(info => {
-			this.setState(state => {
-				return {
-					// set the corpus key here if not defined already
-					...withCorpusKey(state.corpusKey, state),
-					corpora: info.corpora,
-				};
+		this._corporaPromise
+			.then(info => {
+				const available = new Set(info.corpora.map(c => c.key));
+
+				this.setState(state => {
+					return { unavailableCorpora: new Set(state.corpora.filter(c => !available.has(c.key))) };
+				});
+			}, ignoreCanceled)
+			.catch(reason => {
+				this.setState(state => {
+					return { unavailableCorpora: new Set(state.corpora) };
+				});
+
+				console.error(reason);
 			});
-		}, ignoreCanceled);
 
 		addHashChangeListener(this._onHashUpdateHandler);
 	}
@@ -63,14 +85,14 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 
 		this.setState(state => ({
 			pageQuery: pageQuery,
-			...withCorpusKey(pageCorpus ?? state.corpusKey, state),
+			...withCorpus(pageCorpus || state.currentCorpusKey, state),
 
 			currentQuery: pageQuery,
 			queryId: pageQuery === state.pageQuery || pageQuery === state.currentQuery ? state.queryId : nextId(),
 		}));
 	};
 	private _onCorpusSelectedHandler = (corpus: Corpus): void => {
-		this.setState(state => withCorpusKey(corpus.key, state));
+		this.setState(state => withCorpus(corpus.key, state));
 		setPageParam("corpus", corpus.key);
 	};
 	private _onQueryCommitHandler = (query: string): void => {
@@ -79,7 +101,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			if (query.trim()) {
 				// query isn't just spaces
 				history = history.push(query);
-				storyQueryHistory(state.corpusKey, history);
+				storyQueryHistory(state.currentCorpusKey, history);
 			}
 
 			return {
@@ -96,47 +118,42 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		});
 	};
 
-	private _currentCorpus(): Corpus | undefined {
-		return this.state.corpora.find(c => c.key === this.state.corpusKey);
-	}
-
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
 				{optional(this.state.corpora.length > 0, () => (
 					<NetspeakCorpusSelector
 						lang={this.lang}
-						selected={this.state.corpusKey}
+						selected={this.state.currentCorpusKey}
 						corpora={this.state.corpora}
+						unavailable={this.state.unavailableCorpora}
 						onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
 
-				{optional(this._currentCorpus() !== undefined, () => (
-					<div className="search-wrapper">
-						<NetspeakSearch
-							key={this.state.queryId + ";" + this.state.corpusKey}
-							lang={this.lang}
-							corpus={this._currentCorpus()!}
-							defaultQuery={this.state.pageQuery}
-							onCommitQuery={this._onQueryCommitHandler}
-							history={this.state.history}
-							defaultExampleVisibility={this.state.exampleVisibility}
-							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
-							pageSize={40}
-							autoFocus={true}
-						/>
-					</div>
-				))}
+				<div className="search-wrapper">
+					<NetspeakSearch
+						key={this.state.queryId + ";" + this.state.currentCorpusKey}
+						lang={this.lang}
+						corpusKey={this.state.currentCorpusKey}
+						defaultQuery={this.state.pageQuery}
+						onCommitQuery={this._onQueryCommitHandler}
+						history={this.state.history}
+						defaultExampleVisibility={this.state.exampleVisibility}
+						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+						pageSize={40}
+						autoFocus={true}
+					/>
+				</div>
 			</Page>
 		);
 	}
 }
 
-function withCorpusKey(corpusKey: string, state?: Readonly<State>): Pick<State, "corpusKey" | "history"> {
+function withCorpus(corpusKey: string, state?: Readonly<State>): Pick<State, "currentCorpusKey" | "history"> {
 	return {
-		corpusKey,
-		history: state?.corpusKey === corpusKey ? state.history : loadQueryHistory(corpusKey),
+		currentCorpusKey: corpusKey,
+		history: state?.currentCorpusKey === corpusKey ? state.history : loadQueryHistory(corpusKey),
 	};
 }
 

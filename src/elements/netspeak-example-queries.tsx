@@ -1,22 +1,21 @@
 import React from "react";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
-import { Corpus } from "../lib/netspeak";
 import "./netspeak-example-queries.scss";
 import NetspeakQueryText from "./netspeak-query-text";
 
 interface Props extends LocalizableProps {
-	corpus: Corpus;
-	onQueryClicked?: (query: string, corpus: Corpus) => void;
+	corpusKey: string;
+	onQueryClicked?: (query: string, corpusKey: string) => void;
 }
 
 export default function NetspeakExampleQueries(props: Props): JSX.Element {
 	const l = createLocalizer(props, locales);
 
-	const examples = exampleQueries[props.corpus.language] || exampleQueries["en"];
+	const examples = exampleQueries[props.corpusKey] || exampleQueries["web-en"];
 
 	const handleClick = (e: React.MouseEvent<HTMLElement>): void => {
 		const query = e.currentTarget.dataset.query!;
-		props.onQueryClicked?.(query, props.corpus);
+		props.onQueryClicked?.(query, props.corpusKey);
 	};
 
 	return (
@@ -73,7 +72,7 @@ const locales: Locales<SimpleLocale<QueryKey>> = {
  * A list of language-specific example queries.
  */
 const exampleQueries: Record<string, Partial<Record<QueryKey, string>>> = {
-	en: {
+	"web-en": {
 		"q-mark": "how to ? this",
 		"dots": "see ... works",
 		"option-set": "it's [ great well ]",
@@ -81,7 +80,7 @@ const exampleQueries: Record<string, Partial<Record<QueryKey, string>>> = {
 		"order": "{ more show me }",
 		"gap": "m...d ? g?p",
 	},
-	de: {
+	"web-de": {
 		"q-mark": "was ? das",
 		"dots": "was ... hier ab",
 		"option-set": "wie [ nützlich praktisch ]",

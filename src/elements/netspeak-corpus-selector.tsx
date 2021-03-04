@@ -6,6 +6,7 @@ import { Corpus } from "../lib/netspeak";
 interface Props extends LocalizableProps {
 	selected?: string;
 	corpora: readonly Corpus[];
+	unavailable: ReadonlySet<Corpus>;
 	onCorpusSelected: (corpus: Corpus) => void;
 }
 
@@ -32,13 +33,18 @@ export default function NetspeakCorpusSelector(props: Props): JSX.Element {
 		}, 1);
 	}
 
-	const buttons = sorted.map((corpus, i) => {
-		const selected = corpus === selectedCorpus;
-		const className = selected ? "selected" : "";
-		const label = l(("label-" + corpus.name.toLowerCase()) as any) || corpus.name;
+	const buttons = sorted.map(corpus => {
+		const classList: string[] = [];
+		if (corpus === selectedCorpus) {
+			classList.push("selected");
+		}
+		if (props.unavailable.has(corpus)) {
+			classList.push("unavailable");
+		}
+
 		return (
-			<button key={corpus.key} className={className} value={corpus.key} onClick={handleButtonClick}>
-				{label}
+			<button key={corpus.key} className={classList.join(" ")} value={corpus.key} onClick={handleButtonClick}>
+				{l(("label-" + corpus.name.toLowerCase()) as any) || corpus.name}
 			</button>
 		);
 	});
