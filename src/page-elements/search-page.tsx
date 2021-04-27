@@ -1,7 +1,7 @@
 import React from "react";
 import "./search-page.scss";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
-import { getCurrentLang } from "../lib/localize";
+import { createLocalizer, getCurrentLang, Locales, SimpleLocale } from "../lib/localize";
 import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
 import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
@@ -97,6 +97,8 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	};
 
 	render(): JSX.Element {
+		const l = createLocalizer(this, locales);
+
 		return (
 			<Page lang={this.lang} className="SearchPage">
 				{optional(this.state.corpora.length > 0, () => (
@@ -107,6 +109,15 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
+
+				<div className="notice">
+					<p>
+						{l("notice")}
+						<br></br>
+						<br></br>
+					</p>
+				</div>
+
 				<div className="search-wrapper">
 					<NetspeakSearch
 						key={this.state.queryId + ";" + this.state.corpusKey}
@@ -171,3 +182,14 @@ function loadExampleVisibility(): ExampleVisibility | null {
 function storeExampleVisibility(value: ExampleVisibility): void {
 	sessionStorage.setItem("exampleVisibility", value);
 }
+
+const locales: Locales<SimpleLocale<"notice">> = {
+	en: {
+		notice:
+			"Netspeak is current offline due to technical difficulties. We apologize for the inconvenience and are currently working on resolving the issue. Netspeak will be available again within the next couple of days.",
+	},
+	de: {
+		notice:
+			"Netspeak ist derzeit nicht verfügbar aufgrund von technischen Schwierigkeiten. Wir entschuldigen uns für die Unannehmlichkeiten und arbeiten an dem Problem. Netspeak wird in ein paar Tagen wieder verfügbar sein.",
+	},
+};
