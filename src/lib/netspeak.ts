@@ -69,8 +69,8 @@ export class Netspeak {
 	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
 
-	constructor(hostname?: string) {
-		this._client = new NetspeakServiceClient(hostname ?? Netspeak.defaultHostname);
+	private constructor() {
+		this._client = new NetspeakServiceClient(Netspeak.defaultHostname);
 	}
 
 	/**
