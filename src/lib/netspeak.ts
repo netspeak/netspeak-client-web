@@ -1,4 +1,5 @@
 import { NetspeakServiceClient } from "./generated/NetspeakServiceServiceClientPb";
+//Peter: need another import for NeuralNetspeakServiceClient
 import {
 	SearchRequest,
 	PhraseConstraints,
@@ -65,12 +66,12 @@ export interface NetspeakSearchResult extends ReadonlyNetspeakSearchResult {
 export class Netspeak {
 	corpusCaching = true;
 
-	private _client: NetspeakServiceClient;
+	private _client: NetspeakServiceClient[]; //replace second member with neural netspeak service client later
 	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
 
 	private constructor() {
-		this._client = new NetspeakServiceClient(Netspeak.defaultHostname);
+		this._client = [new NetspeakServiceClient(Netspeak.defaultHostname), new NetspeakServiceClient("localhost:9000")];
 	}
 
 	/**
@@ -106,6 +107,19 @@ export class Netspeak {
 		}
 	}
 
+    //Peter: pick out one of the clients based on our corpus string, currently only supports current and neural
+	private _getClient(corpus: string) {
+	    //Peter: store the chosen client in a variable so we can easily alternate between the normal and neural client
+    	let client = this._client[0];
+
+        //Peter: when designated corpus is neural-X use the neural netspeak client instead
+        if("neural-" == corpus.substring(0, 7))
+    	{
+            client = this._client[1];
+   	    }
+	    return client;
+	}
+
 	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>): Promise<ReadonlyNetspeakSearchResult> {
 		try {
 			const req = this._toSearchRequest(request);
@@ -113,7 +127,8 @@ export class Netspeak {
 			const query = req.getQuery();
 			const corpus = req.getCorpus();
 
-			return this._client.search(req, null).then(resp => {
+            //formerly this._client instead of _getClient(corpus)
+			return this._getClient(corpus).search(req, null).then(resp => {
 				if (resp.hasError()) {
 					// error
 					const error = resp.getError()!;
@@ -250,30 +265,35 @@ export class Netspeak {
 	/**
 	 * Queries all available corpora from the Netspeak API.
 	 */
-	queryCorpora(): Promise<Readonly<CorporaInfo>> {
-		if (this.corpusCaching && this._cachedCorpus) {
-			// cached
-			return Promise.resolve(this._cachedCorpus);
-		} else {
-			return this._client.getCorpora(new CorporaRequest(), null).then(resp => {
-				const info: CorporaInfo = {
-					corpora: resp.getCorporaList().map(c => {
-						return {
-							key: c.getKey(),
-							name: c.getName(),
-							language: c.getLanguage(),
-						};
-					}),
-				};
 
-				if (this.corpusCaching) {
-					this._cachedCorpus = info;
-				}
+	async queryCorpora(): Promise<Readonly<CorporaInfo>> {
+        if (this.corpusCaching && this._cachedCorpus) {
+            // cached
+            return this._cachedCorpus;
+        } else {
+            const responses = await Promise.all(this._client.map(c => c.getCorpora(new CorporaRequest(), null)));
 
-				return info;
-			});
-		}
-	}
+            const info: CorporaInfo = { corpora: [] };
+
+            for (const resp of responses) {
+                info.corpora.push(
+                    ...resp.getCorporaList().map(c => {
+                        return {
+                            key: c.getKey(),
+                            name: c.getName(),
+                            language: c.getLanguage(),
+                        };
+                    })
+                );
+            }
+
+            if (this.corpusCaching) {
+                this._cachedCorpus = info;
+            }
+
+            return info;
+        }
+    }
 
 	/**
 	 * The default base URL of the Netspeak API.
