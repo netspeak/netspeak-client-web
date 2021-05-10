@@ -183,7 +183,7 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 			classes.push(
 				String(Word.nameOfType(word.type))
 					.toLowerCase()
-					.replace(/[^a-z]+/, "-")
+					.replace(/[^a-z]+/g, "-")
 			);
 
 			if (elements.length > 0) {

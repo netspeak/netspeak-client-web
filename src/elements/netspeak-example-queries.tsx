@@ -4,19 +4,18 @@ import "./netspeak-example-queries.scss";
 import NetspeakQueryText from "./netspeak-query-text";
 
 interface Props extends LocalizableProps {
-	corpus: string;
-	onQueryClicked?: (query: string, corpus: string) => void;
+	corpusKey: string;
+	onQueryClicked?: (query: string, corpusKey: string) => void;
 }
 
 export default function NetspeakExampleQueries(props: Props): JSX.Element {
 	const l = createLocalizer(props, locales);
 
-	const corpus = props.corpus in exampleQueries ? props.corpus : defaultCorpus;
-	const examples = exampleQueries[corpus];
+	const examples = exampleQueries[props.corpusKey] || exampleQueries["web-en"];
 
 	const handleClick = (e: React.MouseEvent<HTMLElement>): void => {
 		const query = e.currentTarget.dataset.query!;
-		props.onQueryClicked?.(query, corpus);
+		props.onQueryClicked?.(query, props.corpusKey);
 	};
 
 	return (
@@ -70,7 +69,7 @@ const locales: Locales<SimpleLocale<QueryKey>> = {
 };
 
 /**
- * A list of corpus specific example queries.
+ * A list of language-specific example queries.
  */
 const exampleQueries: Record<string, Partial<Record<QueryKey, string>>> = {
 	"web-en": {
@@ -90,7 +89,3 @@ const exampleQueries: Record<string, Partial<Record<QueryKey, string>>> = {
 		"gap": "M?t ? Lü...e",
 	},
 };
-/**
- * The default corpus for which examples will be displayed in case the current corpus is unknown.
- */
-const defaultCorpus = "web-en";

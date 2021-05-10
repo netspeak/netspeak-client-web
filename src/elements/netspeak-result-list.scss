@@ -76,17 +76,15 @@
 	span.text span {
 		color: #333;
 
-		&.asterisk,
-		&.q-mark,
-		&.plus,
-		&.regex {
+		&.word-for-qmark,
+		&.word-for-star,
+		&.word-for-plus,
+		&.word-for-regex {
 			color: #c5000b;
 		}
-		&.option-set,
-		&.order-set,
-		&.dict-set,
-		&.option-set-regex,
-		&.order-set-regex {
+		&.word-in-dictset,
+		&.word-in-optionset,
+		&.word-in-orderset {
 			color: #2d7db3;
 		}
 	}
