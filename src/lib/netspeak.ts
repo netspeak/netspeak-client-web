@@ -71,7 +71,7 @@ export class Netspeak {
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
 
 	private constructor() {
-		this._client = [new NetspeakServiceClient(Netspeak.defaultHostname), new NetspeakServiceClient("localhost:500051")];
+		this._client = [new NetspeakServiceClient(Netspeak.defaultHostname), new NetspeakServiceClient("http://localhost:50051")];
 	}
 
 	/**
