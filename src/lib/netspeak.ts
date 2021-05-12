@@ -71,7 +71,7 @@ export class Netspeak {
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
 
 	private constructor() {
-		this._client = [new NetspeakServiceClient(Netspeak.defaultHostname), new NetspeakServiceClient("localhost:9000")];
+		this._client = [new NetspeakServiceClient(Netspeak.defaultHostname), new NetspeakServiceClient("localhost:500051")];
 	}
 
 	/**
@@ -113,7 +113,7 @@ export class Netspeak {
     	let client = this._client[0];
 
         //Peter: when designated corpus is neural-X use the neural netspeak client instead
-        if("neural-" == corpus.substring(0, 7))
+        if("neural-" === corpus.substring(0, 7))
     	{
             client = this._client[1];
    	    }

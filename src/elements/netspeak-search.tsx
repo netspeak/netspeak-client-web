@@ -614,6 +614,21 @@ const locales: Locales<SimpleLocale<
 
 		details: "Details",
 	},
+	"neural-en": {
+		noPhrasesFound: "No phrases found.",
+		noHistory: "No query history.",
+
+		unknownWord: "Unknown word",
+
+		noConnectionError:
+			"No response form the Netspeak server. Please make sure you have a stable internet connection.",
+		serverUnreachableError: "The Netspeak server failed to respond. Please retry in a few minutes.",
+		invalidQueryError: "Your input is not a valid Netspeak query.",
+		netspeakError: "An error occurred in Netspeak.",
+		unknownError: "Unknown error.",
+
+		details: "Details",
+	},
 };
 
 const EMPTY_STATS: PhraseCollectionStats = {

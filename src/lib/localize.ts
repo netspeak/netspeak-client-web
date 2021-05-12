@@ -1,5 +1,5 @@
-export const supportedLanguages: ReadonlySet<string> = new Set(["en", "de"]);
-export type SupportedLanguage = "en" | "de";
+export const supportedLanguages: ReadonlySet<string> = new Set(["en", "de", "neural-en"]);
+export type SupportedLanguage = "en" | "de" | "neural-en";
 
 export interface LocalizableProps {
 	readonly lang: SupportedLanguage;

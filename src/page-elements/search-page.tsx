@@ -21,6 +21,11 @@ const KNOWN_CORPORA: readonly Corpus[] = [
 		name: "German",
 		language: "de",
 	},
+	{
+		key: "web-neural",
+		name: "Neural (WIP)",
+		language: "neural-en",
+	},
 ];
 const DEFAULT_CORPUS_KEY = "web-en";
 

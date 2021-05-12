@@ -56,19 +56,26 @@ export default function NetspeakCorpusSelector(props: Props): JSX.Element {
 	);
 }
 
-const locales: Locales<SimpleLocale<"label-english" | "label-german">> = {
+const locales: Locales<SimpleLocale<"label-english" | "label-german" | "label-neural-en">> = {
 	en: {
 		"label-english": "English",
 		"label-german": "German",
+		"label-neural-en": "Neural",
 	},
 	de: {
 		"label-english": "Englisch",
 		"label-german": "Deutsch",
+		"label-neural-en": "Neural",
+	},
+	"neural-en": {
+		"label-english": "English",
+		"label-german": "German",
+		"label-neural-en": "Neural",
 	},
 };
 
 function sortedCorpora(corpora: Iterable<Corpus>): Corpus[] {
-	const defaultSorting = ["en", "de"];
+	const defaultSorting = ["en", "de", "neural-en"];
 
 	return [...corpora].sort((a, b) => {
 		let indexA = defaultSorting.indexOf(a.language);
