@@ -26,4 +26,7 @@ const locales: Locales<SimpleLocale<"slogan">> = {
 	de: {
 		slogan: "Ein Wort ergibt das andere.",
 	},
+	"neural-en": {
+		slogan: "One word leads to another.",
+	},
 };

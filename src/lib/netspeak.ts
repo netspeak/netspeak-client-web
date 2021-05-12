@@ -113,10 +113,12 @@ export class Netspeak {
     	let client = this._client[0];
 
         //Peter: when designated corpus is neural-X use the neural netspeak client instead
-        if("neural-" === corpus.substring(0, 7))
+        if("neural" === corpus.substring(4, 10))
     	{
+			/*alert("neural: ");*/
             client = this._client[1];
    	    }
+		   /*else alert("not neural: " + corpus.substring(4, 10));*/
 	    return client;
 	}
 
