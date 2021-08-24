@@ -279,7 +279,7 @@ export class Netspeak {
 	 * The default host of the Netspeak API.
 	 */
 	static get defaultHostname(): string {
-		return "https://ngram.api.netspeak.org:443";
+		return "https://ngram.api.netspeak.org";
 	}
 
 	static get instance(): Netspeak {
