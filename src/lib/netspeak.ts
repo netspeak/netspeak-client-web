@@ -276,18 +276,10 @@ export class Netspeak {
 	}
 
 	/**
-	 * The default base URL of the Netspeak API.
-	 */
-	static get defaultBaseUrl(): string {
-		return "https://api.netspeak.org/netspeak4/";
-	}
-
-	/**
 	 * The default host of the Netspeak API.
 	 */
 	static get defaultHostname(): string {
-		// TODO: Configure for api.netspeak.org
-		return "http://localhost:8080";
+		return "https://ngram.api.netspeak.org:443";
 	}
 
 	static get instance(): Netspeak {
