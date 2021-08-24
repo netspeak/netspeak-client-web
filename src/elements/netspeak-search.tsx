@@ -87,7 +87,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.state = {
 			query: props.defaultQuery || "",
-			normalizedQuery: normalizeQuery(props.defaultQuery),
+			normalizedQuery: this._normalizeQuery(props.defaultQuery),
 			loadingState: LoadingState.EXHAUSTED,
 
 			examplesVisibility: props.defaultExampleVisibility || "peek",
@@ -106,6 +106,17 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this.cancelable.cancel();
 	}
 
+	private _normalizeQuery(query: string | null | undefined): NormalizedQuery {
+		let norm = normalizeQuery(query);
+
+		if (this.props.corpusKey === "web-en") {
+			// lower-case all queries to web-en
+			norm = norm.toLowerCase();
+		}
+
+		return norm;
+	}
+
 	private _setExampleVisibility(visibility: ExampleVisibility): void {
 		this.setState({ examplesVisibility: visibility });
 		this.props.onSetExampleVisibility?.(visibility);
@@ -118,7 +129,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this._delayErrorPromise?.cancel();
 		this._delayCommitPromise?.cancel();
 
-		const normalizedQuery = normalizeQuery(query);
+		const normalizedQuery = this._normalizeQuery(query);
 		const changed = normalizedQuery !== this.state.normalizedQuery;
 
 		this.setState({ query, normalizedQuery });
