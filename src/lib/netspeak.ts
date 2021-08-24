@@ -1,6 +1,12 @@
-import { jsonp } from "./jsonp";
+import { NetspeakServiceClient } from "./generated/NetspeakServiceServiceClientPb";
+import {
+	SearchRequest,
+	PhraseConstraints,
+	CorporaRequest,
+	Phrase as ServicePhrase,
+} from "./generated/NetspeakService_pb";
 import { LRUCache } from "./lru-cache";
-import { constructQueryParams, noop } from "./util";
+import { noop } from "./util";
 
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
@@ -15,23 +21,19 @@ export function normalizeQuery(query: string | undefined | null): string {
 
 export interface Corpus {
 	/** The unique key (or id) of the corpus. */
-	key: string;
+	readonly key: string;
 	/** The english name of the corpus. */
-	name: string;
-	/** The ISO 639-1 name of the language of the corpus. Only available for Netspeak >= 4. */
-	language?: string;
+	readonly name: string;
+	/** The ISO 639-1 name of the language of the corpus. */
+	readonly language: string;
 }
 export interface CorporaInfo {
-	/** The key of the default corpus. */
-	default: string | undefined;
-	corpora: Corpus[];
+	readonly corpora: Corpus[];
 }
 export interface NetspeakSearchRequest {
 	query: string;
-	corpus?: string;
-	format?: "json";
+	corpus: string;
 	maxfreq?: number;
-	maxregexmatches?: number;
 	nmax?: number;
 	nmin?: number;
 	topk?: number;
@@ -61,12 +63,15 @@ export interface NetspeakSearchResult extends ReadonlyNetspeakSearchResult {
 }
 
 export class Netspeak {
-	baseUrl = Netspeak.defaultBaseUrl;
-	defaultCorpus = Netspeak.defaultCorpus;
 	corpusCaching = true;
 
+	private _client: NetspeakServiceClient;
 	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
-	private _cachedCorpus: Promise<Readonly<CorporaInfo>> | undefined = undefined;
+	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
+
+	private constructor() {
+		this._client = new NetspeakServiceClient(Netspeak.defaultHostname);
+	}
 
 	/**
 	 * Queries phrases from the Netspeak API using the given request.
@@ -103,73 +108,58 @@ export class Netspeak {
 
 	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>): Promise<ReadonlyNetspeakSearchResult> {
 		try {
-			// copy request
-			const req = { ...request };
+			const req = this._toSearchRequest(request);
 
-			// configure request
-			req.format = "json";
-			if (!req.corpus) {
-				req.corpus = this.defaultCorpus;
-			}
-			// TODO: proper handling of lower-case indexes
-			if (req.corpus === "web-en") {
-				req.query = req.query.toLowerCase();
-			}
+			const query = req.getQuery();
+			const corpus = req.getCorpus();
 
-			// get URL
-			const url = this.baseUrl + "search" + constructQueryParams(req);
+			return this._client.search(req, null).then(resp => {
+				if (resp.hasError()) {
+					// error
+					const error = resp.getError()!;
+					throw new NetspeakError(error.getKind(), error.getMessage());
+				} else {
+					// success
+					const result = resp.getResult()!;
 
-			return jsonp<any>(url).then(json => {
-				const query = req.query;
-				const corpus = req.corpus!;
+					const searchResult: NetspeakSearchResult = {
+						phrases: result.getPhrasesList().map(p => {
+							const words = p.getWordsList().map(w => {
+								return new Word(w.getText(), w.getTag());
+							});
+							return new Phrase(words, p.getFrequency(), query, corpus);
+						}),
+						unknownWords: result.getUnknownWordsList(),
+					};
 
-				// for information on how the JSON object is structured see www.netspeak.org
-
-				const errorCode = json["9"];
-				if (errorCode) {
-					// json["9"]:  error code for any value != 0
-					// json["10"]: error message
-					const errorMessage = json["10"];
-					if (errorCode === 1) {
-						throw new NetspeakInvalidQueryError(errorMessage);
-					} else {
-						throw new NetspeakError(errorCode, errorMessage);
-					}
+					return searchResult;
 				}
-
-				// json["4"]: [ // array of phrases
-				//     {
-				//         "1": internal id (int),
-				//         "2": absolute frequency (int),
-				//         "3": [ // array of words
-				//             {
-				//                 "1": type of word (int),
-				//                 "2": the word (string)
-				//             }, ...
-				//         ]
-				//     }, ...
-				// ];
-				const rawPhrases: {
-					"1": number;
-					"2": number;
-					"3": { "1": number; "2": string }[];
-				}[] = json["4"] || [];
-
-				const phrases = rawPhrases.map(phrase => {
-					const words = phrase["3"].map(w => new Word(w["2"], w["1"]));
-					return new Phrase(words, phrase["2"], query, corpus);
-				});
-
-				const unknownWords: string[] = json["5"] || [];
-
-				return {
-					phrases,
-					unknownWords,
-				};
 			});
 		} catch (error) {
 			return Promise.reject(error);
 		}
+	}
+	private _toSearchRequest(request: Readonly<NetspeakSearchRequest>): SearchRequest {
+		const r = new SearchRequest();
+		r.setQuery(request.query);
+		r.setCorpus(request.corpus);
+		if (request.topk !== undefined) {
+			r.setMaxPhrases(request.topk);
+		}
+
+		const constraints = new PhraseConstraints();
+		if (request.nmax !== undefined) {
+			constraints.setWordsMax(request.nmax);
+		}
+		if (request.nmin !== undefined) {
+			constraints.setWordsMin(request.nmin);
+		}
+		if (request.maxfreq !== undefined) {
+			constraints.setFrequencyMax(request.maxfreq);
+		}
+		r.setPhraseConstraints(constraints);
+
+		return r;
 	}
 
 	/**
@@ -261,55 +251,35 @@ export class Netspeak {
 	 * Queries all available corpora from the Netspeak API.
 	 */
 	queryCorpora(): Promise<Readonly<CorporaInfo>> {
-		// cached
 		if (this.corpusCaching && this._cachedCorpus) {
-			return this._cachedCorpus;
-		}
-
-		const result = jsonp<any>(this.baseUrl + "corpus").then(json => {
-			if ("default" in json && "corpora" in json) {
-				// Netspeak 4
-				return json as CorporaInfo;
-			} else {
-				// Netspeak 3
-
-				const corpora: CorporaInfo = {
-					default: undefined,
-					corpora: [],
+			// cached
+			return Promise.resolve(this._cachedCorpus);
+		} else {
+			return this._client.getCorpora(new CorporaRequest(), null).then(resp => {
+				const info: CorporaInfo = {
+					corpora: resp.getCorporaList().map(c => {
+						return {
+							key: c.getKey(),
+							name: c.getName(),
+							language: c.getLanguage(),
+						};
+					}),
 				};
 
-				for (const corpus of json) {
-					// corpus = { key: String, name: String, isDefault: Boolean }
-
-					if (corpus.isDefault && corpora.default === undefined) corpora.default = corpus.key;
-					delete corpus.isDefault;
-
-					corpora.corpora.push(corpus);
+				if (this.corpusCaching) {
+					this._cachedCorpus = info;
 				}
 
-				return corpora;
-			}
-		});
-
-		if (this.corpusCaching) {
-			this._cachedCorpus = result;
+				return info;
+			});
 		}
-
-		return result;
 	}
 
 	/**
-	 * The default base URL of the Netspeak API.
+	 * The default host of the Netspeak API.
 	 */
-	static get defaultBaseUrl(): string {
-		return "https://api.netspeak.org/netspeak4/";
-	}
-
-	/**
-	 * The default corpus specified by the Netspeak API.
-	 */
-	static get defaultCorpus(): string {
-		return "web-en";
+	static get defaultHostname(): string {
+		return "https://ngram.api.netspeak.org";
 	}
 
 	static get instance(): Netspeak {
@@ -330,21 +300,9 @@ export class NetspeakInvalidQueryError extends NetspeakError {
 	}
 }
 
-/**
- * The different types of operators that matched a given word.
- */
-export enum WordTypes {
-	WORD = 0,
-	Q_MARK = 1,
-	ASTERISK = 2,
-	DICT_SET = 3,
-	ORDER_SET = 4,
-	OPTION_SET = 5,
-	PLUS = 6,
-	REGEX = 7,
-	ORDER_SET_REGEX = 8,
-	OPTION_SET_REGEX = 9,
-}
+export const WordTypes = ServicePhrase.Word.Tag;
+// eslint-disable-next-line no-redeclare
+export type WordTypes = ServicePhrase.Word.Tag;
 
 export class Word {
 	/**
@@ -361,7 +319,14 @@ export class Word {
 	 * @returns The name.
 	 */
 	static nameOfType(type: WordTypes): string {
-		return WordTypes[type];
+		for (const name in WordTypes) {
+			if (Object.prototype.hasOwnProperty.call(WordTypes, name)) {
+				if ((WordTypes[name] as any) === type) {
+					return name;
+				}
+			}
+		}
+		throw new Error(`Could not find name for value ${type}.`);
 	}
 }
 

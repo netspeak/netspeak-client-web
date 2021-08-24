@@ -40,8 +40,8 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
-	corpus: string;
-	onCommitQuery?: (query: string, corpus: string) => void;
+	corpusKey: string;
+	onCommitQuery?: (query: string, corpusKey: string) => void;
 
 	history?: QueryHistory;
 
@@ -87,7 +87,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.state = {
 			query: props.defaultQuery || "",
-			normalizedQuery: normalizeQuery(props.defaultQuery),
+			normalizedQuery: this._normalizeQuery(props.defaultQuery),
 			loadingState: LoadingState.EXHAUSTED,
 
 			examplesVisibility: props.defaultExampleVisibility || "peek",
@@ -106,19 +106,30 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this.cancelable.cancel();
 	}
 
+	private _normalizeQuery(query: string | null | undefined): NormalizedQuery {
+		let norm = normalizeQuery(query);
+
+		if (this.props.corpusKey === "web-en") {
+			// lower-case all queries to web-en
+			norm = norm.toLowerCase();
+		}
+
+		return norm;
+	}
+
 	private _setExampleVisibility(visibility: ExampleVisibility): void {
 		this.setState({ examplesVisibility: visibility });
 		this.props.onSetExampleVisibility?.(visibility);
 	}
 
 	private _commit(query: string): void {
-		this.props.onCommitQuery?.(query, this.props.corpus);
+		this.props.onCommitQuery?.(query, this.props.corpusKey);
 	}
 	private _setQuery(query: string, commit: boolean): void {
 		this._delayErrorPromise?.cancel();
 		this._delayCommitPromise?.cancel();
 
-		const normalizedQuery = normalizeQuery(query);
+		const normalizedQuery = this._normalizeQuery(query);
 		const changed = normalizedQuery !== this.state.normalizedQuery;
 
 		this.setState({ query, normalizedQuery });
@@ -148,7 +159,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			const promise = this.cancelable(
 				Netspeak.instance.search({
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 				})
 			);
@@ -172,7 +183,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			Netspeak.instance.search(
 				{
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},
@@ -247,6 +258,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				details: reason.message,
 			};
 		} else {
+			if (typeof reason === "object") {
+				try {
+					reason = JSON.stringify(reason, undefined, 4);
+				} catch (e) {
+					// noop
+				}
+			}
+
 			return {
 				type: "Unknown",
 				details: String(reason),
@@ -467,7 +486,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					<div className="wrapper examples-wrapper">
 						<NetspeakExampleQueries
 							lang={this.props.lang}
-							corpus={this.props.corpus}
+							corpusKey={this.props.corpusKey}
 							onQueryClicked={this._onExampleQueryClickHandler}
 						/>
 					</div>
@@ -517,7 +536,7 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 		return (
 			<details>
 				<summary>{l("details")}</summary>
-				<p>{text}</p>
+				<pre>{text}</pre>
 			</details>
 		);
 	}
