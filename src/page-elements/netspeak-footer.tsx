@@ -17,13 +17,41 @@ export default function NetspeakFooter(props: LocalizableProps): JSX.Element {
 		<div className="NetspeakFooter">
 			<div>
 				<div id="webis-copyright">
-					{"\xA9 2019 "}
+					{`\xA9 ${new Date().getFullYear()} `}
 					<a href="https://webis.de" target="_blank" rel="noopener noreferrer">
 						Webis Group
 					</a>
 					<Bullet />
 					<a href="https://webis.de/people.html" target="_blank" rel="noopener noreferrer" id="contact">
 						{l("contact")}
+					</a>
+					<Bullet />
+					<a
+						href="https://github.com/netspeak"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="img"
+						id="github"
+						title="GitHub">
+						<span></span>
+					</a>
+					<a
+						href="https://twitter.com/_netspeak_"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="img"
+						id="twitter"
+						title="Twitter">
+						<span></span>
+					</a>
+					<a
+						href="https://www.youtube.com/playlist?list=PLgD1TOdHQCI97rA9s4z1EGxRJSXCHzwBk"
+						target="_blank"
+						rel="noopener noreferrer"
+						className="img"
+						id="youtube"
+						title="YouTube">
+						<span></span>
 					</a>
 					<Bullet />
 					<a
