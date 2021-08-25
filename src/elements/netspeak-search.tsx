@@ -386,7 +386,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 								</p>
 							</div>
 						))}
-						{this.props.history?.items.map(query => {
+						{this.props.history?.items.slice(0, 20).map(query => {
 							const onClick = (): void => {
 								close();
 								this._setQuery(query, true);
