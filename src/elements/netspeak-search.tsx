@@ -450,22 +450,18 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
-						<div style={{ display: "table", width: "100%" }}>
+						<div>
 							{warnings.map((p, i) => (
-								<p>
-									<ProblemInner key={i} lang={this.props.lang} problem={p} />
-								</p>
+								<ProblemInner key={i} lang={this.props.lang} problem={p} />
 							))}
 						</div>
 					</div>
 				))}
 				{optional(errors.length > 0, () => (
 					<div className="wrapper errors-wrapper">
-						<div style={{ display: "table", width: "100%" }}>
+						<div>
 							{errors.map((p, i) => (
-								<p>
-									<ProblemInner key={i} lang={this.props.lang} problem={p} />
-								</p>
+								<ProblemInner key={i} lang={this.props.lang} problem={p} />
 							))}
 						</div>
 					</div>
@@ -533,29 +529,29 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 	switch (problem.type) {
 		case "UnknownWord":
 			return (
-				<>
+				<p>
 					{l("unknownWord")}
 					{": "}
 					<em>{problem.word}</em>
-				</>
+				</p>
 			);
 
 		case "NoConnection":
-			return <>{l("noConnectionError")}</>;
+			return <p>{l("noConnectionError")}</p>;
 		case "ServerUnreachable":
-			return <>{l("serverUnreachableError")}</>;
+			return <p>{l("serverUnreachableError")}</p>;
 
 		case "InvalidQuery":
 			return (
 				<>
-					{l("invalidQueryError")}
+					<p>{l("invalidQueryError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);
 		case "NetspeakServer":
 			return (
 				<>
-					{l("netspeakError")}
+					<p>{l("netspeakError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);
@@ -563,7 +559,7 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 		case "Unknown":
 			return (
 				<>
-					{l("unknownError")}
+					<p>{l("unknownError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);
