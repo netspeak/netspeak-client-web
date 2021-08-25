@@ -1,3 +1,4 @@
+import { Metadata } from "grpc-web";
 import { NetspeakServiceClient } from "./generated/NetspeakServiceServiceClientPb";
 import {
 	SearchRequest,
@@ -113,7 +114,11 @@ export class Netspeak {
 			const query = req.getQuery();
 			const corpus = req.getCorpus();
 
-			return this._client.search(req, null).then(resp => {
+			const meta: Metadata = {
+				"netspeak-tracking-id": getTrackingId(),
+			};
+
+			return this._client.search(req, meta).then(resp => {
 				if (resp.hasError()) {
 					// error
 					const error = resp.getError()!;
@@ -354,4 +359,24 @@ export class Phrase {
 		this.text = this.words.map(w => w.text || "").join(" ");
 		this.id = this.corpus + "\n" + this.text;
 	}
+}
+
+/**
+ * Returns a random tracking ID.
+ */
+function getTrackingId(): string {
+	let id = sessionStorage.getItem("netspeak-id");
+	if (id === null) {
+		id = randomHex(32);
+		sessionStorage.setItem("netspeak-id", id);
+	}
+	return id;
+}
+function randomHex(length: number): string {
+	let s = "";
+	for (let i = 0; i < length; i++) {
+		const number = Math.floor(Math.random() * 16);
+		s += number.toString(16);
+	}
+	return s.toLowerCase();
 }
