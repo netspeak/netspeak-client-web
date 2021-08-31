@@ -286,6 +286,10 @@ export class Netspeak {
 	static get defaultHostname(): string {
 		return "https://ngram.api.netspeak.org";
 	}
+	//The host for the neural netspeak API
+	static get neuralHostname(): string {
+		return "https://neural.api.netspeak.org";
+	}
 
 	static get instance(): Netspeak {
 		return (defaultNetspeakInstance = defaultNetspeakInstance || new Netspeak());

@@ -1,6 +1,7 @@
 import React from "react";
 import "./search-page.scss";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
+import NetspeakShowExperimental from "../elements/netspeak-show-experimental";
 import { getCurrentLang } from "../lib/localize";
 import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
 import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
@@ -29,6 +30,8 @@ interface State {
 	corpora: readonly Corpus[];
 	unavailableCorpora: ReadonlySet<Corpus>;
 
+	showExperimental: boolean;
+
 	pageQuery: string;
 	currentQuery: string;
 	queryId: number;
@@ -45,6 +48,8 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		...withCorpus(getPageParam("corpus") || DEFAULT_CORPUS_KEY),
 		corpora: KNOWN_CORPORA,
 		unavailableCorpora: new Set(),
+
+		showExperimental: false,
 
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
@@ -130,6 +135,13 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
+				<div>
+					<NetspeakShowExperimental 
+						lang={this.lang}
+						active={this.state.showExperimental}
+						onClicked={() => this.setState({showExperimental: !this.state.showExperimental})}
+						/>
+				</div>
 
 				<div className="search-wrapper">
 					<NetspeakSearch
