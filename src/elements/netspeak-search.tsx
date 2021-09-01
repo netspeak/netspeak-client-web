@@ -43,6 +43,10 @@ interface Props extends LocalizableProps {
 	corpusKey: string;
 	onCommitQuery?: (query: string, corpusKey: string) => void;
 
+	showExperimental: boolean;
+	refreshSearch: boolean;
+	onSearchRefreshed: () => void;
+
 	history?: QueryHistory;
 
 	defaultExampleVisibility?: ExampleVisibility;
@@ -150,7 +154,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					query: normalizedQuery,
 					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-				})
+				}, this.props.showExperimental)
 			);
 			this._handleSearchPromise(normalizedQuery, promise);
 		}
@@ -176,6 +180,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},
+				this.props.showExperimental,
 				{
 					checkComplete: true,
 					topkMode: "fill",
@@ -416,6 +421,13 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	render(): JSX.Element {
 		const l = createLocalizer(this.props, locales);
 		const { warnings, errors } = this._splitProblems();
+		if(this.props.refreshSearch)
+		{
+			this._setQuery("", true);
+			this._setQuery(this.state.query, true); //done to reset normalized query
+			this._queryPhrases(this.state.query);
+			this.props.onSearchRefreshed();
+		}
 
 		return (
 			<div className="NetspeakSearch">
@@ -484,6 +496,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							phrases={this.state.phrases}
 							stats={this.state.phrasesStats}
 							onChange={this._onPhraseChange}
+							showExperimental={this.props.showExperimental}
 						/>
 					</div>
 				))}

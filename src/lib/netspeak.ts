@@ -69,9 +69,11 @@ export class Netspeak {
 	private _client: NetspeakServiceClient;
 	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
+	private _neural: boolean; //compared to function neural to determine if client needs to be changed or cache deleted
 
 	private constructor() {
 		this._client = new NetspeakServiceClient(Netspeak.defaultHostname);
+		this._neural = false;
 	}
 
 	/**
@@ -82,22 +84,26 @@ export class Netspeak {
 	 * If the value is not set or `undefined`, it is not certain whether there are still phrases matching the query.
 	 *
 	 * @param request A request specifying the the options of the Netspeak API.
+	 * @param neural Determines whether or not to use the default or neural hostname
 	 * @param options
 	 */
 	search(
 		request: Readonly<NetspeakSearchRequest>,
+		neural: Readonly<boolean>,
 		options?: Readonly<NetspeakSearchOptions>
 	): Promise<ReadonlyNetspeakSearchResult> {
+		this._handleNeural(neural);
+
 		// fill mode
 		if (options?.topkMode === "fill") {
-			return this._fillSearch(request, { ...options });
+			return this._fillSearch(request, neural, { ...options });
 		} else {
 			const key = JSON.stringify(request);
 			const cached = this._cache.get(key);
 			if (cached !== undefined) {
 				return cached;
 			} else {
-				const uncached = this._uncachedSearch(request);
+				const uncached = this._uncachedSearch(request, neural);
 				uncached.then(res => {
 					// only cache successful responses
 					this._cache.add(key, Promise.resolve(res));
@@ -107,8 +113,20 @@ export class Netspeak {
 		}
 	}
 
-	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>): Promise<ReadonlyNetspeakSearchResult> {
+	private _handleNeural(neural: Readonly<boolean>) {
+		if(this._neural !== neural)
+		{
+			this._client = new NetspeakServiceClient(neural ? Netspeak.neuralHostname : Netspeak.defaultHostname); //replace client used for results
+			this._cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100); //erase cache on experimental activated
+		}
+
+		this._neural = neural;
+	}
+
+	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>, neural: Readonly<boolean>): Promise<ReadonlyNetspeakSearchResult> {
 		try {
+			this._handleNeural(neural);
+
 			const req = this._toSearchRequest(request);
 
 			const query = req.getQuery();
@@ -181,8 +199,11 @@ export class Netspeak {
 	 */
 	private _fillSearch(
 		request: Readonly<NetspeakSearchRequest>,
+		neural: Readonly<boolean>,
 		options: NetspeakSearchOptions
 	): Promise<NetspeakSearchResult> {
+		this._handleNeural(neural);
+
 		// copy request
 		const req = { ...request };
 
@@ -211,7 +232,7 @@ export class Netspeak {
 			const fill = (): Promise<NetspeakSearchResult & { complete: boolean }> => {
 				req.topk = goal - result.phrases.length + 1; // + 1 to check for completeness
 
-				return this.search(req, options).then(({ phrases, unknownWords }) => {
+				return this.search(req, neural, options).then(({ phrases, unknownWords }) => {
 					// append new phrases
 					result.phrases.push(...phrases);
 
@@ -285,6 +306,7 @@ export class Netspeak {
 	 */
 	static get defaultHostname(): string {
 		return "https://ngram.api.netspeak.org";
+		//return "https://neural.api.netspeak.org";
 	}
 	//The host for the neural netspeak API
 	static get neuralHostname(): string {

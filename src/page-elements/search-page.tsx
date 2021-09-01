@@ -31,6 +31,7 @@ interface State {
 	unavailableCorpora: ReadonlySet<Corpus>;
 
 	showExperimental: boolean;
+	refreshSearch: boolean; //set to true after pressing the showExperimental button to refresh the result list results
 
 	pageQuery: string;
 	currentQuery: string;
@@ -50,6 +51,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		unavailableCorpora: new Set(),
 
 		showExperimental: false,
+		refreshSearch: false,
 
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
@@ -122,26 +124,31 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			exampleVisibility: visibility,
 		});
 	};
+	private _onShowExperimental = (): void => {
+		this.setState({showExperimental: !this.state.showExperimental});
+		this.setState({refreshSearch: true});
+	}
+	private _onSearchRefreshed = (): void => {
+		this.setState({refreshSearch: false}); //sent to result list to be called after search is refreshed
+	}
 
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
 				{optional(this.state.corpora.length > 0, () => (
 					<NetspeakCorpusSelector
-						lang={this.lang}
-						selected={this.state.currentCorpusKey}
-						corpora={this.state.corpora}
-						unavailable={this.state.unavailableCorpora}
-						onCorpusSelected={this._onCorpusSelectedHandler}
+					lang={this.lang}
+					selected={this.state.currentCorpusKey}
+					corpora={this.state.corpora}
+					unavailable={this.state.unavailableCorpora}
+					onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
-				<div>
-					<NetspeakShowExperimental 
-						lang={this.lang}
-						active={this.state.showExperimental}
-						onClicked={() => this.setState({showExperimental: !this.state.showExperimental})}
-						/>
-				</div>
+				<NetspeakShowExperimental 
+				lang={this.lang}
+				active={this.state.showExperimental}
+				onClicked={this._onShowExperimental}
+				/>
 
 				<div className="search-wrapper">
 					<NetspeakSearch
@@ -150,12 +157,16 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						corpusKey={this.state.currentCorpusKey}
 						defaultQuery={this.state.pageQuery}
 						onCommitQuery={this._onQueryCommitHandler}
+						showExperimental={this.state.showExperimental}
+						refreshSearch={this.state.refreshSearch}
+						onSearchRefreshed={this._onSearchRefreshed}
 						history={this.state.history}
 						defaultExampleVisibility={this.state.exampleVisibility}
 						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
 						pageSize={40}
 						autoFocus={true}
 					/>
+
 				</div>
 			</Page>
 		);
