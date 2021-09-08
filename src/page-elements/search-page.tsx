@@ -135,6 +135,12 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
+				<div className="options-wrapper">
+				<NetspeakShowExperimental 
+				lang={this.lang}
+				active={this.state.showExperimental}
+				onClicked={this._onShowExperimental}
+				/>
 				{optional(this.state.corpora.length > 0, () => (
 					<NetspeakCorpusSelector
 					lang={this.lang}
@@ -144,11 +150,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 					onCorpusSelected={this._onCorpusSelectedHandler}
 					/>
 				))}
-				<NetspeakShowExperimental 
-				lang={this.lang}
-				active={this.state.showExperimental}
-				onClicked={this._onShowExperimental}
-				/>
+				</div>
 
 				<div className="search-wrapper">
 					<NetspeakSearch
