@@ -84,14 +84,18 @@ export type OnChangeFn = (phrase: Phrase, change: PhraseStateChangeFn) => void;
 interface ListProps extends LocalizableProps {
 	phrases: readonly PhraseState[];
 	stats: PhraseCollectionStats;
+	neuralPhrases: readonly PhraseState[];
+	neuralStats: PhraseCollectionStats;
 	onChange: OnChangeFn;
 	showExperimental: boolean;
 }
 
-export default function NetspeakResultList(props: ListProps): JSX.Element {
+export default function NetspeakResultList(props: ListProps, neural: boolean): JSX.Element {
 	return (
 		<div className="NetspeakResultList">
-			{props.phrases.map(phrase => (
+			{
+			// !neural ?
+			props.phrases.map(phrase => (
 				<ResultListItem
 					key={phrase.phrase.text}
 					lang={props.lang}
@@ -100,6 +104,15 @@ export default function NetspeakResultList(props: ListProps): JSX.Element {
 					onChange={props.onChange}
 					showExperimental={props.showExperimental}
 				/>
+			// )) : props.neuralPhrases.map(phrase => (
+			// 	<ResultListItem
+			// 		key={phrase.phrase.text}
+			// 		lang={props.lang}
+			// 		phrase={phrase}
+			// 		stats={props.neuralStats}
+			// 		onChange={props.onChange}
+			// 		showExperimental={props.showExperimental}
+			// 	/>
 			))}
 		</div>
 	);
@@ -208,20 +221,66 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 		);
 
 	render(): JSX.Element {
-		const relativeFreq = this.props.phrase.phrase.frequency / this.props.stats.frequencyMax;
-		const backgroundSize = `${relativeFreq * 0.618 * 100}% 130%`;
+		if(this.props.showExperimental)
+		{
+			const relativeFreq = this.props.phrase.phrase.frequency / this.props.stats.frequencyMax;
+			const backgroundSize = `${relativeFreq * 0.618 * 100}% 130%`;
 
-		return (
-			<div className="phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
+			return (
 				<div>
-					<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+					<div className={this.props.showExperimental ? "small-phrase-container" : "phrase-container"} style={{ backgroundSize }} onClick={this.onClick}>
+						<div>
+							<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+						</div>
+						<span className="freq">
+							{this.formatFrequency()}
+							<span className="percentage">{this.formatPercentage()}</span>
+						</span>
+					</div>
+					{optional(this.props.showExperimental, () => (
+						<div className="small-phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
+							<div>
+								<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+							</div>
+							<span className="freq">
+								{this.formatFrequency()}
+								<span className="percentage">{this.formatPercentage()}</span>
+							</span>
+						</div>
+					))}
 				</div>
-				<span className="freq">
-					{this.formatFrequency()}
-					<span className="percentage">{this.formatPercentage()}</span>
-				</span>
-			</div>
-		);
+			);
+		}
+		else
+		{
+			const relativeFreq = this.props.phrase.phrase.frequency / this.props.stats.frequencyMax;
+			const backgroundSize = `${relativeFreq * 0.618 * 100}% 130%`;
+
+			return (
+				<div>
+					<div className={this.props.showExperimental ? "small-phrase-container" : "phrase-container"} style={{ backgroundSize }} onClick={this.onClick}>
+						<div>
+							<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+						</div>
+						<span className="freq">
+							{this.formatFrequency()}
+							<span className="percentage">{this.formatPercentage()}</span>
+						</span>
+					</div>
+					{optional(this.props.showExperimental, () => (
+						<div className="small-phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
+							<div>
+								<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+							</div>
+							<span className="freq">
+								{this.formatFrequency()}
+								<span className="percentage">{this.formatPercentage()}</span>
+							</span>
+						</div>
+					))}
+				</div>
+			);
+		}
 	}
 }
 

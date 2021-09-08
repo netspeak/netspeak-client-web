@@ -66,6 +66,9 @@ interface State {
 	phrases: readonly PhraseState[];
 	phrasesStats: PhraseCollectionStats;
 
+	neuralPhrases: readonly PhraseState[];
+	neuralPhrasesStats: PhraseCollectionStats;
+
 	problems: readonly Problem[];
 }
 
@@ -98,6 +101,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 			phrases: [],
 			phrasesStats: EMPTY_STATS,
+
+			neuralPhrases: [],
+			neuralPhrasesStats: EMPTY_STATS,
 
 			problems: [],
 		};
@@ -154,9 +160,21 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					query: normalizedQuery,
 					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-				}, this.props.showExperimental)
+				}, false)
 			);
-			this._handleSearchPromise(normalizedQuery, promise);
+			this._handleSearchPromise(normalizedQuery, promise, false);
+
+			if(this.props.showExperimental)
+			{
+				const secondPromise = this.cancelable(
+					Netspeak.instance.search({
+						query: normalizedQuery,
+						corpus: this.props.corpusKey,
+						topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+					}, true)
+				);
+				this._handleSearchPromise(normalizedQuery, secondPromise, true);
+			}
 		}
 	}
 	private _queryMorePhrases = (): void => {
@@ -172,6 +190,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.setState({ loadingState: LoadingState.LOADING });
 
+		//non-neural promise
 		const promise = this.cancelable(
 			Netspeak.instance.search(
 				{
@@ -180,18 +199,40 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},
-				this.props.showExperimental,
+				false, //showExperimental
 				{
 					checkComplete: true,
 					topkMode: "fill",
 				}
 			)
 		);
-		this._handleSearchPromise(normalizedQuery, promise);
+		this._handleSearchPromise(normalizedQuery, promise, false);
+
+		//optional neural promise
+		if(this.props.showExperimental)
+		{
+			const secondPromise = this.cancelable(
+				Netspeak.instance.search(
+					{
+						query: normalizedQuery,
+						corpus: this.props.corpusKey,
+						topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+						maxfreq: minFreq,
+					},
+					true, //showExperimental
+					{
+						checkComplete: true,
+						topkMode: "fill",
+					}
+				)
+			);
+			this._handleSearchPromise(normalizedQuery, secondPromise, true);
+		}
 	};
 	private _handleSearchPromise(
 		normalizedQuery: NormalizedQuery,
-		promise: CancelablePromise<ReadonlyNetspeakSearchResult>
+		promise: CancelablePromise<ReadonlyNetspeakSearchResult>,
+		neural: boolean
 	): void {
 		this._delayErrorPromise?.cancel();
 
@@ -204,7 +245,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					// too late
 				} else {
 					// append all queried phrases
-					this._mergePhrases(normalizedQuery, result.phrases);
+					this._mergePhrases(normalizedQuery, result.phrases, neural);
 					// set the loading state
 					this.setState({
 						loadingState:
@@ -272,50 +313,99 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			this.setState({
 				phrases: [],
 				phrasesStats: EMPTY_STATS,
+
+				neuralPhrases: [],
+				neuralPhrasesStats: EMPTY_STATS,
 			});
 		} else {
 			const newPhrases = this.state.phrases.filter(p => p.pinned);
+			const newNeuralPhrases = this.state.neuralPhrases.filter(p => p.pinned);
 			if (newPhrases.length !== this.state.phrases.length) {
 				this.setState({
 					phrases: newPhrases,
 					phrasesStats: getStats(newPhrases),
 				});
 			}
-		}
-	}
-	private _mergePhrases(normalizedQuery: NormalizedQuery, phrases: Iterable<Phrase>): void {
-		const newPhrases = this.state.phrases.filter(p => p.pinned || p.phrase.query === normalizedQuery);
-		const textSet = new Set<string>(newPhrases.map(p => p.phrase.text));
-		let numberOfNewPhrases = 0;
-
-		for (const phrase of phrases) {
-			if (!textSet.has(phrase.text)) {
-				textSet.add(phrase.text);
-				numberOfNewPhrases++;
-				newPhrases.push(
-					new PhraseState(
-						phrase,
-						false,
-						false,
-						new PhraseSnippetState(toLookaheadSnippetSupplier(DEFAULT_SNIPPETS.getSupplier(phrase.text)))
-					)
-				);
+			if (newNeuralPhrases.length !== this.state.neuralPhrases.length) {
+				this.setState({
+					neuralPhrases: newNeuralPhrases,
+					neuralPhrasesStats: getStats(newNeuralPhrases),
+				});
 			}
 		}
+	}
+	private _mergePhrases(normalizedQuery: NormalizedQuery, phrases: Iterable<Phrase>, neural: boolean): void {
+		if(!neural)
+		{
+			const newPhrases = this.state.phrases.filter(p => p.pinned || p.phrase.query === normalizedQuery);
+			const textSet = new Set<string>(newPhrases.map(p => p.phrase.text));
+			let numberOfNewPhrases = 0;
 
-		if (numberOfNewPhrases > 0) {
-			// set state to reflect new phrases
-			newPhrases.sort((a, b) => b.phrase.frequency - a.phrase.frequency);
-			this.setState({
-				phrases: newPhrases,
-				phrasesStats: getStats(newPhrases),
-			});
-		} else if (newPhrases.length !== this.state.phrases.length) {
-			// no new phrases but some old ones have been removed
-			this.setState({
-				phrases: newPhrases,
-				phrasesStats: getStats(newPhrases),
-			});
+			for (const phrase of phrases) {
+				if (!textSet.has(phrase.text)) {
+					textSet.add(phrase.text);
+					numberOfNewPhrases++;
+					newPhrases.push(
+						new PhraseState(
+							phrase,
+							false,
+							false,
+							new PhraseSnippetState(toLookaheadSnippetSupplier(DEFAULT_SNIPPETS.getSupplier(phrase.text)))
+						)
+					);
+				}
+			}
+
+			if (numberOfNewPhrases > 0) {
+				// set state to reflect new phrases
+				newPhrases.sort((a, b) => b.phrase.frequency - a.phrase.frequency);
+				this.setState({
+					phrases: newPhrases,
+					phrasesStats: getStats(newPhrases),
+				});
+			} else if (newPhrases.length !== this.state.phrases.length) {
+				// no new phrases but some old ones have been removed
+				this.setState({
+					phrases: newPhrases,
+					phrasesStats: getStats(newPhrases),
+				});
+			}
+		}
+		else
+		{
+			const newPhrases = this.state.neuralPhrases.filter(p => p.pinned || p.phrase.query === normalizedQuery);
+			const textSet = new Set<string>(newPhrases.map(p => p.phrase.text));
+			let numberOfNewPhrases = 0;
+
+			for (const phrase of phrases) {
+				if (!textSet.has(phrase.text)) {
+					textSet.add(phrase.text);
+					numberOfNewPhrases++;
+					newPhrases.push(
+						new PhraseState(
+							phrase,
+							false,
+							false,
+							new PhraseSnippetState(toLookaheadSnippetSupplier(DEFAULT_SNIPPETS.getSupplier(phrase.text)))
+						)
+					);
+				}
+			}
+
+			if (numberOfNewPhrases > 0) {
+				// set state to reflect new phrases
+				newPhrases.sort((a, b) => b.phrase.frequency - a.phrase.frequency);
+				this.setState({
+					neuralPhrases: newPhrases,
+					neuralPhrasesStats: getStats(newPhrases),
+				});
+			} else if (newPhrases.length !== this.state.neuralPhrases.length) {
+				// no new phrases but some old ones have been removed
+				this.setState({
+					neuralPhrases: newPhrases,
+					neuralPhrasesStats: getStats(newPhrases),
+				});
+			}
 		}
 	}
 
@@ -358,6 +448,25 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				phrases: newPhrases,
 				phrasesStats: getStats(newPhrases),
 			});
+		}
+
+		if(this.props.showExperimental)
+		{
+			const neuralPhrases = this.state.neuralPhrases;
+			const index = neuralPhrases.findIndex(p => p.phrase === phrase);
+			const neuralPhraseState = neuralPhrases[index];
+			const newNeuralPhraseState = change(neuralPhraseState);
+			if (newNeuralPhraseState !== neuralPhraseState) {
+				const newNeuralPhrases: readonly PhraseState[] = [
+					...neuralPhrases.slice(0, index),
+					newNeuralPhraseState,
+					...neuralPhrases.slice(index + 1),
+				];
+				this.setState({
+					neuralPhrases: newNeuralPhrases,
+					neuralPhrasesStats: getStats(newNeuralPhrases),
+				});
+			}
 		}
 	};
 	private _onExampleButtonClick = (): void => {
@@ -495,6 +604,8 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							lang={this.props.lang}
 							phrases={this.state.phrases}
 							stats={this.state.phrasesStats}
+							neuralPhrases={this.state.neuralPhrases}
+							neuralStats={this.state.neuralPhrasesStats}
 							onChange={this._onPhraseChange}
 							showExperimental={this.props.showExperimental}
 						/>

@@ -33,12 +33,32 @@
 	 */
 
 	.phrase-container {
+		display: inline-block;
+
 		background-repeat: no-repeat;
 		background-position: calc(100% + 1px) -2px;
 		background-image: url("../img/frequency-bar.png");
 		cursor: pointer;
 		padding: 0 var(--left-right-padding);
 		width: 100%;
+		box-sizing: border-box;
+
+		&::after {
+			content: "";
+			clear: both;
+			display: block;
+		}
+	}
+
+	.small-phrase-container {
+		display: inline-block;
+
+		background-repeat: no-repeat;
+		background-position: calc(100% + 1px) -2px;
+		background-image: url("../img/frequency-bar.png");
+		cursor: pointer;
+		padding: 0 var(--left-right-padding);
+		width: 50%;
 		box-sizing: border-box;
 
 		&::after {
