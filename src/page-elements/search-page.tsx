@@ -9,6 +9,8 @@ import { optional, nextId } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
+import NetspeakGraph, { GraphElement } from "../elements/netspeak-graph";
+import { PhraseState } from "../elements/netspeak-result-list";
 
 interface State {
 	corpusKey: string;
@@ -21,6 +23,10 @@ interface State {
 	history: QueryHistory;
 
 	exampleVisibility: ExampleVisibility;
+
+	selectedWords: GraphElement[];
+	statePhrases: PhraseState[];
+	highlightedPhrases : string[];
 }
 
 export default class SearchPage extends React.PureComponent<unknown, State> {
@@ -33,6 +39,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
 		queryId: nextId(),
+		selectedWords: [],
+		statePhrases: [],
+		highlightedPhrases : [],
 
 		exampleVisibility: loadExampleVisibility() ?? "peek",
 	};
@@ -70,6 +79,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		}));
 	};
 	private _onCorpusSelectedHandler = (corpusKey: string): void => {
+		this._syncStateWithGraph([])
 		this.setState(state => withCorpusKey(corpusKey, state));
 		setPageParam("corpus", corpusKey);
 	};
@@ -96,29 +106,72 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		});
 	};
 
+
+	// Send all pinned & expanded phrases as extra props to graph via search page state
+	private _syncStateWithGraph = (phraseStates: readonly PhraseState[]) => {
+		this.setState(state => {
+			return {
+				statePhrases: phraseStates.filter(val => {
+					return (val.pinned || (val.expanded && val.phrase.query == this.state.pageQuery))
+				})
+			}
+		})
+	}
+	private _onSetSelection = (selection: GraphElement[]) => {
+		this.setState(state => {
+			return {
+				selectedWords: selection
+			}
+		});
+	}
+	private _setHighlightedPhrases = (phrases: string[]) => {
+		this.setState(state => {
+			return {
+				highlightedPhrases : phrases
+			}
+		})
+	}
+
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
 				{optional(this.state.corpora.length > 0, () => (
-					<NetspeakCorpusSelector
-						lang={this.lang}
-						selected={this.state.corpusKey}
-						corpora={this.state.corpora}
-						onCorpusSelected={this._onCorpusSelectedHandler}
-					/>
+					<div className="corpusSelecterWrapper">
+						<NetspeakCorpusSelector
+							lang={this.lang}
+							selected={this.state.corpusKey}
+							corpora={this.state.corpora}
+							onCorpusSelected={this._onCorpusSelectedHandler}
+						/>
+					</div>
 				))}
-				<div className="search-wrapper">
-					<NetspeakSearch
-						key={this.state.queryId + ";" + this.state.corpusKey}
-						lang={this.lang}
+				<div className="flexbox-container">
+
+					<div className="search-wrapper">
+						<NetspeakSearch
+							key={this.state.queryId + ";" + this.state.corpusKey}
+							lang={this.lang}
+							corpus={this.state.corpusKey}
+							defaultQuery={this.state.pageQuery}
+							onCommitQuery={this._onQueryCommitHandler}
+							selectedWords={this.state.selectedWords}
+							history={this.state.history}
+							defaultExampleVisibility={this.state.exampleVisibility}
+							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+							pageSize={40}
+							autoFocus={true}
+							syncStateWithGraph={this._syncStateWithGraph}
+							setHighlightedPhrases={this._setHighlightedPhrases}
+							highlightedPhrases = {this.state.highlightedPhrases}
+						/>
+					</div>
+					<NetspeakGraph
 						corpus={this.state.corpusKey}
-						defaultQuery={this.state.pageQuery}
-						onCommitQuery={this._onQueryCommitHandler}
-						history={this.state.history}
-						defaultExampleVisibility={this.state.exampleVisibility}
-						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
-						pageSize={40}
-						autoFocus={true}
+						pageQuerry={this.state.pageQuery}
+						statePhrases={this.state.statePhrases}
+						onSetSelection={this._onSetSelection}
+						highlightedPhrases={this.state.highlightedPhrases}
+						setHighlightedPhrases={this._setHighlightedPhrases}
 					/>
 				</div>
 			</Page>

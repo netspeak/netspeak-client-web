@@ -1,0 +1,94 @@
+.GraphMenuButton {
+  cursor: pointer;
+  position: relative;
+  top: 0;
+  left: 0;
+  margin: 0;
+  padding: 6px;
+  width: 25px;
+  height: 25px;
+
+  opacity: 0.5;
+  // transition: transform 0.7s ease-in-out;
+
+  &:hover {
+    animation: rotation 2s infinite linear;
+    opacity: 0.8;
+  }
+}
+@media (min-width: 1130px) {
+  .GraphMenuButton {
+    position: absolute;
+  }
+}
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.popup-content {
+  width: 300px !important;
+}
+
+.popup-content > .popupGrid {
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+.popup-content > .popupGrid > * {
+  margin-bottom: 1em;
+}
+
+.switchWrapper {
+  width: 100%;
+  height: 2.5em;
+  position: relative;
+}
+.switchWrapper .react-switch {
+  right: 5px;
+  position: absolute !important;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.switchWrapper span {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+#graphWrapper.loading::after {
+  content: "";
+  opacity: 0.5;
+  left: 40%;
+  right: 40%;
+  top: 25%;
+  width: 20%;
+  height: 50%;
+  animation-name: fade-in-loading-animation;
+  animation-duration: 1s;
+  background-image: url("../img/loading.svg");
+  background-repeat: no-repeat;
+  opacity: 1;
+  background-size: contain;
+  position: absolute;
+}
+#graphWrapper.loading > svg{
+  
+  opacity: 0.7;
+}
+
+@keyframes fade-in-loading-animation {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 50%;
+  }
+}

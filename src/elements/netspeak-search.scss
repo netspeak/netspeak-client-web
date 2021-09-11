@@ -1,6 +1,5 @@
 .NetspeakSearch {
 	font-size: 100%;
-	border-left: 1px solid #bbb;
 	border-right: 1px solid #bbb;
 
 	& > .wrapper {
@@ -10,7 +9,6 @@
 	/* Search bar */
 
 	& > .search-bar-wrapper {
-		border-top: 1px solid #bbb;
 		font-size: 110%;
 
 		input {

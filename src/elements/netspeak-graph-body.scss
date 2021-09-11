@@ -1,0 +1,71 @@
+@media (min-width: 1171px) {
+    #graphWrapper {
+        flex: 2 1 500px;
+        position: sticky;
+        top: 0px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    .NetspeakSearch > .wrapper.load-more-wrapper{
+    border-bottom: none;
+    }
+}
+@media (min-width: 1130px) {
+    #graphWrapper {
+        padding-left: 20px;
+    }
+}
+
+// @media (max-width: 1000px) {
+//     #graphWrapper {
+//         flex: 0 0 500px;
+//         position: sticky;
+//         top: 0px;
+//     }
+// }
+@media (max-width: 1170px) {
+    #graphWrapper {
+        flex: 0 0 500px;
+        position: relative;
+    }
+}
+svg {
+    width: 100%;
+    height: 100%;
+}
+
+path.highlightedPath.visible,
+path.highlightedPath,
+path.selectedPath.visible,
+path.selectedPath {
+    stroke: #cb0c29;
+    stroke-width: 1.5px !important;
+}
+
+text.highlightedPath,
+text.selectedPath {
+    fill: #cb0c29;
+}
+
+path.visible {
+    stroke: black;
+}
+path {
+    stroke-width: 0.7px;
+    fill: none;
+    opacity: .5;
+
+}
+
+// path.selectedPath{
+
+// }
+
+.graphHighlightable.selectedPath,
+.graphHighlightable.highlightedPath {
+    opacity: 1;
+}
+
+.selectedWord {
+    fill: darkviolet !important;
+}
