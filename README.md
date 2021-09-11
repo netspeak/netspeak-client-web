@@ -15,10 +15,10 @@ Then, install the dependencies:
 
 ```bash
 cd path/to/repo
-npm i
+npm ci
 ```
 
-And now, you should be ready to rock. As for IDEs, I recommend [VS Code](https://code.visualstudio.com/).
+And now, you should be ready to rock. As for IDEs, I recommend [VS Code](https://code.visualstudio.com/) together with the [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) and [Stylelint](https://marketplace.visualstudio.com/items?itemName=stylelint.vscode-stylelint) extensions.
 
 Use the `npm run develop` command to open a local server with a live preview of the website. The page will automatically update as source files change.
 
