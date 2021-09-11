@@ -10,7 +10,8 @@
     "start": "npm run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "lint": "eslint --no-error-on-unmatched-pattern src/**",
+    "lint": "eslint --no-error-on-unmatched-pattern src/** && stylelint \"src/**/*.scss\"",
+    "lint:fix": "eslint --no-error-on-unmatched-pattern --fix src/** && stylelint \"src/**/*.scss\" --fix",
     "test": "npm run build",
     "publish-demo": "npx gulp publishDemo",
     "publish-release": "npx gulp publishRelease"
@@ -47,6 +48,10 @@
     "prettier": "2.1.0",
     "shelljs": "^0.8.3",
     "simple-git": "^1.132.0",
+    "stylelint": "^13.13.1",
+    "stylelint-config-prettier": "^8.0.2",
+    "stylelint-config-standard": "^22.0.0",
+    "stylelint-prettier": "^1.2.0",
     "typescript": "^4.0.2"
   }
 }

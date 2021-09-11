@@ -1,4 +1,8 @@
-html, body, #___gatsby, #gatsby-focus-wrapper, #Page {
+html,
+body,
+#___gatsby,
+#gatsby-focus-wrapper,
+#Page {
 	padding: 0;
 	margin: 0;
 	width: 100%;
@@ -12,7 +16,7 @@ html {
 }
 
 #Page {
-	background-color: #FFF;
+	background-color: #fff;
 	border-collapse: collapse;
 	display: table;
 }
@@ -27,7 +31,7 @@ html {
 	font-family: "Product Sans", "Noto Sans", "Verdana", sans-serif;
 }
 
-#Page>.footer-wrapper {
+#Page > .footer-wrapper {
 	display: table-row;
 	vertical-align: bottom;
 	height: 1px;
