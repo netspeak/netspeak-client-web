@@ -444,6 +444,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		return (
 			<div className="NetspeakSearch">
+				{optional(this.props.showExperimental, () => (
+					<div className="searchBarEmptySpacer"/>
+				))}
 				<div className="wrapper search-bar-wrapper">
 					{optional(!this.props.showExperimental, () => (
 						<table>
