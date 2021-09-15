@@ -135,6 +135,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	}
 	private _onSetQuery = (s: string): void => {
 		this.setState({storedQuery: s});
+		this.setState({refreshSearch: true});
 	}
 
 	render(): JSX.Element {

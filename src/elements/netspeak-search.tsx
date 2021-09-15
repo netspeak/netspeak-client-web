@@ -160,7 +160,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				}, 
 				this.props.showExperimental)
 			);
-			this._handleSearchPromise(normalizedQuery, promise, this.props.showExperimental);
+			this._handleSearchPromise(normalizedQuery, promise);
 		}
 	}
 	private _queryMorePhrases = (): void => {
@@ -192,12 +192,11 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				}
 			)
 		);
-		this._handleSearchPromise(normalizedQuery, promise, this.props.showExperimental);
+		this._handleSearchPromise(normalizedQuery, promise);
 	};
 	private _handleSearchPromise(
 		normalizedQuery: NormalizedQuery,
-		promise: CancelablePromise<ReadonlyNetspeakSearchResult>,
-		neural: boolean
+		promise: CancelablePromise<ReadonlyNetspeakSearchResult>
 	): void {
 		this._delayErrorPromise?.cancel();
 
@@ -438,11 +437,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			this.props.onSearchRefreshed();
 		}
 
-		if(this.props.showExperimental && this.props.forcedExperimentalQuery != this.state.query)
+		if(this.props.showExperimental && this.props.forcedExperimentalQuery !== this.state.query)
 		{
 			this._setQuery(this.props.forcedExperimentalQuery, false);
-			this._queryPhrases(this.state.query);
-			this.props.onSearchRefreshed();
 		}
 
 		return (
