@@ -16,7 +16,7 @@ export default function NetspeakShowExperimental(props: Props): JSX.Element {
 		<div className="NetspeakShowExperimental">
 			<div className="wrapper">
 				<button onClick={handleButtonClick} value={props.active ? "active" : "inactive"}>
-					{"SHOW EXPERIMENTAL"}
+					{props.active ? "HIDE EXPERIMENTAL" : "SHOW EXPERIMENTAL"}
 				</button>
 			</div>
 		</div>

@@ -1,8 +1,14 @@
 .SearchPage {
 	#content {
-		max-width: 500px;
+		max-width: 1000px;
 		margin: 0 64px;
 		padding: 3em 0;
+	}
+
+	.section {
+		float: left;
+		width: 40%;
+		margin-right: 5%;
 	}
 
 	.NetspeakCorpusSelector {
@@ -13,14 +19,14 @@
 		margin: 0 0 2em auto;
 	}
 
-	@media screen and (max-width: 628px /* 500px + 64px * 2 */) {
+	@media screen and (max-width: 1256px /* (500px + 64px * 2) * 2 */) {
 		#content {
-			max-width: 500px;
+			max-width: 1000px;
 			margin: 0 auto;
 		}
 	}
 
-	@media screen and (max-width: 500px) {
+	@media screen and (max-width: 1000px) {
 		#content {
 			margin: 0;
 		}

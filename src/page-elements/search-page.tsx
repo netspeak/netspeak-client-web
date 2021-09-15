@@ -29,6 +29,7 @@ interface State {
 	currentCorpusKey: string;
 	corpora: readonly Corpus[];
 	unavailableCorpora: ReadonlySet<Corpus>;
+	storedQuery: string;
 
 	showExperimental: boolean;
 	refreshSearch: boolean; //set to true after pressing the showExperimental button to refresh the result list results
@@ -49,6 +50,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		...withCorpus(getPageParam("corpus") || DEFAULT_CORPUS_KEY),
 		corpora: KNOWN_CORPORA,
 		unavailableCorpora: new Set(),
+		storedQuery: "",
 
 		showExperimental: false,
 		refreshSearch: false,
@@ -131,44 +133,76 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	private _onSearchRefreshed = (): void => {
 		this.setState({refreshSearch: false}); //sent to result list to be called after search is refreshed
 	}
+	private _onSetQuery = (s: string): void => {
+		this.setState({storedQuery: s});
+	}
 
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
-				<div className="options-wrapper">
-				<NetspeakShowExperimental 
-				lang={this.lang}
-				active={this.state.showExperimental}
-				onClicked={this._onShowExperimental}
-				/>
-				{optional(this.state.corpora.length > 0, () => (
-					<NetspeakCorpusSelector
-					lang={this.lang}
-					selected={this.state.currentCorpusKey}
-					corpora={this.state.corpora}
-					unavailable={this.state.unavailableCorpora}
-					onCorpusSelected={this._onCorpusSelectedHandler}
-					/>
-				))}
+				<div className="section">
+					<div className="options-wrapper">
+						{optional(this.state.corpora.length > 0, () => (
+							<NetspeakCorpusSelector
+								lang={this.lang}
+								selected={this.state.currentCorpusKey}
+								corpora={this.state.corpora}
+								unavailable={this.state.unavailableCorpora}
+								onCorpusSelected={this._onCorpusSelectedHandler}
+							/>
+						))}
+					</div>
+
+					<div className="search-wrapper">
+						<NetspeakSearch
+							key={this.state.queryId + ";" + this.state.currentCorpusKey}
+							lang={this.lang}
+							corpusKey={this.state.currentCorpusKey}
+							defaultQuery={this.state.pageQuery}
+							onSetQuery={this._onSetQuery}
+							onCommitQuery={this._onQueryCommitHandler}
+							showExperimental={false}
+							forcedExperimentalQuery={""}
+							refreshSearch={this.state.refreshSearch}
+							onSearchRefreshed={this._onSearchRefreshed}
+							history={this.state.history}
+							defaultExampleVisibility={this.state.exampleVisibility}
+							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+							pageSize={40}
+							autoFocus={true}
+						/>
+
+					</div>
 				</div>
-
-				<div className="search-wrapper">
-					<NetspeakSearch
-						key={this.state.queryId + ";" + this.state.currentCorpusKey}
-						lang={this.lang}
-						corpusKey={this.state.currentCorpusKey}
-						defaultQuery={this.state.pageQuery}
-						onCommitQuery={this._onQueryCommitHandler}
-						showExperimental={this.state.showExperimental}
-						refreshSearch={this.state.refreshSearch}
-						onSearchRefreshed={this._onSearchRefreshed}
-						history={this.state.history}
-						defaultExampleVisibility={this.state.exampleVisibility}
-						onSetExampleVisibility={this._onSetExampleVisibilityHandler}
-						pageSize={40}
-						autoFocus={true}
-					/>
-
+				<div className="section">
+					<div className="options-wrapper">
+						<NetspeakShowExperimental
+							lang={this.lang}
+							active={this.state.showExperimental}
+							onClicked={this._onShowExperimental}
+						/>
+					</div>
+					<div className="search-wrapper">
+						{optional(this.state.showExperimental, () => (
+						<NetspeakSearch
+							key={this.state.queryId + ";" + this.state.currentCorpusKey}
+							lang={this.lang}
+							corpusKey={this.state.currentCorpusKey}
+							defaultQuery={this.state.pageQuery}
+							onSetQuery={this._onSetQuery}
+							onCommitQuery={this._onQueryCommitHandler}
+							showExperimental={true}
+							forcedExperimentalQuery={this.state.storedQuery}
+							refreshSearch={this.state.refreshSearch}
+							onSearchRefreshed={this._onSearchRefreshed}
+							history={this.state.history}
+							defaultExampleVisibility={this.state.exampleVisibility}
+							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+							pageSize={40}
+							autoFocus={true}
+						/>
+						))}
+					</div>
 				</div>
 			</Page>
 		);
