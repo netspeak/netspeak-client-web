@@ -152,16 +152,21 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		} else {
 			this.setState({ loadingState: LoadingState.LOADING });
 
-			const promise = this.cancelable(
-				Netspeak.instance.search(
-					{
-						query: normalizedQuery,
-						corpus: this.props.corpusKey,
-						topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-					},
-					this.props.showExperimental
-				)
-			);
+			const promise = this.props.showExperimental
+				? this.cancelable(
+						Netspeak.neuralInstance.search({
+							query: normalizedQuery,
+							corpus: this.props.corpusKey,
+							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+						})
+				  )
+				: this.cancelable(
+						Netspeak.instance.search({
+							query: normalizedQuery,
+							corpus: this.props.corpusKey,
+							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+						})
+				  );
 			this._handleSearchPromise(normalizedQuery, promise);
 		}
 	}
@@ -178,22 +183,35 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.setState({ loadingState: LoadingState.LOADING });
 
-		//non-neural promise
-		const promise = this.cancelable(
-			Netspeak.instance.search(
-				{
-					query: normalizedQuery,
-					corpus: this.props.corpusKey,
-					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-					maxfreq: minFreq,
-				},
-				this.props.showExperimental,
-				{
-					checkComplete: true,
-					topkMode: "fill",
-				}
-			)
-		);
+		const promise = this.props.showExperimental
+			? this.cancelable(
+					Netspeak.neuralInstance.search(
+						{
+							query: normalizedQuery,
+							corpus: this.props.corpusKey,
+							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+							maxfreq: minFreq,
+						},
+						{
+							checkComplete: true,
+							topkMode: "fill",
+						}
+					)
+			  )
+			: this.cancelable(
+					Netspeak.instance.search(
+						{
+							query: normalizedQuery,
+							corpus: this.props.corpusKey,
+							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+							maxfreq: minFreq,
+						},
+						{
+							checkComplete: true,
+							topkMode: "fill",
+						}
+					)
+			  );
 		this._handleSearchPromise(normalizedQuery, promise);
 	};
 	private _handleSearchPromise(
