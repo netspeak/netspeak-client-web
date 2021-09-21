@@ -88,12 +88,10 @@ interface ListProps extends LocalizableProps {
 	showExperimental: boolean;
 }
 
-export default function NetspeakResultList(props: ListProps, neural: boolean): JSX.Element {
+export default function NetspeakResultList(props: ListProps): JSX.Element {
 	return (
 		<div className="NetspeakResultList">
-			{
-			// !neural ?
-			props.phrases.map(phrase => (
+			{props.phrases.map(phrase => (
 				<ResultListItem
 					key={phrase.phrase.text}
 					lang={props.lang}
@@ -215,7 +213,7 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 
 		return (
 			<div>
-				<div className={"phrase-container"} style={{ backgroundSize }} onClick={this.onClick}>
+				<div className="phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
 					<div>
 						<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
 					</div>
