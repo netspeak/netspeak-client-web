@@ -212,18 +212,14 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 		const backgroundSize = `${relativeFreq * 0.618 * 100}% 130%`;
 
 		return (
-			<div>
-				<div className="phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
-					<div>
-						<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>
-							{this.formatText()}
-						</span>
-					</div>
-					<span className="freq">
-						{this.formatFrequency()}
-						<span className="percentage">{this.formatPercentage()}</span>
-					</span>
+			<div className="phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
+				<div>
+					<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
 				</div>
+				<span className="freq">
+					{this.formatFrequency()}
+					<span className="percentage">{this.formatPercentage()}</span>
+				</span>
 			</div>
 		);
 	}
