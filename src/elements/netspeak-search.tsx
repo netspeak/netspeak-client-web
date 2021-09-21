@@ -128,7 +128,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		const changed = normalizedQuery !== this.state.normalizedQuery;
 
 		this.setState({ query, normalizedQuery });
-		if(!this.props.showExperimental) this.props.onSetQuery(this.state.query);
+		if (!this.props.showExperimental) this.props.onSetQuery(this.state.query);
 		if (changed) {
 			this._queryPhrases(normalizedQuery);
 		}
@@ -153,12 +153,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			this.setState({ loadingState: LoadingState.LOADING });
 
 			const promise = this.cancelable(
-				Netspeak.instance.search({
-					query: normalizedQuery,
-					corpus: this.props.corpusKey,
-					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-				}, 
-				this.props.showExperimental)
+				Netspeak.instance.search(
+					{
+						query: normalizedQuery,
+						corpus: this.props.corpusKey,
+						topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+					},
+					this.props.showExperimental
+				)
 			);
 			this._handleSearchPromise(normalizedQuery, promise);
 		}
@@ -339,14 +341,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	}
 
 	private _onSearchBarQueryEnterHandler = (query: string): void => {
-		if(!this.props.showExperimental) this._setQuery(query, false);
+		if (!this.props.showExperimental) this._setQuery(query, false);
 	};
 	private _onExampleQueryClickHandler = (query: string): void => {
 		if (this.state.examplesVisibility === "peek") {
 			this._setExampleVisibility("visible");
 		}
 
-		if(!this.props.showExperimental) this._setQuery(query, true);
+		if (!this.props.showExperimental) this._setQuery(query, true);
 	};
 	private _onPhraseChange: OnChangeFn = (phrase, change) => {
 		const phrases = this.state.phrases;
@@ -370,8 +372,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this._setExampleVisibility(this._areExamplesVisible() ? "hidden" : "visible");
 	};
 	private _onClearButtonClick = (): void => {
-		if (!this.props.showExperimental)
-		{
+		if (!this.props.showExperimental) {
 			this._setQuery("", true);
 			this._clearPhrases(true);
 		}
@@ -429,23 +430,21 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	render(): JSX.Element {
 		const l = createLocalizer(this.props, locales);
 		const { warnings, errors } = this._splitProblems();
-		if(this.props.refreshSearch)
-		{
+		if (this.props.refreshSearch) {
 			this._setQuery("", true);
 			this._setQuery(this.state.query, true); //done to reset normalized query
 			this._queryPhrases(this.state.query);
 			this.props.onSearchRefreshed();
 		}
 
-		if(this.props.showExperimental && this.props.forcedExperimentalQuery !== this.state.query)
-		{
+		if (this.props.showExperimental && this.props.forcedExperimentalQuery !== this.state.query) {
 			this._setQuery(this.props.forcedExperimentalQuery, false);
 		}
 
 		return (
 			<div className="NetspeakSearch">
 				{optional(this.props.showExperimental, () => (
-					<div className="searchBarEmptySpacer"/>
+					<div className="searchBarEmptySpacer" />
 				))}
 				<div className="wrapper search-bar-wrapper">
 					{optional(!this.props.showExperimental, () => (

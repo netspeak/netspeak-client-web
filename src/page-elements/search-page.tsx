@@ -127,16 +127,16 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		});
 	};
 	private _onShowExperimental = (): void => {
-		this.setState({showExperimental: !this.state.showExperimental});
-		this.setState({refreshSearch: true});
-	}
+		this.setState({ showExperimental: !this.state.showExperimental });
+		this.setState({ refreshSearch: true });
+	};
 	private _onSearchRefreshed = (): void => {
-		this.setState({refreshSearch: false}); //sent to result list to be called after search is refreshed
-	}
+		this.setState({ refreshSearch: false }); //sent to result list to be called after search is refreshed
+	};
 	private _onSetQuery = (s: string): void => {
-		this.setState({storedQuery: s});
-		this.setState({refreshSearch: true});
-	}
+		this.setState({ storedQuery: s });
+		this.setState({ refreshSearch: true });
+	};
 
 	render(): JSX.Element {
 		return (
@@ -172,7 +172,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							pageSize={40}
 							autoFocus={true}
 						/>
-
 					</div>
 				</div>
 				<div className="section">
@@ -185,23 +184,23 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 					</div>
 					<div className="search-wrapper">
 						{optional(this.state.showExperimental, () => (
-						<NetspeakSearch
-							key={this.state.queryId + ";" + this.state.currentCorpusKey}
-							lang={this.lang}
-							corpusKey={this.state.currentCorpusKey}
-							defaultQuery={this.state.pageQuery}
-							onSetQuery={this._onSetQuery}
-							onCommitQuery={this._onQueryCommitHandler}
-							showExperimental={true}
-							forcedExperimentalQuery={this.state.storedQuery}
-							refreshSearch={this.state.refreshSearch}
-							onSearchRefreshed={this._onSearchRefreshed}
-							history={this.state.history}
-							defaultExampleVisibility={this.state.exampleVisibility}
-							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
-							pageSize={40}
-							autoFocus={true}
-						/>
+							<NetspeakSearch
+								key={this.state.queryId + ";" + this.state.currentCorpusKey}
+								lang={this.lang}
+								corpusKey={this.state.currentCorpusKey}
+								defaultQuery={this.state.pageQuery}
+								onSetQuery={this._onSetQuery}
+								onCommitQuery={this._onQueryCommitHandler}
+								showExperimental={true}
+								forcedExperimentalQuery={this.state.storedQuery}
+								refreshSearch={this.state.refreshSearch}
+								onSearchRefreshed={this._onSearchRefreshed}
+								history={this.state.history}
+								defaultExampleVisibility={this.state.exampleVisibility}
+								onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+								pageSize={40}
+								autoFocus={true}
+							/>
 						))}
 					</div>
 				</div>

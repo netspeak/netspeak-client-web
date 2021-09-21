@@ -113,9 +113,8 @@ export class Netspeak {
 		}
 	}
 
-	private _handleNeural(neural: Readonly<boolean>) {
-		if(this._neural !== neural)
-		{
+	private _handleNeural(neural: Readonly<boolean>): void {
+		if (this._neural !== neural) {
 			this._client = new NetspeakServiceClient(neural ? Netspeak.neuralHostname : Netspeak.defaultHostname); //replace client used for results
 			this._cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100); //erase cache on experimental activated
 		}
@@ -123,7 +122,10 @@ export class Netspeak {
 		this._neural = neural;
 	}
 
-	private _uncachedSearch(request: Readonly<NetspeakSearchRequest>, neural: Readonly<boolean>): Promise<ReadonlyNetspeakSearchResult> {
+	private _uncachedSearch(
+		request: Readonly<NetspeakSearchRequest>,
+		neural: Readonly<boolean>
+	): Promise<ReadonlyNetspeakSearchResult> {
 		try {
 			this._handleNeural(neural);
 

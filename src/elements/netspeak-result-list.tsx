@@ -215,7 +215,9 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 			<div>
 				<div className="phrase-container" style={{ backgroundSize }} onClick={this.onClick}>
 					<div>
-						<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>{this.formatText()}</span>
+						<span className={"text" + (this.props.phrase.pinned ? " pinned" : "")}>
+							{this.formatText()}
+						</span>
 					</div>
 					<span className="freq">
 						{this.formatFrequency()}
