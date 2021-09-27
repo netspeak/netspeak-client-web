@@ -29,5 +29,5 @@ module.exports = {
 		"@typescript-eslint/no-explicit-any": "off",
 		"no-restricted-globals": "off",
 	},
-	ignorePatterns: ["src/img/**", "*.css", "gulpfile.js", "publish/**"],
+	ignorePatterns: ["src/img/**", "*.css", "*.scss", "gulpfile.js", "publish/**", "src/lib/generated/**"],
 };

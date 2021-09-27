@@ -30,7 +30,7 @@ export default function HelpPage(): JSX.Element {
 								<P>{data.desc()}</P>
 								<NetspeakSearch
 									lang={lang}
-									corpus="web-en"
+									corpusKey="web-en"
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}

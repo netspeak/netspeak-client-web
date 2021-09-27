@@ -41,8 +41,8 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
-	corpus: string;
-	onCommitQuery?: (query: string, corpus: string) => void;
+	corpusKey: string;
+	onCommitQuery?: (query: string, corpusKey: string) => void;
 
 	history?: QueryHistory;
 
@@ -118,7 +118,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	}
 
 	private _commit(query: string): void {
-		this.props.onCommitQuery?.(query, this.props.corpus);
+		this.props.onCommitQuery?.(query, this.props.corpusKey);
 	}
 	private _setQuery(query: string, commit: boolean): void {
 		this._delayErrorPromise?.cancel();
@@ -154,7 +154,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			const promise = this.cancelable(
 				Netspeak.instance.search({
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 				})
 			);
@@ -178,7 +178,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			Netspeak.instance.search(
 				{
 					query: normalizedQuery,
-					corpus: this.props.corpus,
+					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
 					maxfreq: minFreq,
 				},
@@ -253,6 +253,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				details: reason.message,
 			};
 		} else {
+			if (typeof reason === "object") {
+				try {
+					reason = JSON.stringify(reason, undefined, 4);
+				} catch (e) {
+					// noop
+				}
+			}
+
 			return {
 				type: "Unknown",
 				details: String(reason),
@@ -386,7 +394,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 								</p>
 							</div>
 						))}
-						{this.props.history?.items.map(query => {
+						{this.props.history?.items.slice(0, 20).map(query => {
 							const onClick = (): void => {
 								close();
 								this._setQuery(query, true);
@@ -450,22 +458,18 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
-						<div style={{ display: "table", width: "100%" }}>
+						<div>
 							{warnings.map((p, i) => (
-								<p>
-									<ProblemInner key={i} lang={this.props.lang} problem={p} />
-								</p>
+								<ProblemInner key={i} lang={this.props.lang} problem={p} />
 							))}
 						</div>
 					</div>
 				))}
 				{optional(errors.length > 0, () => (
 					<div className="wrapper errors-wrapper">
-						<div style={{ display: "table", width: "100%" }}>
+						<div>
 							{errors.map((p, i) => (
-								<p>
-									<ProblemInner key={i} lang={this.props.lang} problem={p} />
-								</p>
+								<ProblemInner key={i} lang={this.props.lang} problem={p} />
 							))}
 						</div>
 					</div>
@@ -475,7 +479,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 					<div className="wrapper examples-wrapper">
 						<NetspeakExampleQueries
 							lang={this.props.lang}
-							corpus={this.props.corpus}
+							corpusKey={this.props.corpusKey}
 							onQueryClicked={this._onExampleQueryClickHandler}
 						/>
 					</div>
@@ -528,7 +532,7 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 		return (
 			<details>
 				<summary>{l("details")}</summary>
-				<p>{text}</p>
+				<pre>{text}</pre>
 			</details>
 		);
 	}
@@ -536,29 +540,29 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 	switch (problem.type) {
 		case "UnknownWord":
 			return (
-				<>
+				<p>
 					{l("unknownWord")}
 					{": "}
 					<em>{problem.word}</em>
-				</>
+				</p>
 			);
 
 		case "NoConnection":
-			return <>{l("noConnectionError")}</>;
+			return <p>{l("noConnectionError")}</p>;
 		case "ServerUnreachable":
-			return <>{l("serverUnreachableError")}</>;
+			return <p>{l("serverUnreachableError")}</p>;
 
 		case "InvalidQuery":
 			return (
 				<>
-					{l("invalidQueryError")}
+					<p>{l("invalidQueryError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);
 		case "NetspeakServer":
 			return (
 				<>
-					{l("netspeakError")}
+					<p>{l("netspeakError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);
@@ -566,7 +570,7 @@ function ProblemInner(props: { problem: Problem } & LocalizableProps): JSX.Eleme
 		case "Unknown":
 			return (
 				<>
-					{l("unknownError")}
+					<p>{l("unknownError")}</p>
 					{withDetails(problem.details)}
 				</>
 			);

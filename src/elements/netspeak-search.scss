@@ -29,6 +29,7 @@
 
 		.TransparentButton {
 			padding: 0.5em 0.25em;
+
 			--transparent-button-icon-size: 1.25em;
 		}
 
@@ -79,9 +80,28 @@
 		background-color: #eaa;
 	}
 
-	& > .warnings-wrapper p,
-	& > .errors-wrapper p {
-		margin: 1em;
+	& > .warnings-wrapper,
+	& > .errors-wrapper {
+		& > div {
+			padding: 1em;
+
+			& > p,
+			& > details {
+				margin: 1em 0;
+			}
+
+			& > :first-child {
+				margin-top: 0;
+			}
+			& > :last-child {
+				margin-bottom: 0;
+			}
+
+			pre {
+				font-family: monospace;
+				white-space: pre-wrap;
+			}
+		}
 	}
 
 	/* Popup fix */
