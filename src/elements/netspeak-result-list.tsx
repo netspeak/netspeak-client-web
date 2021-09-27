@@ -229,12 +229,6 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 		this.props.onChange(this.props.phrase.phrase, phraseState =>
 			phraseState.setExpanded(!this.props.phrase.expanded)
 		)
-		//select or deselect paths/phrases in graph
-		// console.log(this.props.phrase.expanded)
-		// if (this.props.phrase.expanded == false) { selectPaths("phraseClass" + stringToValidClassName(this.props.phrase.phrase.text)) }
-		// else { deselectPaths("phraseClass" + stringToValidClassName(this.props.phrase.phrase.text)) }
-
-
 	};
 
 	render(): JSX.Element {

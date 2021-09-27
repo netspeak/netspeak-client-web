@@ -244,7 +244,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
     const addSynonymsToGraphColumns = async (graphColumns: NetspeakGraphColumn[], columnIndex: number, columnLength: number, phraseIndex: number, phrase: Phrase): Promise<string[][]> => {
         var finalSynonymGrouping: string[][] = []
         //find all adjacent synonyms in phrase 
-        let wordType = WordTypes.DICT_SET
+        let wordType = WordTypes.WORD_IN_DICTSET
         var phraseLength = 0
         //find length of phrase expression
         for (var i = phraseIndex; i < phrase.words.length; i++) {
@@ -374,7 +374,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
                 // if  wildcard : 
                 if (expectedLen == 0 || expectedLen == -2) {
                     var realLen = 0;
-                    const wordType = (expectedLen == 0) ? WordTypes.ASTERISK : WordTypes.Q_MARK;
+                    const wordType = (expectedLen == 0) ? WordTypes.WORD_FOR_STAR : WordTypes.WORD_FOR_QMARK;
                     // allocate words until next word has different type 
                     for (var k = i; k < words.length; k++) {
                         if (words[k].type == wordType) { realLen++; }
@@ -647,7 +647,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
                         <SliderWithTooltip min={1} max={50} value={maxRows} onChange={setMaxRows} />
                     </div>
                     <div>
-                        <p>Show Phrases In Frequency Range ({(frequencyRange[0] * 100).toFixed(RANGE_FIXED)}% to {(frequencyRange[1] * 100).toFixed(RANGE_FIXED)}%)</p>
+                        <p>Show Phrases In Frequency Range ({(Math.pow(frequencyRange[0], frequencySliderPow) * 100).toFixed(RANGE_FIXED)}% to {(Math.pow(frequencyRange[1], frequencySliderPow) * 100).toFixed(RANGE_FIXED)}%)</p>
                         <FrequencySlider
                             currentRange={frequencyRange}
                             maxRange={maxRange}

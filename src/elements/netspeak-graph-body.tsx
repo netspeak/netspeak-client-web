@@ -56,17 +56,6 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps) => {
     // MARK: Selection of words -in graph- follows.
     const [query, setQuery] = useState("")
 
-    // console.log(props.query)
-    // console.log(query)
-
-    // // reset selected words on new query
-    // if (props.query != query) {
-    //     console.log("reset")
-
-    //     setQuery(props.query)
-    //     setSelectedWords([] as GraphElement[])
-    // }
-
 
 
     const isPhraseSelected = (phrase: GraphPhrase) => {
@@ -327,16 +316,26 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps) => {
                 let xOffsetEnd = ORDER_TOP_TO_BOTTOM ? xTravelRange * (1 - (linkData.offsetFactor + 1 - ((linkData.offsetFactor + 1) % 2)) / maxRows) : xTravelRange * (1 - linkData.offsetFactor / maxRows)
 
                 let selected = linkData.phrases.filter(val => val.selected).length > 0
+                let positions : [number, number][]
 
-                drawLinkThroughPositions(
-                    [[sourceWordX, sourceY],
+                if (targetY != sourceY){
+                     positions = [[sourceWordX, sourceY],
                     [sourceColumnX, sourceY],
 
                     [sourceColumnX + xOffsetStart, sourceY],
+
                     [targetColumnX - xOffsetEnd, targetY],
 
-                    [targetColumnX, targetY],
-                    [targetWordX - PADDING, targetY]],
+                    [targetColumnX , targetY],
+                    [targetWordX - PADDING, targetY]]
+                
+                }
+                else {
+                     positions = [[sourceWordX, sourceY], [targetWordX - PADDING, targetY]]
+
+                }
+                drawLinkThroughPositions(
+                    positions,
                     linkData.phrases.flatMap((a) => { return "phraseClass" + stringToValidClassName(a.text) }),
                     sumFrequenciesOfLink(linkData) / maxLinkFrequencyInColumns[linkData.sourceColumnIndex],
                     selected)
@@ -364,8 +363,6 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps) => {
     const onMouseLeaveText = () => {
         props.setHighlightedPhrases([])
     }
-    console.log(props.selectedWords)
-    // console.log(props.columns[0].elements)
     return (
         <svg viewBox={'0 0 ' + width + ' ' + height}
             id="graphSVG"
