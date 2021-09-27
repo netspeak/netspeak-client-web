@@ -1,17 +1,16 @@
 @media (min-width: 1171px) {
     #graphWrapper {
         flex: 2 1 500px;
-        position: sticky;
-        top: 0px;
-        padding-left: 20px;
         padding-right: 20px;
     }
     .NetspeakSearch > .wrapper.load-more-wrapper{
     border-bottom: none;
     }
 }
-@media (min-width: 1130px) {
+@media (min-width: 1150px) {
     #graphWrapper {
+        position: sticky;
+        top: 0px;
         padding-left: 20px;
     }
 }

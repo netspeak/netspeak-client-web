@@ -16,7 +16,7 @@
     opacity: 0.8;
   }
 }
-@media (min-width: 1130px) {
+@media (min-width: 1150px) {
   .GraphMenuButton {
     position: absolute;
   }
@@ -72,6 +72,7 @@
   animation-duration: 1s;
   background-image: url("../img/loading.svg");
   background-repeat: no-repeat;
+  background-position: center;
   opacity: 1;
   background-size: contain;
   position: absolute;

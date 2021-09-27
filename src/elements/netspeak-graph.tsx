@@ -16,6 +16,7 @@ import Select from 'react-select'
 import { PhraseState } from "./netspeak-result-list";
 import { read } from "fs";
 import { optional } from "../lib/util";
+import { Position }  from "reactjs-popup"
 
 
 const { createSliderWithTooltip } = Slider;
@@ -126,9 +127,9 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
     const [groupWordsSetting, setGroupWordsSetting] = useState(GroupWordsSetting.DoNotGroup)
 
     //word selection for graph/search 
-    const [selectedWords, _setSelectedWords] = useState([] as {element: GraphElement, id: string}[])
+    const [selectedWords, _setSelectedWords] = useState([] as { element: GraphElement, id: string }[])
 
-    const setSelectedWords = (selection: {element: GraphElement, id: string}[]) => {
+    const setSelectedWords = (selection: { element: GraphElement, id: string }[]) => {
         _setSelectedWords(selection)
         props.onSetSelection(selection.flatMap(tuple => tuple.element))
     }
@@ -151,7 +152,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
         }
     }
     const selectWord = (element: GraphElement, id: string) => {
-        setSelectedWords(selectedWords.concat({element : element, id: id}))
+        setSelectedWords(selectedWords.concat({ element: element, id: id }))
     }
 
     const deselectWord = (element: GraphElement, id: string) => {
@@ -454,7 +455,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
                     //if phrase longer than there are columns - add new ones
                     var pinnedQueryColumns = mapQueryToColumns(statePhrase.phrase.query)
                     if (pinnedQueryColumns.length > columns.length) {
-                        columns = columns.concat(pinnedQueryColumns.splice(pinnedQueryColumns.length - columns.length -1))
+                        columns = columns.concat(pinnedQueryColumns.splice(pinnedQueryColumns.length - columns.length - 1))
                     }
                 }
             }
@@ -572,7 +573,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
     // setGraphColumns(await generateGraphNodes(result.res?.phrases ?? [], columns))
     var loadGraph = useAsync(generateGraphNodes, [props.pageQuerry, props.statePhrases, frequencyRange, maxRows, groupWordsSetting])
     var columns = (loadGraph.res ?? [])
-
+    var screenWidth = useWindowDimensions().width
     return (
         <div id="graphWrapper" className={loadGraph.loading ? "loading" : ""}>
             {
@@ -596,7 +597,7 @@ const NetspeakGraph = (props: NetspeakGraphProps) => {
 
             <Popup trigger={
                 <img src={gearIcon} alt="Settings" className="GraphMenuButton" />
-            } position="left top">
+            } position={(screenWidth>=1150 ? "left top" as Position : "right" as Position)!}>
                 <div className="popupGrid" style={{ display: "grid" }}>
                     <h3> Graph Settings </h3>
 
@@ -684,6 +685,30 @@ const useAsync = <T extends unknown>(fn: () => Promise<T>, deps: any[]) => {
         }
     }, deps)
     return { loading, error, res };
+}
+
+//window dimensions function to notice resizing
+function getWindowDimensions() {
+    const { innerWidth: width, innerHeight: height } = window;
+    return {
+        width,
+        height
+    };
+}
+
+const useWindowDimensions = () => {
+    const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
+
+    useEffect(() => {
+        function handleResize() {
+            setWindowDimensions(getWindowDimensions());
+        }
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    return windowDimensions;
 }
 
 
