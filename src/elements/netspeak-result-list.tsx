@@ -9,13 +9,15 @@ import TransparentButton from "./transparent-button";
 import PinImage from "../img/pin.svg";
 import CopyImage from "../img/copy.svg";
 import { CancelablePromise, ignoreCanceled, newCancelableCollection } from "../lib/cancelable-promise";
+import { stringToValidClassName } from "./netspeak-graph-body"
+import { GraphElement } from "./netspeak-graph";
 
 export class PhraseSnippetState {
 	constructor(
 		public readonly supplier: LookaheadSnippetSupplier,
 		public readonly snippets: readonly Snippet[] = [],
 		public readonly loading: LoadingState = LoadingState.MORE_AVAILABLE
-	) {}
+	) { }
 
 	pushSnippets(snippets: readonly Snippet[]): PhraseSnippetState {
 		if (snippets.length === 0) {
@@ -47,7 +49,7 @@ export class PhraseState {
 		public readonly pinned: boolean,
 		public readonly expanded: boolean,
 		public readonly snippets: PhraseSnippetState
-	) {}
+	) { }
 
 	setPinned(value: boolean): PhraseState {
 		return this.set("pinned", value);
@@ -85,20 +87,36 @@ interface ListProps extends LocalizableProps {
 	phrases: readonly PhraseState[];
 	stats: PhraseCollectionStats;
 	onChange: OnChangeFn;
+	selectedWords: GraphElement[],
+	setHighlightedPhrases : (arg0: string[]) => void;
+	highlightedPhrases : string[]
+
 }
 
 export default function NetspeakResultList(props: ListProps): JSX.Element {
 	return (
 		<div className="NetspeakResultList">
-			{props.phrases.map(phrase => (
-				<ResultListItem
-					key={phrase.phrase.text}
-					lang={props.lang}
-					phrase={phrase}
-					stats={props.stats}
-					onChange={props.onChange}
-				/>
-			))}
+			{
+				props.phrases.filter(phrase => {
+					//if a word is selected, only show phrases that all words share 
+					if (props.selectedWords.length == 0) { return true }
+					else {
+						return !props.selectedWords.flatMap(selectedWord => {
+							return selectedWord.phrases.flatMap(phrase => phrase.text).includes(phrase.phrase.text)
+						}).includes(false)
+					}
+				}).map(phrase =>
+					<ResultListItem
+						key={phrase.phrase.text}
+						lang={props.lang}
+						phrase={phrase}
+						stats={props.stats}
+						onChange={props.onChange}
+						setHighlightedPhrases={props.setHighlightedPhrases}
+						highlightedPhrases = {props.highlightedPhrases}
+						
+					/>
+				)}
 		</div>
 	);
 }
@@ -107,11 +125,19 @@ interface ItemProps extends LocalizableProps {
 	phrase: PhraseState;
 	stats: PhraseCollectionStats;
 	onChange: OnChangeFn;
+	setHighlightedPhrases : (arg0: string[]) => void;
+	highlightedPhrases : string[]
 }
 
 function ResultListItem(props: ItemProps): JSX.Element {
+	var phraseClass = "phraseClass" + stringToValidClassName(props.phrase.phrase.text)
+	let highlighted = props.highlightedPhrases.includes(phraseClass)
 	return (
-		<div className="ResultListItem">
+		<div className={["ResultListItem", phraseClass, "graphHighlightable", (highlighted ? "highlightedPath" : "")].join(" ")} 
+			onMouseEnter={() => props.setHighlightedPhrases([phraseClass]) }
+			onMouseLeave={() => props.setHighlightedPhrases([])}
+			
+		>
 			<PhraseContainer {...props} />
 			{optional(props.phrase.expanded, () => (
 				<PhraseInfo {...props} />
@@ -199,10 +225,11 @@ class PhraseContainer extends React.PureComponent<ItemProps> {
 		return <>{elements}</>;
 	}
 
-	onClick = (): void =>
+	onClick = (): void => {
 		this.props.onChange(this.props.phrase.phrase, phraseState =>
 			phraseState.setExpanded(!this.props.phrase.expanded)
-		);
+		)
+	};
 
 	render(): JSX.Element {
 		const relativeFreq = this.props.phrase.phrase.frequency / this.props.stats.frequencyMax;
@@ -227,7 +254,14 @@ interface PhraseInfoState {
 	copied: boolean;
 }
 
-class PhraseInfo extends React.PureComponent<ItemProps, PhraseInfoState> {
+
+interface PhraseInfoProps extends LocalizableProps {
+	phrase: PhraseState;
+	stats: PhraseCollectionStats;
+	onChange: OnChangeFn;
+}
+
+class PhraseInfo extends React.PureComponent<PhraseInfoProps, PhraseInfoState> {
 	state: PhraseInfoState = {
 		copied: false,
 	};

@@ -23,9 +23,12 @@
 			--item-background-color: #fff;
 		}
 		&[options-visible],
-		&:hover {
+		&:hover,
+		.hoverOver,
+		&.ResultListItem.highlightedPath.graphHighlightable{
 			--item-background-color: #e2ebf1;
 		}
+		
 	}
 
 	/**

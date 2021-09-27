@@ -1,12 +1,36 @@
 .SearchPage {
+
+	.flexbox-container {
+		align-items: start;
+		display: flex;
+		flex-direction: row;
+		flex-wrap: wrap;
+		max-width: 1700px;
+		flex: 0 1 auto;
+		border: 1px #bbb solid;
+		// background-color: #f8f8f8;
+	}
+	
 	#content {
-		max-width: 500px;
+		max-width: 1200px;
 		margin: 0 64px;
 		padding: 3em 0;
 	}
 
+	.corpusSelecterWrapper{
+		max-width: 500px;
+	}
 	.NetspeakCorpusSelector {
 		margin: 0 0 2em auto;
+	}
+	.search-wrapper {
+		flex: 0 1 500px;
+	}
+	
+	@media screen and (max-width: 1149px) {
+		.flexbox-container {
+			max-width: 500px;
+		}
 	}
 
 	@media screen and (max-width: 628px /* 500px + 64px * 2 */) {

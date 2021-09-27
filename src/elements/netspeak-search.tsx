@@ -35,6 +35,7 @@ import TransparentButton from "./transparent-button";
 import Popup from "reactjs-popup";
 import NetspeakQueryText from "./netspeak-query-text";
 import { QueryHistory } from "../lib/query-history";
+import { GraphElement } from "./netspeak-graph";
 
 export type ExampleVisibility = "visible" | "hidden" | "peek";
 
@@ -51,6 +52,11 @@ interface Props extends LocalizableProps {
 	pageSize?: number;
 
 	autoFocus?: boolean;
+	//added for graph-to-search communication
+	syncStateWithGraph : (arg0: readonly PhraseState[])=> void;
+	selectedWords : GraphElement[];
+	setHighlightedPhrases : (arg0: string[]) => void;
+	highlightedPhrases : string[]
 }
 interface State {
 	query: string;
@@ -266,7 +272,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		if (clearPinned) {
 			this.setState({
 				phrases: [],
-				phrasesStats: EMPTY_STATS,
+				phrasesStats: EMPTY_STATS
 			});
 		} else {
 			const newPhrases = this.state.phrases.filter(p => p.pinned);
@@ -349,6 +355,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				newPhraseState,
 				...phrases.slice(index + 1),
 			];
+			this.props.syncStateWithGraph(newPhrases)
 			this.setState({
 				phrases: newPhrases,
 				phrasesStats: getStats(newPhrases),
@@ -362,6 +369,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	private _onClearButtonClick = (): void => {
 		this._setQuery("", true);
 		this._clearPhrases(true);
+		this.props.syncStateWithGraph([])
 	};
 
 	private _renderHistoryPopup(): JSX.Element {
@@ -484,6 +492,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							phrases={this.state.phrases}
 							stats={this.state.phrasesStats}
 							onChange={this._onPhraseChange}
+							selectedWords = {this.props.selectedWords}
+							setHighlightedPhrases = {this.props.setHighlightedPhrases}
+							highlightedPhrases= {this.props.highlightedPhrases}
 						/>
 					</div>
 				))}
