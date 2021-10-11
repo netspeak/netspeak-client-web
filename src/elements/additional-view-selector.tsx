@@ -1,13 +1,15 @@
 import React from "react";
-import "./netspeak-show-experimental.scss";
+import "./additional-view-selector.scss";
+import FlaskImage from "../img/flask.svg";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
+import {url} from "../lib/util";
 
 interface Props extends LocalizableProps {
 	active: boolean;
 	onClicked: () => void;
 }
 
-export default function NetspeakShowExperimental(props: Props): JSX.Element {
+export default function AdditionalViewSelector(props: Props): JSX.Element {
 	const l = createLocalizer(props, locales);
 
 	const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -15,10 +17,10 @@ export default function NetspeakShowExperimental(props: Props): JSX.Element {
 	};
 
 	return (
-		<div className="NetspeakShowExperimental">
+		<div className="AdditionalViewSelector">
 			<div className="wrapper">
 				<button onClick={handleButtonClick} value={props.active ? "active" : "inactive"}>
-					{props.active ? l("hideEXP") : l("showEXP")}
+					<img className="view-button-image" src={FlaskImage} /> {props.active ? l("hideEXP") : l("showEXP")}
 				</button>
 			</div>
 		</div>
@@ -27,11 +29,11 @@ export default function NetspeakShowExperimental(props: Props): JSX.Element {
 
 const locales: Locales<SimpleLocale<"hideEXP" | "showEXP">> = {
 	en: {
-		hideEXP: "HIDE EXPERIMENTAL",
-		showEXP: "SHOW EXPERIMENTAL",
+		hideEXP: "Hide Beta Results",
+		showEXP: "Show Beta Results",
 	},
 	de: {
-		hideEXP: "VERSTECK EXPERIMENTAL",
-		showEXP: "ZEIG EXPERIMENTAL",
+		hideEXP: "Beta Ergebnisse ausblenden",
+		showEXP: "Beta Ergebnisse anzeigen",
 	},
 };

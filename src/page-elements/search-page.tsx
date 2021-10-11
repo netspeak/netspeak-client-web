@@ -1,7 +1,7 @@
 import React from "react";
 import "./search-page.scss";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
-import NetspeakShowExperimental from "../elements/netspeak-show-experimental";
+import AdditionalFeatureSelector from "../elements/additional-view-selector";
 import { getCurrentLang } from "../lib/localize";
 import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
 import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
@@ -176,7 +176,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 				</div>
 				<div className="section">
 					<div className="options-wrapper">
-						<NetspeakShowExperimental
+						<AdditionalFeatureSelector
 							lang={this.lang}
 							active={this.state.showExperimental}
 							onClicked={this._onShowExperimental}
@@ -196,8 +196,10 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								refreshSearch={this.state.refreshSearch}
 								onSearchRefreshed={this._onSearchRefreshed}
 								history={this.state.history}
-								defaultExampleVisibility={this.state.exampleVisibility}
-								onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+								defaultExampleVisibility={"hidden"}
+								onSetExampleVisibility={(): void => {
+									/* do nothing */
+								}}
 								pageSize={40}
 								autoFocus={true}
 							/>

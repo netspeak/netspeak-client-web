@@ -1,13 +1,24 @@
 .NetspeakSearch {
 	font-size: 100%;
-	border-left: 1px solid #bbb;
-	border-right: 1px solid #bbb;
 
 	& > .wrapper {
 		border-bottom: 1px solid #bbb;
+		border-left: 1px solid #bbb;
+		border-right: 1px solid #bbb;
 	}
 
 	/* Search bar */
+
+	& > .title-bar-wrapper {
+		font-size: 110%;
+		padding: 0.5em;
+		line-height: 1.5em;
+		border-top: 1px solid #bbb;
+		color: #444;
+		span {
+			color: #888;
+		}
+	}
 
 	& > .search-bar-wrapper {
 		border-top: 1px solid #bbb;
@@ -47,11 +58,6 @@
 			padding: 0;
 			border-spacing: 0;
 		}
-	}
-
-	.searchBarEmptySpacer
-	{
-		margin-bottom: 35px;
 	}
 
 	/* History */

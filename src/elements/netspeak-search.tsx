@@ -462,10 +462,12 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		return (
 			<div className="NetspeakSearch">
 				{optional(this.props.showExperimental, () => (
-					<div className="searchBarEmptySpacer" />
+					<div className="wrapper title-bar-wrapper">
+						<span>Experimental:</span> {this.state.query}
+					</div>
 				))}
-				<div className="wrapper search-bar-wrapper">
-					{optional(!this.props.showExperimental, () => (
+				{optional(!this.props.showExperimental, () => (
+					<div className="wrapper search-bar-wrapper">
 						<table>
 							<tbody>
 								<tr>
@@ -492,8 +494,8 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 								</tr>
 							</tbody>
 						</table>
-					))}
-				</div>
+					</div>
+				))}
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
