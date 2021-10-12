@@ -34,12 +34,20 @@ export default function HelpPage(): JSX.Element {
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}
+									onSetQuery={() => {
+										// do nothing
+									}}
+									showExperimental={false}
+									forcedExperimentalQuery={""}
+									refreshSearch={false}
+									onSearchRefreshed={() => {
+										// do nothing
+									}}
 								/>
 							</div>
 						</div>
 					);
 				})}
-
 				{Toc.h2("for-developers", l("devs"))}
 				{l("devsP")()}
 			</Toc>
