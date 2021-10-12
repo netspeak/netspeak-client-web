@@ -463,7 +463,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			<div className="NetspeakSearch">
 				{optional(this.props.showExperimental, () => (
 					<div className="wrapper title-bar-wrapper">
-						<span>Experimental:</span> {this.state.query}
+						<span>Beta:</span> {this.state.query}
 					</div>
 				))}
 				{optional(!this.props.showExperimental, () => (

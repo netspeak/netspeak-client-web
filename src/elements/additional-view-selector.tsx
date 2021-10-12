@@ -2,7 +2,6 @@ import React from "react";
 import "./additional-view-selector.scss";
 import FlaskImage from "../img/flask.svg";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
-import {url} from "../lib/util";
 
 interface Props extends LocalizableProps {
 	active: boolean;
@@ -20,7 +19,8 @@ export default function AdditionalViewSelector(props: Props): JSX.Element {
 		<div className="AdditionalViewSelector">
 			<div className="wrapper">
 				<button onClick={handleButtonClick} value={props.active ? "active" : "inactive"}>
-					<img className="view-button-image" src={FlaskImage} /> {props.active ? l("hideEXP") : l("showEXP")}
+					<img className="view-button-image" src={FlaskImage} alt={" "} />
+					{props.active ? l("hideEXP") : l("showEXP")}
 				</button>
 			</div>
 		</div>
