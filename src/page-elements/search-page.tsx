@@ -6,7 +6,7 @@ import { getCurrentLang } from "../lib/localize";
 import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
 import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
-import { optional, nextId } from "../lib/util";
+import {optional, nextId, noop} from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
@@ -197,9 +197,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								onSearchRefreshed={this._onSearchRefreshed}
 								history={this.state.history}
 								defaultExampleVisibility={"hidden"}
-								onSetExampleVisibility={(): void => {
-									/* do nothing */
-								}}
+								onSetExampleVisibility={noop}
 								pageSize={40}
 								autoFocus={true}
 							/>

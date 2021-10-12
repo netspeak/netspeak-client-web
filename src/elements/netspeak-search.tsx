@@ -41,7 +41,7 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
 	corpusKey: string;
-	onSetQuery: (s: string) => void;
+	onSetQuery: (query: string) => void;
 	onCommitQuery?: (query: string, corpusKey: string) => void;
 
 	showExperimental: boolean;
@@ -183,35 +183,21 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.setState({ loadingState: LoadingState.LOADING });
 
-		const promise = this.props.showExperimental
-			? this.cancelable(
-					Netspeak.neuralInstance.search(
-						{
-							query: normalizedQuery,
-							corpus: this.props.corpusKey,
-							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-							maxfreq: minFreq,
-						},
-						{
-							checkComplete: true,
-							topkMode: "fill",
-						}
-					)
-			  )
-			: this.cancelable(
-					Netspeak.instance.search(
-						{
-							query: normalizedQuery,
-							corpus: this.props.corpusKey,
-							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-							maxfreq: minFreq,
-						},
-						{
-							checkComplete: true,
-							topkMode: "fill",
-						}
-					)
-			  );
+		const instance = this.props.showExperimental ? Netspeak.neuralInstance : Netspeak.instance;
+		const promise = this.cancelable(
+			instance.search(
+				{
+					query: normalizedQuery,
+					corpus: this.props.corpusKey,
+					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+					maxfreq: minFreq,
+				},
+				{
+					checkComplete: true,
+					topkMode: "fill",
+				}
+			)
+		);
 		this._handleSearchPromise(normalizedQuery, promise);
 	};
 	private _handleSearchPromise(

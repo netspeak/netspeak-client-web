@@ -3,6 +3,7 @@ import "./help-page.scss";
 import { getCurrentLang, Locales, SimpleLocale, createLocalizer, SupplierLocale } from "../lib/localize";
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
+import { noop } from "../lib/util";
 
 export default function HelpPage(): JSX.Element {
 	const lang = getCurrentLang();
@@ -34,15 +35,11 @@ export default function HelpPage(): JSX.Element {
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}
-									onSetQuery={() => {
-										// do nothing
-									}}
+									onSetQuery={noop}
 									showExperimental={false}
 									forcedExperimentalQuery={""}
 									refreshSearch={false}
-									onSearchRefreshed={() => {
-										// do nothing
-									}}
+									onSearchRefreshed={noop}
 								/>
 							</div>
 						</div>

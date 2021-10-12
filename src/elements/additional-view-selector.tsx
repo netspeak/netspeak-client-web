@@ -18,7 +18,9 @@ export default function AdditionalViewSelector(props: Props): JSX.Element {
 	return (
 		<div className="AdditionalViewSelector">
 			<div className="wrapper">
-				<button onClick={handleButtonClick} value={props.active ? "active" : "inactive"}>
+				<button
+					onClick={handleButtonClick}
+					className={props.active ? "additional-view-shown" : "additional-view-hidden"}>
 					<img className="view-button-image" src={FlaskImage} alt={" "} />
 					{props.active ? l("hideEXP") : l("showEXP")}
 				</button>

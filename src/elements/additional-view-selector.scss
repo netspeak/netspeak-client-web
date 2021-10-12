@@ -15,7 +15,7 @@
 			padding: 0.5em 0.75em;
 		}
 
-		button[value="active"] {
+		button.additional-view-shown {
 			border-color: #0074a8;
 			background-color: #ccefff;
 			color: #00334a;
@@ -29,7 +29,7 @@
 			}
 		}
 
-		button[value="inactive"] {
+		button.additional-view-hidden {
 			border-color: #0074a8;
 			background-color: #fff;
 			color: #0074a8;
