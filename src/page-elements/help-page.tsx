@@ -1,9 +1,9 @@
 import React from "react";
 import "./help-page.scss";
-import { getCurrentLang, Locales, SimpleLocale, createLocalizer, SupplierLocale } from "../lib/localize";
+import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
-import { noop } from "../lib/util";
+import { NetspeakApi } from "../lib/netspeak";
 
 export default function HelpPage(): JSX.Element {
 	const lang = getCurrentLang();
@@ -35,11 +35,8 @@ export default function HelpPage(): JSX.Element {
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}
-									onSetQuery={noop}
-									showExperimental={false}
-									forcedExperimentalQuery={""}
-									refreshSearch={false}
-									onSearchRefreshed={noop}
+									apiType={NetspeakApi.ngram}
+									storedQuery={""}
 								/>
 							</div>
 						</div>

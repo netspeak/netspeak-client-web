@@ -1,12 +1,12 @@
 import React from "react";
 import "./search-page.scss";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
-import AdditionalFeatureSelector from "../elements/additional-view-selector";
+import AdditionalFeatureSelector from "../elements/addon-visibility-selector";
 import { getCurrentLang } from "../lib/localize";
-import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
-import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
+import { ExampleVisibility, NetspeakSearch } from "../elements/netspeak-search";
+import { CorporaInfo, Corpus, Netspeak, NetspeakApi } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
-import {optional, nextId, noop} from "../lib/util";
+import { nextId, noop, optional } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
@@ -29,9 +29,8 @@ interface State {
 	currentCorpusKey: string;
 	corpora: readonly Corpus[];
 	unavailableCorpora: ReadonlySet<Corpus>;
-	storedQuery: string;
 
-	showExperimental: boolean;
+	betaResults: boolean;
 	refreshSearch: boolean; //set to true after pressing the showExperimental button to refresh the result list results
 
 	pageQuery: string;
@@ -50,9 +49,8 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		...withCorpus(getPageParam("corpus") || DEFAULT_CORPUS_KEY),
 		corpora: KNOWN_CORPORA,
 		unavailableCorpora: new Set(),
-		storedQuery: "",
 
-		showExperimental: false,
+		betaResults: false,
 		refreshSearch: false,
 
 		pageQuery: getPageParam("q") || "",
@@ -63,7 +61,8 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	};
 
 	componentDidMount(): void {
-		this._corporaPromise = new CancelablePromise(Netspeak.instance.queryCorpora());
+		// TODO this should probably happen for the addons too
+		this._corporaPromise = new CancelablePromise(Netspeak.getNetspeakClient(NetspeakApi.ngram).queryCorpora());
 		this._corporaPromise
 			.then(info => {
 				const available = new Set(info.corpora.map(c => c.key));
@@ -126,16 +125,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 			exampleVisibility: visibility,
 		});
 	};
+
 	private _onShowExperimental = (): void => {
-		this.setState({ showExperimental: !this.state.showExperimental });
-		this.setState({ refreshSearch: true });
-	};
-	private _onSearchRefreshed = (): void => {
-		this.setState({ refreshSearch: false }); //sent to result list to be called after search is refreshed
-	};
-	private _onSetQuery = (s: string): void => {
-		this.setState({ storedQuery: s });
-		this.setState({ refreshSearch: true });
+		this.setState({ betaResults: !this.state.betaResults });
 	};
 
 	render(): JSX.Element {
@@ -160,12 +152,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							lang={this.lang}
 							corpusKey={this.state.currentCorpusKey}
 							defaultQuery={this.state.pageQuery}
-							onSetQuery={this._onSetQuery}
 							onCommitQuery={this._onQueryCommitHandler}
-							showExperimental={false}
-							forcedExperimentalQuery={""}
-							refreshSearch={this.state.refreshSearch}
-							onSearchRefreshed={this._onSearchRefreshed}
+							apiType={NetspeakApi.ngram}
+							storedQuery={""}
 							history={this.state.history}
 							defaultExampleVisibility={this.state.exampleVisibility}
 							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
@@ -178,28 +167,25 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 					<div className="options-wrapper">
 						<AdditionalFeatureSelector
 							lang={this.lang}
-							active={this.state.showExperimental}
+							active={this.state.betaResults}
 							onClicked={this._onShowExperimental}
 						/>
 					</div>
 					<div className="search-wrapper">
-						{optional(this.state.showExperimental, () => (
+						{optional(this.state.betaResults, () => (
 							<NetspeakSearch
 								key={this.state.queryId + ";" + this.state.currentCorpusKey}
 								lang={this.lang}
 								corpusKey={this.state.currentCorpusKey}
 								defaultQuery={this.state.pageQuery}
-								onSetQuery={this._onSetQuery}
 								onCommitQuery={this._onQueryCommitHandler}
-								showExperimental={true}
-								forcedExperimentalQuery={this.state.storedQuery}
-								refreshSearch={this.state.refreshSearch}
-								onSearchRefreshed={this._onSearchRefreshed}
+								apiType={NetspeakApi.neural}
+								storedQuery={this.state.currentQuery}
 								history={this.state.history}
 								defaultExampleVisibility={"hidden"}
 								onSetExampleVisibility={noop}
 								pageSize={40}
-								autoFocus={true}
+								autoFocus={false}
 							/>
 						))}
 					</div>

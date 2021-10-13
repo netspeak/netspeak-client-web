@@ -85,7 +85,6 @@ interface ListProps extends LocalizableProps {
 	phrases: readonly PhraseState[];
 	stats: PhraseCollectionStats;
 	onChange: OnChangeFn;
-	showExperimental: boolean;
 }
 
 export default function NetspeakResultList(props: ListProps): JSX.Element {
@@ -98,7 +97,6 @@ export default function NetspeakResultList(props: ListProps): JSX.Element {
 					phrase={phrase}
 					stats={props.stats}
 					onChange={props.onChange}
-					showExperimental={props.showExperimental}
 				/>
 			))}
 		</div>
@@ -109,7 +107,6 @@ interface ItemProps extends LocalizableProps {
 	phrase: PhraseState;
 	stats: PhraseCollectionStats;
 	onChange: OnChangeFn;
-	showExperimental: boolean;
 }
 
 function ResultListItem(props: ItemProps): JSX.Element {

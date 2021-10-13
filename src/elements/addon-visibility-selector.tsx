@@ -1,5 +1,5 @@
 import React from "react";
-import "./additional-view-selector.scss";
+import "./addon-visibility-selector.scss";
 import FlaskImage from "../img/flask.svg";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 
@@ -8,7 +8,7 @@ interface Props extends LocalizableProps {
 	onClicked: () => void;
 }
 
-export default function AdditionalViewSelector(props: Props): JSX.Element {
+export default function AddonVisibilitySelector(props: Props): JSX.Element {
 	const l = createLocalizer(props, locales);
 
 	const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
@@ -18,9 +18,7 @@ export default function AdditionalViewSelector(props: Props): JSX.Element {
 	return (
 		<div className="AdditionalViewSelector">
 			<div className="wrapper">
-				<button
-					onClick={handleButtonClick}
-					className={props.active ? "additional-view-shown" : "additional-view-hidden"}>
+				<button onClick={handleButtonClick} className={props.active ? "addon-shown" : "addon-hidden"}>
 					<img className="view-button-image" src={FlaskImage} alt={" "} />
 					{props.active ? l("hideEXP") : l("showEXP")}
 				</button>

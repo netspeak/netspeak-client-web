@@ -1,28 +1,29 @@
 import React from "react";
-import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
+import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 import {
-	Phrase,
-	normalizeQuery,
 	Netspeak,
-	NetspeakInvalidQueryError,
+	NetspeakApi,
 	NetspeakError,
+	NetspeakInvalidQueryError,
+	normalizeQuery,
+	Phrase,
 	ReadonlyNetspeakSearchResult,
 } from "../lib/netspeak";
-import { optional, LoadingState, assertNever, delay, url } from "../lib/util";
+import { assertNever, delay, LoadingState, optional, url } from "../lib/util";
 import NetspeakExampleQueries from "./netspeak-example-queries";
 import {
 	CancelableCollection,
-	newCancelableCollection,
-	wasCanceled,
 	CancelablePromise,
 	ignoreCanceled,
+	newCancelableCollection,
+	wasCanceled,
 } from "../lib/cancelable-promise";
 import { NetspeakSearchBar } from "./netspeak-search-bar";
 import NetspeakResultList, {
-	PhraseState,
+	OnChangeFn,
 	PhraseCollectionStats,
 	PhraseSnippetState,
-	OnChangeFn,
+	PhraseState,
 } from "./netspeak-result-list";
 import LoadMoreButton from "./load-more-button";
 import { DEFAULT_SNIPPETS, toLookaheadSnippetSupplier } from "../lib/snippets";
@@ -41,13 +42,10 @@ export type ExampleVisibility = "visible" | "hidden" | "peek";
 interface Props extends LocalizableProps {
 	defaultQuery?: string;
 	corpusKey: string;
-	onSetQuery: (query: string) => void;
 	onCommitQuery?: (query: string, corpusKey: string) => void;
+	storedQuery: string;
 
-	showExperimental: boolean;
-	forcedExperimentalQuery: string;
-	refreshSearch: boolean;
-	onSearchRefreshed: () => void;
+	apiType: NetspeakApi;
 
 	history?: QueryHistory;
 
@@ -58,6 +56,7 @@ interface Props extends LocalizableProps {
 
 	autoFocus?: boolean;
 }
+
 interface State {
 	query: string;
 	normalizedQuery: NormalizedQuery;
@@ -108,8 +107,16 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	componentDidMount(): void {
 		this._queryPhrases(this.state.normalizedQuery);
 	}
+
 	componentWillUnmount(): void {
 		this.cancelable.cancel();
+	}
+
+	componentDidUpdate(prevProps: Props, prevState: State): void {
+		if (prevProps.storedQuery !== this.props.storedQuery) {
+			console.log("update to query: ", this.props.storedQuery);
+			this._setQuery(this.props.storedQuery, true);
+		}
 	}
 
 	private _setExampleVisibility(visibility: ExampleVisibility): void {
@@ -120,7 +127,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	private _commit(query: string): void {
 		this.props.onCommitQuery?.(query, this.props.corpusKey);
 	}
+
 	private _setQuery(query: string, commit: boolean): void {
+		// called every time the query changes (i.e. user types)
 		this._delayErrorPromise?.cancel();
 		this._delayCommitPromise?.cancel();
 
@@ -128,7 +137,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		const changed = normalizedQuery !== this.state.normalizedQuery;
 
 		this.setState({ query, normalizedQuery });
-		if (!this.props.showExperimental) this.props.onSetQuery(this.state.query);
+
 		if (changed) {
 			this._queryPhrases(normalizedQuery);
 		}
@@ -144,6 +153,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}, ignoreCanceled);
 		}
 	}
+
 	private _queryPhrases(normalizedQuery: NormalizedQuery): void {
 		if (!normalizedQuery) {
 			// empty query
@@ -152,24 +162,17 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		} else {
 			this.setState({ loadingState: LoadingState.LOADING });
 
-			const promise = this.props.showExperimental
-				? this.cancelable(
-						Netspeak.neuralInstance.search({
-							query: normalizedQuery,
-							corpus: this.props.corpusKey,
-							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-						})
-				  )
-				: this.cancelable(
-						Netspeak.instance.search({
-							query: normalizedQuery,
-							corpus: this.props.corpusKey,
-							topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
-						})
-				  );
+			const promise = this.cancelable(
+				Netspeak.getNetspeakClient(this.props.apiType).search({
+					query: normalizedQuery,
+					corpus: this.props.corpusKey,
+					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
+				})
+			);
 			this._handleSearchPromise(normalizedQuery, promise);
 		}
 	}
+
 	private _queryMorePhrases = (): void => {
 		const normalizedQuery = this.state.normalizedQuery;
 		// current phrases = all phrases - phrases pinned from other queries
@@ -183,9 +186,8 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		this.setState({ loadingState: LoadingState.LOADING });
 
-		const instance = this.props.showExperimental ? Netspeak.neuralInstance : Netspeak.instance;
 		const promise = this.cancelable(
-			instance.search(
+			Netspeak.getNetspeakClient(this.props.apiType).search(
 				{
 					query: normalizedQuery,
 					corpus: this.props.corpusKey,
@@ -200,6 +202,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		);
 		this._handleSearchPromise(normalizedQuery, promise);
 	};
+
 	private _handleSearchPromise(
 		normalizedQuery: NormalizedQuery,
 		promise: CancelablePromise<ReadonlyNetspeakSearchResult>
@@ -245,6 +248,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}
 		);
 	}
+
 	private _reasonToProblem(reason: any): Problem {
 		if (reason instanceof NetworkError) {
 			if (navigator.onLine) {
@@ -294,6 +298,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}
 		}
 	}
+
 	private _mergePhrases(normalizedQuery: NormalizedQuery, phrases: Iterable<Phrase>): void {
 		const newPhrases = this.state.phrases.filter(p => p.pinned || p.phrase.query === normalizedQuery);
 		const textSet = new Set<string>(newPhrases.map(p => p.phrase.text));
@@ -345,14 +350,14 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	}
 
 	private _onSearchBarQueryEnterHandler = (query: string): void => {
-		if (!this.props.showExperimental) this._setQuery(query, false);
+		this._setQuery(query, false);
 	};
 	private _onExampleQueryClickHandler = (query: string): void => {
 		if (this.state.examplesVisibility === "peek") {
 			this._setExampleVisibility("visible");
 		}
 
-		if (!this.props.showExperimental) this._setQuery(query, true);
+		this._setQuery(query, true);
 	};
 	private _onPhraseChange: OnChangeFn = (phrase, change) => {
 		const phrases = this.state.phrases;
@@ -376,10 +381,8 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this._setExampleVisibility(this._areExamplesVisible() ? "hidden" : "visible");
 	};
 	private _onClearButtonClick = (): void => {
-		if (!this.props.showExperimental) {
-			this._setQuery("", true);
-			this._clearPhrases(true);
-		}
+		this._setQuery("", true);
+		this._clearPhrases(true);
 	};
 
 	private _renderHistoryPopup(): JSX.Element {
@@ -434,25 +437,15 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	render(): JSX.Element {
 		const l = createLocalizer(this.props, locales);
 		const { warnings, errors } = this._splitProblems();
-		if (this.props.refreshSearch) {
-			this._setQuery("", true);
-			this._setQuery(this.state.query, true); //done to reset normalized query
-			this._queryPhrases(this.state.query);
-			this.props.onSearchRefreshed();
-		}
-
-		if (this.props.showExperimental && this.props.forcedExperimentalQuery !== this.state.query) {
-			this._setQuery(this.props.forcedExperimentalQuery, false);
-		}
 
 		return (
 			<div className="NetspeakSearch">
-				{optional(this.props.showExperimental, () => (
+				{optional(this.props.apiType === NetspeakApi.neural, () => (
 					<div className="wrapper title-bar-wrapper">
 						<span>Beta:</span> {this.state.query}
 					</div>
 				))}
-				{optional(!this.props.showExperimental, () => (
+				{optional(this.props.apiType === NetspeakApi.ngram, () => (
 					<div className="wrapper search-bar-wrapper">
 						<table>
 							<tbody>
@@ -519,7 +512,6 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							phrases={this.state.phrases}
 							stats={this.state.phrasesStats}
 							onChange={this._onPhraseChange}
-							showExperimental={this.props.showExperimental}
 						/>
 					</div>
 				))}
@@ -652,6 +644,7 @@ const EMPTY_STATS: PhraseCollectionStats = {
 	frequencyMax: 0,
 	frequencySum: 0,
 };
+
 function getStats(phrases: readonly PhraseState[]): PhraseCollectionStats {
 	let max = 0;
 	let sum = 0;

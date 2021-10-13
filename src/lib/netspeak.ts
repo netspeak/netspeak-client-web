@@ -49,6 +49,11 @@ export interface NetspeakSearchOptions {
 	 */
 	topkMode?: "default" | "fill";
 }
+export enum NetspeakApi {
+	/** Enum to select the api type */
+	neural = "neural",
+	ngram = "ngram",
+}
 
 export interface ReadonlyNetspeakSearchResult {
 	/** The phrases returned by the API. */
@@ -293,11 +298,14 @@ export class Netspeak {
 		return "https://neural.api.netspeak.org";
 	}
 
-	static get instance(): Netspeak {
+	/**
+	 * Get an Instance calling different hosts depending on the apiType
+	 */
+	static getNetspeakClient(apiType: NetspeakApi = NetspeakApi.ngram): Netspeak {
+		if (apiType === NetspeakApi.neural) {
+			return (neuralNetspeakInstance = neuralNetspeakInstance || new Netspeak(Netspeak.neuralHostname));
+		}
 		return (defaultNetspeakInstance = defaultNetspeakInstance || new Netspeak(Netspeak.defaultHostname));
-	}
-	static get neuralInstance(): Netspeak {
-		return (neuralNetspeakInstance = neuralNetspeakInstance || new Netspeak(Netspeak.neuralHostname));
 	}
 }
 
