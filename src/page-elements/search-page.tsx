@@ -177,6 +177,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								corpusKey={this.state.currentCorpusKey}
 								defaultQuery={this.state.pageQuery}
 								apiType={NetspeakApiKind.neural}
+								beta={true}
 								storedQuery={this.state.currentQuery}
 								defaultExampleVisibility={"hidden"}
 								pageSize={40}

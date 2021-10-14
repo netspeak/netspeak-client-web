@@ -55,6 +55,7 @@ interface Props extends LocalizableProps {
 	pageSize?: number;
 
 	autoFocus?: boolean;
+	beta?: boolean;
 }
 
 interface State {
@@ -440,12 +441,11 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		return (
 			<div className="NetspeakSearch">
-				{optional(this.props.apiType === NetspeakApiKind.neural, () => (
+				{this.props.beta ? (
 					<div className="wrapper title-bar-wrapper">
 						<span>Beta:</span> {this.state.query}
 					</div>
-				))}
-				{optional(this.props.apiType === NetspeakApiKind.ngram, () => (
+				) : (
 					<div className="wrapper search-bar-wrapper">
 						<table>
 							<tbody>
@@ -474,7 +474,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							</tbody>
 						</table>
 					</div>
-				))}
+				)}
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
