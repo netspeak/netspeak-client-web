@@ -49,29 +49,6 @@
 		}
 	}
 
-	/* History */
-
-	.history-wrapper > button {
-		background-color: transparent;
-		border: none;
-		display: block;
-		font-size: inherit;
-		width: 100%;
-		padding: 0;
-		margin: 0;
-		& > div {
-			border-top: 1px solid #ddd;
-			cursor: pointer;
-			padding: 0.33em 0.5em;
-			&:hover {
-				text-decoration: underline;
-			}
-		}
-		&:first-child > div {
-			border-top: none;
-		}
-	}
-
 	/* Warning & errors */
 
 	& > .warnings-wrapper {
@@ -108,17 +85,35 @@
 
 	/* Popup fix */
 
-	.popup-overlay {
-		z-index: 1000;
-	}
-	.popup-content {
-		z-index: 1002 !important;
-	}
-
 	/* Other */
 
 	& > .no-phrases-wrapper > p {
 		margin: 0;
 		padding: 0.3em 0.5em;
+	}
+}
+
+/* History */
+
+// The popup isn't a child element of .NetspeakSearch
+
+.history-wrapper > button {
+	background-color: transparent;
+	border: none;
+	display: block;
+	font-size: inherit;
+	width: 100%;
+	padding: 0;
+	margin: 0;
+	& > div {
+		border-top: 1px solid #ddd;
+		cursor: pointer;
+		padding: 0.33em 0.5em;
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+	&:first-child > div {
+		border-top: none;
 	}
 }
