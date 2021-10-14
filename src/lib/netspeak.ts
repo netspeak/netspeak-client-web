@@ -1,9 +1,9 @@
 import { Metadata } from "grpc-web";
 import { NetspeakServiceClient } from "./generated/NetspeakServiceServiceClientPb";
 import {
-	SearchRequest,
-	PhraseConstraints,
 	CorporaRequest,
+	PhraseConstraints,
+	SearchRequest,
 	Phrase as ServicePhrase,
 } from "./generated/NetspeakService_pb";
 import { LRUCache } from "./lru-cache";

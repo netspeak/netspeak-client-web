@@ -1,7 +1,7 @@
 import React from "react";
 import "./addon-visibility-selector.scss";
 import FlaskImage from "../img/flask.svg";
-import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
+import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 
 interface Props extends LocalizableProps {
 	active: boolean;
