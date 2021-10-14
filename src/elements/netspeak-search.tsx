@@ -34,6 +34,7 @@ import ClearImage from "../img/x.svg";
 import HistoryImage from "../img/history.svg";
 import TransparentButton from "./transparent-button";
 import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 import NetspeakQueryText from "./netspeak-query-text";
 import { QueryHistory } from "../lib/query-history";
 
@@ -398,7 +399,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				position="bottom right"
 				closeOnDocumentClick
 				closeOnEscape>
-				{close => (
+				{(close: () => void) => (
 					<div className="history-wrapper">
 						{optional((this.props.history?.items.length ?? 0) === 0, () => (
 							<div>
