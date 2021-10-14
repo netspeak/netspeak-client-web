@@ -2,12 +2,12 @@ import React from "react";
 import { Link } from "gatsby";
 import "./netspeak-footer.scss";
 import {
-	LocalizableProps,
-	Locales,
-	SimpleLocale,
 	createLocalizer,
-	SupportedLanguage,
+	Locales,
+	LocalizableProps,
 	setCurrentLang,
+	SimpleLocale,
+	SupportedLanguage,
 } from "../lib/localize";
 
 export default function NetspeakFooter(props: LocalizableProps): JSX.Element {

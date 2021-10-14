@@ -1,4 +1,4 @@
-import { textContent, normalizeSpaces, constructQueryParams } from "./util";
+import { constructQueryParams, normalizeSpaces, textContent } from "./util";
 
 export interface Snippet {
 	/**

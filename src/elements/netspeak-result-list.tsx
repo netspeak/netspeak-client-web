@@ -1,8 +1,8 @@
 import React from "react";
-import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
-import { Phrase, WordTypes, Word } from "../lib/netspeak";
-import { Snippet, getPhraseRegex, LookaheadSnippetSupplier } from "../lib/snippets";
-import { optional, LoadingState, url, delay } from "../lib/util";
+import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
+import { Phrase, Word, WordTypes } from "../lib/netspeak";
+import { getPhraseRegex, LookaheadSnippetSupplier, Snippet } from "../lib/snippets";
+import { delay, LoadingState, optional, url } from "../lib/util";
 import LoadMoreButton from "./load-more-button";
 import "./netspeak-result-list.scss";
 import TransparentButton from "./transparent-button";
