@@ -1,28 +1,29 @@
 import React from "react";
-import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
+import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 import {
-	Phrase,
-	normalizeQuery,
 	Netspeak,
-	NetspeakInvalidQueryError,
+	NetspeakApiKind,
 	NetspeakError,
+	NetspeakInvalidQueryError,
+	normalizeQuery,
+	Phrase,
 	ReadonlyNetspeakSearchResult,
 } from "../lib/netspeak";
-import { optional, LoadingState, assertNever, delay, url } from "../lib/util";
+import { assertNever, delay, LoadingState, optional, url } from "../lib/util";
 import NetspeakExampleQueries from "./netspeak-example-queries";
 import {
 	CancelableCollection,
-	newCancelableCollection,
-	wasCanceled,
 	CancelablePromise,
 	ignoreCanceled,
+	newCancelableCollection,
+	wasCanceled,
 } from "../lib/cancelable-promise";
 import { NetspeakSearchBar } from "./netspeak-search-bar";
 import NetspeakResultList, {
-	PhraseState,
+	OnChangeFn,
 	PhraseCollectionStats,
 	PhraseSnippetState,
-	OnChangeFn,
+	PhraseState,
 } from "./netspeak-result-list";
 import LoadMoreButton from "./load-more-button";
 import { DEFAULT_SNIPPETS, toLookaheadSnippetSupplier } from "../lib/snippets";
@@ -43,6 +44,9 @@ interface Props extends LocalizableProps {
 	defaultQuery?: string;
 	corpusKey: string;
 	onCommitQuery?: (query: string, corpusKey: string) => void;
+	storedQuery: string;
+
+	apiType?: NetspeakApiKind;
 
 	history?: QueryHistory;
 
@@ -52,7 +56,9 @@ interface Props extends LocalizableProps {
 	pageSize?: number;
 
 	autoFocus?: boolean;
+	beta?: boolean;
 }
+
 interface State {
 	query: string;
 	normalizedQuery: NormalizedQuery;
@@ -103,8 +109,15 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	componentDidMount(): void {
 		this._queryPhrases(this.state.normalizedQuery);
 	}
+
 	componentWillUnmount(): void {
 		this.cancelable.cancel();
+	}
+
+	componentDidUpdate(prevProps: Props, prevState: State): void {
+		if (prevProps.storedQuery !== this.props.storedQuery) {
+			this._setQuery(this.props.storedQuery, true);
+		}
 	}
 
 	private _setExampleVisibility(visibility: ExampleVisibility): void {
@@ -115,7 +128,9 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 	private _commit(query: string): void {
 		this.props.onCommitQuery?.(query, this.props.corpusKey);
 	}
+
 	private _setQuery(query: string, commit: boolean): void {
+		// called every time the query changes (i.e. user types)
 		this._delayErrorPromise?.cancel();
 		this._delayCommitPromise?.cancel();
 
@@ -123,6 +138,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		const changed = normalizedQuery !== this.state.normalizedQuery;
 
 		this.setState({ query, normalizedQuery });
+
 		if (changed) {
 			this._queryPhrases(normalizedQuery);
 		}
@@ -138,6 +154,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}, ignoreCanceled);
 		}
 	}
+
 	private _queryPhrases(normalizedQuery: NormalizedQuery): void {
 		if (!normalizedQuery) {
 			// empty query
@@ -147,7 +164,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			this.setState({ loadingState: LoadingState.LOADING });
 
 			const promise = this.cancelable(
-				Netspeak.instance.search({
+				Netspeak.getNetspeakClient(this.props.apiType).search({
 					query: normalizedQuery,
 					corpus: this.props.corpusKey,
 					topk: this.props.pageSize || DEFAULT_PAGE_SIZE,
@@ -156,6 +173,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			this._handleSearchPromise(normalizedQuery, promise);
 		}
 	}
+
 	private _queryMorePhrases = (): void => {
 		const normalizedQuery = this.state.normalizedQuery;
 		// current phrases = all phrases - phrases pinned from other queries
@@ -170,7 +188,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		this.setState({ loadingState: LoadingState.LOADING });
 
 		const promise = this.cancelable(
-			Netspeak.instance.search(
+			Netspeak.getNetspeakClient(this.props.apiType).search(
 				{
 					query: normalizedQuery,
 					corpus: this.props.corpusKey,
@@ -185,6 +203,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		);
 		this._handleSearchPromise(normalizedQuery, promise);
 	};
+
 	private _handleSearchPromise(
 		normalizedQuery: NormalizedQuery,
 		promise: CancelablePromise<ReadonlyNetspeakSearchResult>
@@ -230,6 +249,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}
 		);
 	}
+
 	private _reasonToProblem(reason: any): Problem {
 		if (reason instanceof NetworkError) {
 			if (navigator.onLine) {
@@ -279,6 +299,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			}
 		}
 	}
+
 	private _mergePhrases(normalizedQuery: NormalizedQuery, phrases: Iterable<Phrase>): void {
 		const newPhrases = this.state.phrases.filter(p => p.pinned || p.phrase.query === normalizedQuery);
 		const textSet = new Set<string>(newPhrases.map(p => p.phrase.text));
@@ -420,34 +441,41 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		return (
 			<div className="NetspeakSearch">
-				<div className="wrapper search-bar-wrapper">
-					<table>
-						<tbody>
-							<tr>
-								<td>
-									<NetspeakSearchBar
-										query={this.state.query}
-										onQueryEnter={this._onSearchBarQueryEnterHandler}
-										autoFocus={this.props.autoFocus}
-									/>
-								</td>
-								<td>
-									<TransparentButton
-										image={url(InfoImage)}
-										selected={this._areExamplesVisible()}
-										onClick={this._onExampleButtonClick}
-									/>
-								</td>
-								<td>
-									<TransparentButton image={url(ClearImage)} onClick={this._onClearButtonClick} />
-								</td>
-								{optional(!!this.props.history, () => (
-									<td>{this._renderHistoryPopup()}</td>
-								))}
-							</tr>
-						</tbody>
-					</table>
-				</div>
+				{this.props.beta ? (
+					<div className="wrapper title-bar-wrapper">
+						<span className="beta">Beta:</span>
+						<NetspeakQueryText query={this.state.query} />
+					</div>
+				) : (
+					<div className="wrapper search-bar-wrapper">
+						<table>
+							<tbody>
+								<tr>
+									<td>
+										<NetspeakSearchBar
+											query={this.state.query}
+											onQueryEnter={this._onSearchBarQueryEnterHandler}
+											autoFocus={this.props.autoFocus}
+										/>
+									</td>
+									<td>
+										<TransparentButton
+											image={url(InfoImage)}
+											selected={this._areExamplesVisible()}
+											onClick={this._onExampleButtonClick}
+										/>
+									</td>
+									<td>
+										<TransparentButton image={url(ClearImage)} onClick={this._onClearButtonClick} />
+									</td>
+									{optional(!!this.props.history, () => (
+										<td>{this._renderHistoryPopup()}</td>
+									))}
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				)}
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
@@ -617,6 +645,7 @@ const EMPTY_STATS: PhraseCollectionStats = {
 	frequencyMax: 0,
 	frequencySum: 0,
 };
+
 function getStats(phrases: readonly PhraseState[]): PhraseCollectionStats {
 	let max = 0;
 	let sum = 0;

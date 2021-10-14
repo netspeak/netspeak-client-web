@@ -1,18 +1,44 @@
 .SearchPage {
 	#content {
-		max-width: 500px;
+		max-width: 1000px;
 		margin: 0 64px;
 		padding: 3em 0;
+	}
+	#content::after {
+		content: "";
+		display: block;
+		clear: both;
+	}
+
+	.section {
+		--gap: 3em;
+
+		float: left;
+		box-sizing: border-box;
+		width: calc(50% - var(--gap) / 2);
+	}
+	.section:nth-child(1) {
+		margin-right: calc(var(--gap) / 2);
+	}
+	.section:nth-child(2) {
+		margin-left: calc(var(--gap) / 2);
 	}
 
 	.NetspeakCorpusSelector {
 		margin: 0 0 2em auto;
 	}
 
-	@media screen and (max-width: 628px /* 500px + 64px * 2 */) {
+	.AdditionalViewSelector {
+		margin: 0 0 2em 0;
+	}
+
+	@media screen and (max-width: 1128px /* 1000px + 64px * 2 */) {
 		#content {
-			max-width: 500px;
 			margin: 0 auto;
+		}
+
+		.section {
+			--gap: 2em;
 		}
 	}
 
@@ -28,6 +54,17 @@
 		.NetspeakSearch {
 			border-left: none;
 			border-right: none;
+		}
+
+		.section:nth-child(1) {
+			margin: 0;
+			width: auto;
+			display: block;
+			float: none;
+		}
+
+		.section:nth-child(2) {
+			display: none;
 		}
 	}
 }
