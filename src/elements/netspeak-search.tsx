@@ -398,7 +398,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 				position="bottom right"
 				closeOnDocumentClick
 				closeOnEscape>
-				{close => (
+				{(close: () => void) => (
 					<div className="history-wrapper">
 						{optional((this.props.history?.items.length ?? 0) === 0, () => (
 							<div>
