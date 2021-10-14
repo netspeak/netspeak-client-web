@@ -15,8 +15,10 @@
 		line-height: 1.5em;
 		border-top: 1px solid #bbb;
 		color: #444;
+
 		span {
 			color: #888;
+			user-select: none;
 		}
 	}
 
