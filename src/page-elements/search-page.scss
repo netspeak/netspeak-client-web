@@ -55,5 +55,16 @@
 			border-left: none;
 			border-right: none;
 		}
+
+		.section:nth-child(1) {
+			margin: 0;
+			width: auto;
+			display: block;
+			float: none;
+		}
+
+		.section:nth-child(2) {
+			display: none;
+		}
 	}
 }
