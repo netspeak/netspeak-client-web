@@ -7,7 +7,7 @@ import {
 	Phrase as ServicePhrase,
 } from "./generated/NetspeakService_pb";
 import { LRUCache } from "./lru-cache";
-import { noop } from "./util";
+import { assertNever, noop } from "./util";
 
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
@@ -49,7 +49,7 @@ export interface NetspeakSearchOptions {
 	 */
 	topkMode?: "default" | "fill";
 }
-export enum NetspeakApi {
+export enum NetspeakApiKind {
 	/** Enum to select the api type */
 	neural = "neural",
 	ngram = "ngram",
@@ -286,9 +286,9 @@ export class Netspeak {
 	}
 
 	/**
-	 * The default host of the Netspeak API.
+	 * The ngram host of the Netspeak API.
 	 */
-	static get defaultHostname(): string {
+	static get ngramHostname(): string {
 		return "https://ngram.api.netspeak.org";
 	}
 	/**
@@ -299,17 +299,21 @@ export class Netspeak {
 	}
 
 	/**
-	 * Get an Instance calling different hosts depending on the apiType
+	 * Get an instance calling different hosts depending on the apiType
 	 */
-	static getNetspeakClient(apiType: NetspeakApi = NetspeakApi.ngram): Netspeak {
-		if (apiType === NetspeakApi.neural) {
-			return (neuralNetspeakInstance = neuralNetspeakInstance || new Netspeak(Netspeak.neuralHostname));
+	static getNetspeakClient(apiKind: NetspeakApiKind = NetspeakApiKind.ngram): Netspeak {
+		switch (apiKind) {
+			case NetspeakApiKind.neural:
+				return (neuralNetspeakInstance ??= new Netspeak(Netspeak.neuralHostname));
+			case NetspeakApiKind.ngram:
+				return (ngramNetspeakInstance ??= new Netspeak(Netspeak.ngramHostname));
+			default:
+				assertNever(apiKind);
 		}
-		return (defaultNetspeakInstance = defaultNetspeakInstance || new Netspeak(Netspeak.defaultHostname));
 	}
 }
 
-let defaultNetspeakInstance: Netspeak | undefined = undefined;
+let ngramNetspeakInstance: Netspeak | undefined = undefined;
 let neuralNetspeakInstance: Netspeak | undefined = undefined;
 
 export class NetspeakError extends Error {

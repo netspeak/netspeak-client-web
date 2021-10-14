@@ -2,7 +2,7 @@ import React from "react";
 import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 import {
 	Netspeak,
-	NetspeakApi,
+	NetspeakApiKind,
 	NetspeakError,
 	NetspeakInvalidQueryError,
 	normalizeQuery,
@@ -45,7 +45,7 @@ interface Props extends LocalizableProps {
 	onCommitQuery?: (query: string, corpusKey: string) => void;
 	storedQuery: string;
 
-	apiType: NetspeakApi;
+	apiType?: NetspeakApiKind;
 
 	history?: QueryHistory;
 
@@ -55,6 +55,7 @@ interface Props extends LocalizableProps {
 	pageSize?: number;
 
 	autoFocus?: boolean;
+	beta?: boolean;
 }
 
 interface State {
@@ -114,7 +115,6 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 	componentDidUpdate(prevProps: Props, prevState: State): void {
 		if (prevProps.storedQuery !== this.props.storedQuery) {
-			console.log("update to query: ", this.props.storedQuery);
 			this._setQuery(this.props.storedQuery, true);
 		}
 	}
@@ -440,12 +440,12 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		return (
 			<div className="NetspeakSearch">
-				{optional(this.props.apiType === NetspeakApi.neural, () => (
+				{this.props.beta ? (
 					<div className="wrapper title-bar-wrapper">
-						<span>Beta:</span> {this.state.query}
+						<span className="beta">Beta:</span>
+						<NetspeakQueryText query={this.state.query} />
 					</div>
-				))}
-				{optional(this.props.apiType === NetspeakApi.ngram, () => (
+				) : (
 					<div className="wrapper search-bar-wrapper">
 						<table>
 							<tbody>
@@ -474,7 +474,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 							</tbody>
 						</table>
 					</div>
-				))}
+				)}
 
 				{optional(warnings.length > 0, () => (
 					<div className="wrapper warnings-wrapper">
