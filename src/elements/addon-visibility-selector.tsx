@@ -11,14 +11,10 @@ interface Props extends LocalizableProps {
 export default function AddonVisibilitySelector(props: Props): JSX.Element {
 	const l = createLocalizer(props, locales);
 
-	const handleButtonClick = (e: React.MouseEvent<HTMLButtonElement>): void => {
-		props.onClicked();
-	};
-
 	return (
 		<div className="AdditionalViewSelector">
 			<div className="wrapper">
-				<button onClick={handleButtonClick} className={props.active ? "addon-shown" : "addon-hidden"}>
+				<button onClick={props.onClicked} className={props.active ? "addon-shown" : "addon-hidden"}>
 					<img className="view-button-image" src={FlaskImage} alt={" "} />
 					{props.active ? l("hideEXP") : l("showEXP")}
 				</button>
