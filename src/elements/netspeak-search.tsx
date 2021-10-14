@@ -443,7 +443,8 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 			<div className="NetspeakSearch">
 				{this.props.beta ? (
 					<div className="wrapper title-bar-wrapper">
-						<span>Beta:</span> {this.state.query}
+						<span className="beta">Beta:</span>
+						<NetspeakQueryText query={this.state.query} />
 					</div>
 				) : (
 					<div className="wrapper search-bar-wrapper">
