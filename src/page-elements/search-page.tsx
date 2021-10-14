@@ -125,7 +125,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	};
 
 	private _onShowExperimental = (): void => {
-		this.setState({ betaResults: !this.state.betaResults });
+		this.setState(state => ({ betaResults: !state.betaResults }));
 	};
 
 	render(): JSX.Element {
