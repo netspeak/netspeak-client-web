@@ -6,7 +6,7 @@ import { getCurrentLang } from "../lib/localize";
 import { ExampleVisibility, NetspeakSearch } from "../elements/netspeak-search";
 import { CorporaInfo, Corpus, Netspeak, NetspeakApiKind } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
-import { nextId, noop, optional } from "../lib/util";
+import { nextId, optional } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
 import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
@@ -176,12 +176,9 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								lang={this.lang}
 								corpusKey={this.state.currentCorpusKey}
 								defaultQuery={this.state.pageQuery}
-								onCommitQuery={this._onQueryCommitHandler}
 								apiType={NetspeakApiKind.neural}
 								storedQuery={this.state.currentQuery}
-								history={this.state.history}
 								defaultExampleVisibility={"hidden"}
-								onSetExampleVisibility={noop}
 								pageSize={40}
 								autoFocus={false}
 							/>
