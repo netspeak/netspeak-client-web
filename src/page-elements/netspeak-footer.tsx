@@ -103,8 +103,8 @@ function LangSelect(props: { lang: string; thisLang: SupportedLanguage; children
 		setCurrentLang(thisLang);
 		window.location.reload();
 	};
-	// eslint-disable-next-line jsx-a11y/anchor-is-valid
 	return (
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a className={className} href="#" onClick={clickHandler}>
 			{props.children}
 		</a>
