@@ -3,7 +3,7 @@ import "./help-page.scss";
 import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
-import { NetspeakApi } from "../lib/netspeak";
+import { NetspeakApiKind } from "../lib/netspeak";
 
 export default function HelpPage(): JSX.Element {
 	const lang = getCurrentLang();
@@ -35,7 +35,7 @@ export default function HelpPage(): JSX.Element {
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}
-									apiType={NetspeakApi.ngram}
+									apiType={NetspeakApiKind.ngram}
 									storedQuery={""}
 								/>
 							</div>

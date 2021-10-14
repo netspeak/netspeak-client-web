@@ -4,7 +4,7 @@ import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
 import AdditionalFeatureSelector from "../elements/addon-visibility-selector";
 import { getCurrentLang } from "../lib/localize";
 import { ExampleVisibility, NetspeakSearch } from "../elements/netspeak-search";
-import { CorporaInfo, Corpus, Netspeak, NetspeakApi } from "../lib/netspeak";
+import { CorporaInfo, Corpus, Netspeak, NetspeakApiKind } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
 import { nextId, noop, optional } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
@@ -62,7 +62,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 
 	componentDidMount(): void {
 		// TODO this should probably happen for the addons too
-		this._corporaPromise = new CancelablePromise(Netspeak.getNetspeakClient(NetspeakApi.ngram).queryCorpora());
+		this._corporaPromise = new CancelablePromise(Netspeak.getNetspeakClient(NetspeakApiKind.ngram).queryCorpora());
 		this._corporaPromise
 			.then(info => {
 				const available = new Set(info.corpora.map(c => c.key));
@@ -153,7 +153,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							corpusKey={this.state.currentCorpusKey}
 							defaultQuery={this.state.pageQuery}
 							onCommitQuery={this._onQueryCommitHandler}
-							apiType={NetspeakApi.ngram}
+							apiType={NetspeakApiKind.ngram}
 							storedQuery={""}
 							history={this.state.history}
 							defaultExampleVisibility={this.state.exampleVisibility}
@@ -179,7 +179,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								corpusKey={this.state.currentCorpusKey}
 								defaultQuery={this.state.pageQuery}
 								onCommitQuery={this._onQueryCommitHandler}
-								apiType={NetspeakApi.neural}
+								apiType={NetspeakApiKind.neural}
 								storedQuery={this.state.currentQuery}
 								history={this.state.history}
 								defaultExampleVisibility={"hidden"}

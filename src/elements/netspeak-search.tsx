@@ -2,7 +2,7 @@ import React from "react";
 import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 import {
 	Netspeak,
-	NetspeakApi,
+	NetspeakApiKind,
 	NetspeakError,
 	NetspeakInvalidQueryError,
 	normalizeQuery,
@@ -45,7 +45,7 @@ interface Props extends LocalizableProps {
 	onCommitQuery?: (query: string, corpusKey: string) => void;
 	storedQuery: string;
 
-	apiType: NetspeakApi;
+	apiType: NetspeakApiKind;
 
 	history?: QueryHistory;
 
@@ -440,12 +440,12 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 		return (
 			<div className="NetspeakSearch">
-				{optional(this.props.apiType === NetspeakApi.neural, () => (
+				{optional(this.props.apiType === NetspeakApiKind.neural, () => (
 					<div className="wrapper title-bar-wrapper">
 						<span>Beta:</span> {this.state.query}
 					</div>
 				))}
-				{optional(this.props.apiType === NetspeakApi.ngram, () => (
+				{optional(this.props.apiType === NetspeakApiKind.ngram, () => (
 					<div className="wrapper search-bar-wrapper">
 						<table>
 							<tbody>
