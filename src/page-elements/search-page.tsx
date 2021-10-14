@@ -31,7 +31,6 @@ interface State {
 	unavailableCorpora: ReadonlySet<Corpus>;
 
 	betaResults: boolean;
-	refreshSearch: boolean; //set to true after pressing the showExperimental button to refresh the result list results
 
 	pageQuery: string;
 	currentQuery: string;
@@ -51,7 +50,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		unavailableCorpora: new Set(),
 
 		betaResults: false,
-		refreshSearch: false,
 
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
