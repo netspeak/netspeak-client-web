@@ -1,5 +1,6 @@
 import React from "react";
 import "./search-page.scss";
+import Page from "./page";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
 import AdditionalFeatureSelector from "../elements/addon-visibility-selector";
 import { getCurrentLang } from "../lib/localize";
@@ -8,7 +9,6 @@ import { CorporaInfo, Corpus, Netspeak, NetspeakApiKind } from "../lib/netspeak"
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
 import { nextId, optional } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
-import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
 
 const KNOWN_CORPORA: readonly Corpus[] = [

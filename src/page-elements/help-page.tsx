@@ -1,7 +1,7 @@
 import React from "react";
 import "./help-page.scss";
-import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
 import Page from "./page";
+import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
 import { NetspeakSearch } from "../elements/netspeak-search";
 
 export default function HelpPage(): JSX.Element {
