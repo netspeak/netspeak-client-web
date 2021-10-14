@@ -115,7 +115,6 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 
 	componentDidUpdate(prevProps: Props, prevState: State): void {
 		if (prevProps.storedQuery !== this.props.storedQuery) {
-			console.log("update to query: ", this.props.storedQuery);
 			this._setQuery(this.props.storedQuery, true);
 		}
 	}
