@@ -151,7 +151,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							corpusKey={this.state.currentCorpusKey}
 							defaultQuery={this.state.pageQuery}
 							onCommitQuery={this._onQueryCommitHandler}
-							apiType={NetspeakApiKind.ngram}
 							storedQuery={""}
 							history={this.state.history}
 							defaultExampleVisibility={this.state.exampleVisibility}

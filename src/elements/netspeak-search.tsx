@@ -45,7 +45,7 @@ interface Props extends LocalizableProps {
 	onCommitQuery?: (query: string, corpusKey: string) => void;
 	storedQuery: string;
 
-	apiType: NetspeakApiKind;
+	apiType?: NetspeakApiKind;
 
 	history?: QueryHistory;
 
