@@ -38,7 +38,6 @@ import NetspeakQueryText from "./netspeak-query-text";
 import { QueryHistory } from "../lib/query-history";
 import { GraphElement } from "./netspeak-graph";
 
-
 export type ExampleVisibility = "visible" | "hidden" | "peek";
 
 interface Props extends LocalizableProps {
@@ -274,7 +273,7 @@ export class NetspeakSearch extends React.PureComponent<Props, State> {
 		if (clearPinned) {
 			this.setState({
 				phrases: [],
-				phrasesStats: EMPTY_STATS,
+				phrasesStats: EMPTY_STATS
 			});
 		} else {
 			const newPhrases = this.state.phrases.filter(p => p.pinned);
