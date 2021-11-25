@@ -1,9 +1,14 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable eqeqeq */
+/* eslint-disable prefer-spread */
+/* eslint-disable no-var */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import React, { useEffect, useState } from "react";
 import { NetspeakGraphColumn, GraphPhrase, GraphElement } from "./netspeak-graph";
-import { linkHorizontal } from "d3";
+import { index, linkHorizontal } from "d3";
 import * as d3 from "d3";
 import "./netspeak-graph-body.scss";
-import { NetspeakGraphWord } from "./netspeak-graph-word";
 
 export type NetspeakGraphBodyProps = {
 	columns: NetspeakGraphColumn[];
@@ -26,11 +31,26 @@ type GraphLink = {
 	offsetFactor: number;
 };
 
-export const stringToValidClassName = (str: string): string => {
+// export const highlightPaths = (classes: String[]) => {
+
+//     d3.selectAll(classes.flatMap((a) => { return "." + a }).join(","))
+//         .classed("highlightedPath", true)
+//     d3.selectAll(".graphHighlightable:not(.highlightedPath)")
+//         .classed("nonHighlightedPath", true)
+// }
+
+// export const dehighlightPaths = () => {
+//     d3.selectAll(".graphHighlightable")
+//         .classed("highlightedPath", false)
+//         .classed("nonHighlightedPath", false)
+// }
+
+export const stringToValidClassName = (str: string) => {
 	return str.replace(/([^a-z0-9]+)/gi, "-");
 };
 
-export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element => {
+// const displayWord
+export const NetspeakGraphBody = (props: NetspeakGraphBodyProps) => {
 	const height = 100,
 		width = 500;
 
@@ -43,9 +63,9 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 	// MARK: Selection of words -in graph- follows.
 	//const [query, setQuery] = useState("");
 
-	const isPhraseSelected = (phrase: GraphPhrase): boolean => {
+	const isPhraseSelected = (phrase: GraphPhrase) => {
 		//if a word is selected, only show phrases that all words share
-		if (props.selectedWords.length === 0) {
+		if (props.selectedWords.length == 0) {
 			return true;
 		} else {
 			return !props.selectedWords
@@ -56,20 +76,21 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 		}
 	};
 
-	const isWordSelected = (word: GraphElement): boolean => {
+	const isWordSelected = (word: GraphElement) => {
 		const selectedWords = props.selectedWords;
 		//if no words are selected, display all
-		if (selectedWords.length === 0) {
+		if (selectedWords.length == 0) {
 			return true;
 		}
 		let selectedWordsPhrases: string[] = [];
-		for (let i = 0; i < selectedWords.length; i++) {
+		for (var i = 0; i < selectedWords.length; i++) {
 			// initiate selection
-			if (i === 0) {
+			if (i == 0) {
 				selectedWordsPhrases = selectedWords[i].element.phrases.map(value => value.text);
 			}
 			//intersect phrases
 			else {
+				// eslint-disable-next-line no-loop-func
 				selectedWordsPhrases = selectedWordsPhrases.filter(value =>
 					selectedWords[i].element.phrases.flatMap(phrase => phrase.text).includes(value)
 				);
@@ -80,19 +101,20 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 		);
 	};
 
-	const maxFrequencyInColumn = (column: NetspeakGraphColumn): number => {
-		return Math.max(
-			...column.elements.flatMap(element => {
+	const maxFrequencyInColumn = (column: NetspeakGraphColumn) => {
+		return Math.max.apply(
+			Math,
+			column.elements.flatMap(element => {
 				return isWordSelected(element) ? element.frequency : 0;
 			})
 		);
 	};
 
-	const getWordSize = (frequency: number, column: NetspeakGraphColumn): number => {
+	const getWordSize = (frequency: number, column: NetspeakGraphColumn) => {
 		return Math.max((frequency / maxFrequencyInColumn(column)) ** (1 / 2), 0.35) * maxFontSize;
 	};
 
-	const sumFrequenciesOfLink = (link: GraphLink): number => {
+	const sumFrequenciesOfLink = (link: GraphLink) => {
 		return link.phrases
 			.flatMap(a => {
 				return a.frequency;
@@ -101,10 +123,39 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 	};
 
 	/// draws horizontal links through the given positions in order
+	// eslint-disable-next-line react-hooks/exhaustive-deps
+	const drawLinkThroughPositions = (
+		positions: [number, number][],
+		classes: string[],
+		pathImportance: number,
+		selected: boolean
+	) => {
+		for (let i = 1; i < positions.length; i++) {
+			const link = linkHorizontal()({
+				source: positions[i - 1],
+				target: positions[i],
+			});
+			if (link != null) {
+				const highlighted = classes.filter(val => props.highlightedPhrases.includes(val)).length > 0;
 
-	const findPositions = (yBase: number): number => {
+				// let path =  <path d={link} stroke="black" fill="none" ></path>
+				d3.select("#graphSVG")
+					.append("path")
+					.attr("d", link)
+					.attr("key", "link" + link)
+					.style("stroke-width", pathImportance ** (1 / 4))
+					.classed(classes.join(" "), true)
+					.classed("visible", ALWAY_SHOW_PATHS ? true : selected || highlighted)
+					.classed("graphHighlightable", true)
+					.classed("highlightedPath", highlighted)
+					.classed("selectedPath", selected)
+					.lower();
+			}
+		}
+	};
+	const findPositions = (yBase: number) => {
 		let maxY = 0;
-		props.columns.forEach((column, cIndex) => {
+		props.columns.map((column, cIndex) => {
 			// let yBase = ORDER_TOP_TO_BOTTOM ? maxFontSize * 2 : height * 0.5
 			let yOffsetTop = 0;
 			let yOffsetBottom = 0;
@@ -114,14 +165,14 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 					return isWordSelected(element) ? eIndex : 99;
 				})
 			);
-			column.elements.forEach((element, eIndex) => {
+			column.elements.map((element, eIndex) => {
 				if (isWordSelected(element)) {
 					const fontSize = getWordSize(element.frequency, column);
 					let y = yBase;
-					if (eIndex === minIndex) {
+					if (eIndex == minIndex) {
 						yOffsetTop += fontSize * 1;
 						yOffsetBottom += fontSize * 0.2;
-					} else if ((eIndex - minIndex) % 2 === 0 && !ORDER_TOP_TO_BOTTOM) {
+					} else if ((eIndex - minIndex) % 2 == 0 && !ORDER_TOP_TO_BOTTOM) {
 						y = y - yOffsetTop;
 						yOffsetTop += fontSize * 1.2;
 					} else {
@@ -141,45 +192,14 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 	const links: GraphLink[] = [];
 
 	//initiate positions of elements
-	let maxY: number;
 	if (props.orderWordsFromTop) {
-		maxY = findPositions(35 + maxFontSize / 2);
+		var maxY = findPositions(35 + maxFontSize / 2);
 	} else {
 		maxY = findPositions(35 + findPositions(0) + maxFontSize / 2);
 	}
 
 	//after render: use positions to draw the links and rend backgrounds, and update size of SVG
 	useEffect(() => {
-		const drawLinkThroughPositions: (
-			positions: [number, number][],
-			classes: string[],
-			pathImportance: number,
-			selected: boolean
-		) => void = (positions: [number, number][], classes: string[], pathImportance: number, selected: boolean) => {
-			for (let i = 1; i < positions.length; i++) {
-				const link = linkHorizontal()({
-					source: positions[i - 1],
-					target: positions[i],
-				});
-				if (link != null) {
-					const highlighted = classes.filter(val => props.highlightedPhrases.includes(val)).length > 0;
-
-					// let path =  <path d={link} stroke="black" fill="none" ></path>
-					d3.select("#graphSVG")
-						.append("path")
-						.attr("d", link)
-						.attr("key", "link" + link)
-						.style("stroke-width", pathImportance ** (1 / 4))
-						.classed(classes.join(" "), true)
-						.classed("visible", ALWAY_SHOW_PATHS ? true : selected || highlighted)
-						.classed("graphHighlightable", true)
-						.classed("highlightedPath", highlighted)
-						.classed("selectedPath", selected)
-						.lower();
-				}
-			}
-		};
-
 		const PADDING = 3;
 		//clear old draws
 		d3.selectAll("path").remove();
@@ -208,12 +228,14 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 		const widthAllocationPriotiy: number[] = [];
 		//determine allocation priority between columns
 		props.columns.forEach((c, cIndex) => {
-			if (props.columns[cIndex + 1] !== undefined) {
+			if (props.columns[cIndex + 1] != undefined) {
 				let priority: number;
 				const elementCount = props.columns[cIndex].elements.length + props.columns[cIndex + 1].elements.length;
 				if (elementCount <= 2) {
 					priority = 1;
-				} else {
+				}
+				// else { priority = 1 + Math.min(elementCount, MAX_ROWS) / (MAX_ROWS / 3)}
+				else {
 					priority = 3;
 				}
 				widthAllocationPriotiy.push(priority);
@@ -224,7 +246,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 		//find x transformation for each column depending on width and priority of previous
 		const columnsXTranslation: number[] = [];
 		props.columns.forEach((c, cIndex) => {
-			if (cIndex === 0) {
+			if (cIndex == 0) {
 				columnsXTranslation.push((0.5 / totalPriority) * remainingWidth);
 			} else {
 				columnsXTranslation.push(
@@ -241,7 +263,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 			.fill(0)
 			.map((maxLinkFrequencyInColumn, cIndex) => {
 				links
-					.filter(link => link.sourceColumnIndex === cIndex)
+					.filter(link => link.sourceColumnIndex == cIndex)
 					.forEach(link => {
 						maxLinkFrequencyInColumn = Math.max(maxLinkFrequencyInColumn, sumFrequenciesOfLink(link));
 					});
@@ -260,7 +282,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 				(d3.select("#" + linkData.targetId + "text").node() as SVGSVGElement) ??
 				(d3.select("#" + linkData.targetId + "rect").node() as SVGSVGElement);
 
-			if (source === undefined || target === undefined) {
+			if (source == undefined || target == undefined) {
 			} else {
 				let sourceRect = source.getBBox();
 				let targetRect = target.getBBox();
@@ -300,7 +322,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 				const selected = linkData.phrases.filter(val => val.selected).length > 0;
 				let positions: [number, number][];
 
-				if (targetY !== sourceY) {
+				if (targetY != sourceY) {
 					positions = [
 						[sourceWordX, sourceY],
 						[sourceColumnX, sourceY],
@@ -327,7 +349,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 					selected
 				);
 				//draw link through empty expression
-				if (d3.select("#" + linkData.sourceId + "text").text() === " ") {
+				if (d3.select("#" + linkData.sourceId + "text").text() == " ") {
 					drawLinkThroughPositions(
 						[
 							[sourceRect.x + columnsXTranslation[linkData.sourceColumnIndex] - PADDING, sourceY],
@@ -342,72 +364,13 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 				}
 			}
 		});
-	}, [
-		props.columns,
-		width,
-		maxY,
-		links,
-		maxFontSize,
-		MAX_ROWS,
-		ORDER_TOP_TO_BOTTOM,
-		props.highlightedPhrases,
-		ALWAY_SHOW_PATHS,
-	]);
+	}, [props.columns, width, maxY, links, maxFontSize, MAX_ROWS, ORDER_TOP_TO_BOTTOM, drawLinkThroughPositions]);
 
-	const onMouseEnterText = (classes: string[]): void => {
+	const onMouseEnterText = (classes: string[]) => {
 		props.setHighlightedPhrases(classes);
 	};
-	const onMouseLeaveText = (): void => {
+	const onMouseLeaveText = () => {
 		props.setHighlightedPhrases([]);
-	};
-
-	const createLinkPaths = (element: GraphElement, cIndex: number, eIndex: number): void => {
-		element.previous
-			?.filter((item, index) => {
-				return element.previous?.indexOf(item) === index;
-			})
-			.forEach(previousText => {
-				const sourceIndexes: { cIndex: number; eIndex: number }[] = [];
-				const previousElements = props.columns[cIndex - 1].elements.filter((previousElement, pEIndex) => {
-					if (previousText === previousElement.text) {
-						sourceIndexes.push({
-							cIndex: cIndex - 1,
-							eIndex: pEIndex,
-						});
-						return true;
-					}
-					return false;
-				});
-				//seed links
-				previousElements.forEach(linkedPrevElement => {
-					const sourceIndex = sourceIndexes.shift();
-					//set offset from other links based index of source element. if only 1 source element, offset by target element.
-
-					let offsetFactor: number;
-					if (props.columns[cIndex - 1].elements.length > 1) {
-						offsetFactor = props.columns[cIndex - 1].elements.indexOf(linkedPrevElement);
-					} else {
-						offsetFactor = MAX_ROWS - props.columns[cIndex].elements.indexOf(element);
-					}
-					const linkedPhrases = linkedPrevElement.phrases.filter(phraseIn => {
-						return element.phrases
-							.flatMap(a => {
-								return a.text;
-							})
-							.includes(phraseIn.text);
-					});
-					if (sourceIndex !== undefined) {
-						links.push({
-							targetId: "c" + cIndex + "e" + eIndex,
-							sourceId: "c" + sourceIndex.cIndex + "e" + sourceIndex.eIndex,
-							targetColumnIndex: cIndex,
-							sourceColumnIndex: sourceIndex.cIndex,
-							phrases: linkedPhrases,
-							offsetFactor: offsetFactor,
-						});
-					}
-				});
-			});
 	};
 	return (
 		<svg viewBox={"0 0 " + width + " " + height} id="graphSVG" key="graphSVG" preserveAspectRatio="xMidYMin meet">
@@ -419,37 +382,116 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 						<g id={"column" + cIndex} className="column" key={"column" + cIndex}>
 							{column.elements.map((element, eIndex) => {
 								if (isWordSelected(element)) {
-									//Parse word data
-									const selectedPath = element.phrases.filter(val => val.selected).length > 0;
+									//Check for phrase selection
+									const selected = element.phrases.filter(val => val.selected).length > 0;
+									// Draw words
 									const indexes = "c" + cIndex + "e" + eIndex;
+
 									const fontSize = getWordSize(element.frequency, column);
 									const classes = element.phrases.filter(isPhraseSelected).flatMap(a => {
 										return "phraseClass" + stringToValidClassName(a.text);
 									});
+
 									const highlighted =
 										classes.filter(val => props.highlightedPhrases.includes(val)).length > 0;
-									const selectedWord =
-										props.selectedWords.filter(word => word.id === indexes).length > 0;
-
-									createLinkPaths(element, cIndex, eIndex);
 
 									return (
-										<NetspeakGraphWord
-											classes={classes}
-											fontSize={fontSize}
-											element={element}
-											highlighted={highlighted}
-											indexes={indexes}
-											onMouseEnterText={onMouseEnterText}
-											onMouseLeaveText={onMouseLeaveText}
-											selectedPath={selectedPath}
-											selectedWord={selectedWord}
-											toggleWordSelection={props.toggleWordSelection}
-											key={classes + "graphWord"}
-										/>
+										<g
+											key={"c" + cIndex + "e" + eIndex + "g"}
+											className="textG"
+											fontSize={fontSize}>
+											<rect
+												// x={(width / props.columns.length) * (cIndex + 0.5)}
+												y={element.yPosition! - fontSize}
+												id={indexes + "rect"}
+												fill="none"
+												height={fontSize}
+												key={index + "rect"}></rect>
+
+											<text
+												onMouseEnter={() => onMouseEnterText(classes)}
+												onMouseLeave={() => onMouseLeaveText()}
+												// onMouseLeave={() => setIsShown(false)}>™
+												// x={(width / props.columns.length) * (cIndex + 0.5)}
+												onClick={() => props.toggleWordSelection(element, indexes)}
+												y={element.yPosition}
+												id={indexes + "text"}
+												key={indexes + eIndex}
+												className={
+													"graphHighlightable" +
+													(props.selectedWords.filter(word => word.id == indexes).length > 0
+														? " selectedWord"
+														: "") +
+													(selected ? " selectedPath" : "") +
+													(highlighted ? " highlightedPath" : "")
+												}>
+												{element.text}
+											</text>
+
+											{
+												// Create link paths
+												element.previous
+													?.filter((item, index) => {
+														return element.previous?.indexOf(item) == index;
+													})
+													.map(previousText => {
+														const sourceIndexes: { cIndex: number; eIndex: number }[] = [];
+														const previousElements = props.columns[
+															cIndex - 1
+														].elements.filter((previousElement, pEIndex) => {
+															if (previousText == previousElement.text) {
+																sourceIndexes.push({
+																	cIndex: cIndex - 1,
+																	eIndex: pEIndex,
+																});
+																return true;
+															}
+															return false;
+														});
+														//seed links
+														previousElements.map(linkedPrevElement => {
+															const sourceIndex = sourceIndexes.shift();
+															//set offset from other links based index of source element. if only 1 source element, offset by target element.
+
+															let offsetFactor: number;
+															if (props.columns[cIndex - 1].elements.length > 1) {
+																offsetFactor = props.columns[
+																	cIndex - 1
+																].elements.indexOf(linkedPrevElement);
+															} else {
+																offsetFactor =
+																	MAX_ROWS -
+																	props.columns[cIndex].elements.indexOf(element);
+															}
+															const linkedPhrases = linkedPrevElement.phrases.filter(
+																phraseIn => {
+																	return element.phrases
+																		.flatMap(a => {
+																			return a.text;
+																		})
+																		.includes(phraseIn.text);
+																}
+															);
+															if (sourceIndex != undefined) {
+																links.push({
+																	targetId: "c" + cIndex + "e" + eIndex,
+																	sourceId:
+																		"c" +
+																		sourceIndex.cIndex +
+																		"e" +
+																		sourceIndex.eIndex,
+																	targetColumnIndex: cIndex,
+																	sourceColumnIndex: sourceIndex.cIndex,
+																	phrases: linkedPhrases,
+																	offsetFactor: offsetFactor,
+																});
+															}
+														});
+													})
+											}
+										</g>
 									);
 								}
-								return null;
 							})}
 						</g>
 					);

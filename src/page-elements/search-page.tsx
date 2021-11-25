@@ -185,10 +185,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							highlightedPhrases={this.state.highlightedPhrases}
 						/>
 					</div>
-<<<<<<< Updated upstream
-=======
-
->>>>>>> Stashed changes
 					<NetspeakGraph
 						corpus={this.state.currentCorpusKey}
 						pageQuerry={this.state.pageQuery}

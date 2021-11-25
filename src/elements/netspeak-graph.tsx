@@ -1,4 +1,3 @@
-<<<<<<< Updated upstream
 import React, { useEffect, useState } from "react";
 import { Phrase, Netspeak, ReadonlyNetspeakSearchResult, WordTypes } from "../lib/netspeak";
 import { NetspeakGraphBody } from "./netspeak-graph-body";
@@ -13,23 +12,6 @@ import { PhraseState } from "./netspeak-result-list";
 import { read } from "fs";
 import { optional } from "../lib/util";
 import { Position } from "reactjs-popup";
-=======
-import gearIcon from "../img/gearicon.svg";
-
-import Slider from "rc-slider";
-import "rc-slider/assets/index.css";
-import Switch from "react-switch";
-import Select from "react-select";
-import Popup, { Position } from "reactjs-popup";
-
-import React, { useState, useEffect, useCallback } from "react";
-import { ReadonlyNetspeakSearchResult, Netspeak, Phrase, WordTypes } from "../lib/netspeak";
-import { optional } from "../lib/util";
-import { NetspeakGraphBody } from "./netspeak-graph-body";
-import { PhraseState } from "./netspeak-result-list";
-
-import "./netspeak-graph.scss";
->>>>>>> Stashed changes
 
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -45,10 +27,7 @@ type NetspeakGraphProps = {
 	setHighlightedPhrases: (arg0: string[]) => void;
 };
 
-<<<<<<< Updated upstream
 type NetspeakGraphSettings = {};
-=======
->>>>>>> Stashed changes
 export type NetspeakGraphColumn = {
 	name: string;
 	elements: GraphElement[];
@@ -76,10 +55,7 @@ enum GroupWordsSetting {
 
 const SYNONYM_PREFIX = "#";
 const MULTIPLE_WILDCARD_SIGN = "...";
-<<<<<<< Updated upstream
 const WILDCARD_SIGN = "?";
-=======
->>>>>>> Stashed changes
 
 // create selection for word groupings
 const wordGroupSelection = [
@@ -94,11 +70,7 @@ const FrequencySlider = (props: {
 	maxRange: number;
 	frequencySliderPow: number;
 	onChange: (value: number[]) => void;
-<<<<<<< Updated upstream
 }) => {
-=======
-}): JSX.Element => {
->>>>>>> Stashed changes
 	const [sliderRange, setSliderRange] = useState(props.currentRange);
 
 	useEffect(() => {
@@ -124,13 +96,8 @@ const FrequencySlider = (props: {
 
 const phraseCache: { [query: string]: ReadonlyNetspeakSearchResult } = {};
 
-<<<<<<< Updated upstream
 const getPhrases = async (query: string, corpus: string, n: number) => {
 	if (phraseCache[query] == undefined) {
-=======
-const getPhrases = async (query: string, corpus: string, n: number): Promise<ReadonlyNetspeakSearchResult> => {
-	if (phraseCache[query] === undefined) {
->>>>>>> Stashed changes
 		phraseCache[query] = await Netspeak.instance.search({
 			query: query,
 			corpus: corpus,
@@ -140,25 +107,15 @@ const getPhrases = async (query: string, corpus: string, n: number): Promise<Rea
 	return phraseCache[query];
 };
 
-<<<<<<< Updated upstream
 const NetspeakGraph = (props: NetspeakGraphProps) => {
-=======
-const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
->>>>>>> Stashed changes
 	//range constants
 	const maxRange = 10000;
 	const frequencySliderPow = 3;
 
-<<<<<<< Updated upstream
 	const maxFrequencyInColumn = (column: NetspeakGraphColumn) => {
 		return Math.max.apply(
 			Math,
 			column.elements.flatMap(element => {
-=======
-	const maxFrequencyInColumn = (column: NetspeakGraphColumn): number => {
-		return Math.max(
-			...column.elements.flatMap(element => {
->>>>>>> Stashed changes
 				return element.frequency;
 			})
 		);
@@ -174,7 +131,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	//word selection for graph/search
 	const [selectedWords, _setSelectedWords] = useState([] as { element: GraphElement; id: string }[]);
 
-<<<<<<< Updated upstream
 	const setSelectedWords = (selection: { element: GraphElement; id: string }[]) => {
 		_setSelectedWords(selection);
 		props.onSetSelection(selection.flatMap(tuple => tuple.element));
@@ -190,34 +146,11 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	//helper functions (for word selection)
 	const toggleWordSelection = (element: GraphElement, id: string) => {
 		if (selectedWords.filter(word => word.id == id).length > 0) {
-=======
-	const setSelectedWords = useCallback(
-		(selection: { element: GraphElement; id: string }[]): void => {
-			_setSelectedWords(selection);
-			props.onSetSelection(selection.flatMap(tuple => tuple.element));
-		},
-		[props]
-	);
-	//reset word selectin on new query
-	//memorize last query
-	const [query, setQuery] = useState(props.pageQuerry);
-	useEffect(() => {
-		if (query !== props.pageQuerry) {
-			setSelectedWords([]);
-			setQuery(props.pageQuerry);
-		}
-	}, [query, props.pageQuerry, setSelectedWords]);
-
-	//helper functions (for word selection)
-	const toggleWordSelection = (element: GraphElement, id: string): void => {
-		if (selectedWords.filter(word => word.id === id).length > 0) {
->>>>>>> Stashed changes
 			deselectWord(element, id);
 		} else {
 			selectWord(element, id);
 		}
 	};
-<<<<<<< Updated upstream
 	const selectWord = (element: GraphElement, id: string) => {
 		setSelectedWords(selectedWords.concat({ element: element, id: id }));
 	};
@@ -228,46 +161,22 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 	/// separates the query to separate columns, with expected length. (cLength 0: multiple word wildcard, -1: synonyms, -2: 1 word wildcard)
 	const mapQueryToColumns = (query: string) => {
-=======
-	const selectWord = (element: GraphElement, id: string): void => {
-		setSelectedWords(selectedWords.concat({ element: element, id: id }));
-	};
-
-	const deselectWord = (element: GraphElement, id: string): void => {
-		setSelectedWords(selectedWords.filter(word => word.id !== id));
-	};
-
-	/// separates the query to separate columns, with expected length. (cLength 0: multiple word wildcard, -1: synonyms, -2: 1 word wildcard)
-	const mapQueryToColumns = (query: string): [title: string, cLength: number][] => {
->>>>>>> Stashed changes
 		const columns: [title: string, cLength: number][] = [];
 
 		query
 			.split(/(\[.*\])|(\{.*\})/)
-<<<<<<< Updated upstream
 			.filter(word => word != undefined)
 			.filter(word => word.trim().length > 0)
 			.map(word => {
-=======
-			.filter(word => word !== undefined)
-			.filter(word => word.trim().length > 0)
-			.forEach(word => {
->>>>>>> Stashed changes
 				if (word.match(/^(\{|\[).*/)) {
 					// if brackets brackets - dont split. set expected length.
 					const len = word.split(" ").filter(word => !["{", "}", "[", "]"].includes(word)).length;
 					columns.push([word, len]);
 				} else {
 					// else : split by whitespace. set negative length for differnt unknown cases (... : wildcard = 0, #: synonym = -1) (... , #)
-<<<<<<< Updated upstream
 					word.split(" ").map(word => {
 						let len = 1;
 						if (word == MULTIPLE_WILDCARD_SIGN) {
-=======
-					word.split(" ").forEach(word => {
-						let len = 1;
-						if (word === MULTIPLE_WILDCARD_SIGN) {
->>>>>>> Stashed changes
 							len = 0;
 						}
 						if (word.startsWith(SYNONYM_PREFIX)) {
@@ -283,11 +192,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 		//remove double "..." columns (nonesense case that makes mapping results to graph messy)
 		for (let i = 1; i < columns.length; i++) {
-<<<<<<< Updated upstream
 			if (columns[i][1] == 0 && columns[i - 1][1] == 0) {
-=======
-			if (columns[i][1] === 0 && columns[i - 1][1] === 0) {
->>>>>>> Stashed changes
 				columns.splice(i, 1);
 				i--;
 			}
@@ -301,41 +206,24 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		const columnsIndexToPrune = new Set<number>().add(0).add(columns.length - 1);
 		while (running) {
 			const countBefore = columnsIndexToPrune.size;
-<<<<<<< Updated upstream
 			columns.map((column, cIndex) => {
 				if (!columnsIndexToPrune.has(cIndex))
 					column.elements.map(element => {
 						//prune space if...
 						if (element.text == " ") {
-=======
-			columns.forEach((column, cIndex) => {
-				if (!columnsIndexToPrune.has(cIndex))
-					column.elements.forEach(element => {
-						//prune space if...
-						if (element.text === " ") {
->>>>>>> Stashed changes
 							//... next column is pruned and no non-space point back to it
 							if (columnsIndexToPrune.has(cIndex + 1)) {
 								if (
 									columns[cIndex + 1].elements
-<<<<<<< Updated upstream
 										.filter(element => element.text != " ")
 										.filter(element => element.previous?.includes(" ")).length == 0
-=======
-										.filter(element => element.text !== " ")
-										.filter(element => element.previous?.includes(" ")).length === 0
->>>>>>> Stashed changes
 								) {
 									columnsIndexToPrune.add(cIndex);
 								}
 							}
 							//... previous column is pruned and no non-spaces are pointed back to
 							if (columnsIndexToPrune.has(cIndex - 1)) {
-<<<<<<< Updated upstream
 								if (element.previous?.filter(text => text != " ").length == 0) {
-=======
-								if (element.previous?.filter(text => text !== " ").length === 0) {
->>>>>>> Stashed changes
 									columnsIndexToPrune.add(cIndex);
 								}
 							}
@@ -343,19 +231,11 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 					});
 			});
 			//keep iterating until no new marks are added
-<<<<<<< Updated upstream
 			running = countBefore != columnsIndexToPrune.size;
 		}
 		//remove all marked
 		columnsIndexToPrune.forEach(cIndex => {
 			columns[cIndex].elements = columns[cIndex].elements.filter(element => element.text != " ");
-=======
-			running = countBefore !== columnsIndexToPrune.size;
-		}
-		//remove all marked
-		columnsIndexToPrune.forEach(cIndex => {
-			columns[cIndex].elements = columns[cIndex].elements.filter(element => element.text !== " ");
->>>>>>> Stashed changes
 		});
 		return columns;
 	};
@@ -372,13 +252,8 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		const wordType = WordTypes.WORD_IN_DICTSET;
 		let phraseLength = 0;
 		//find length of phrase expression
-<<<<<<< Updated upstream
 		for (var i = phraseIndex; i < phrase.words.length; i++) {
 			if (phrase.words[i].type == wordType) {
-=======
-		for (let i = phraseIndex; i < phrase.words.length; i++) {
-			if (phrase.words[i].type === wordType) {
->>>>>>> Stashed changes
 				phraseLength++;
 			} else {
 				break;
@@ -390,15 +265,9 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			return finalSynonymGrouping;
 		}
 		//if single column, trivial assignment
-<<<<<<< Updated upstream
 		else if (columnLength == 1) {
 			finalSynonymGrouping.push([]);
 			for (var i = 0; i + phraseIndex < phrase.words.length && i < phraseLength; i++) {
-=======
-		else if (columnLength === 1) {
-			finalSynonymGrouping.push([]);
-			for (let i = 0; i + phraseIndex < phrase.words.length && i < phraseLength; i++) {
->>>>>>> Stashed changes
 				finalSynonymGrouping[0].push(phrase.words[phraseIndex + i].text);
 			}
 		}
@@ -406,17 +275,12 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		else if (phraseLength > columnLength) {
 			//max size of phrase : difference between phrases and column count + 1, to leave enough for following ones.
 			const maxSize = 1 + phraseLength - columnLength;
-<<<<<<< Updated upstream
 			// var res = Netspeak.instance.search({
-=======
-			// let res = Netspeak.instance.search({
->>>>>>> Stashed changes
 			//     query: graphColumns[columnIndex].name,
 			//     corpus: props.corpus,
 			//     topk: 30
 			// })
 			const res = await getPhrases(graphColumns[columnIndex].name, props.corpus, 100);
-<<<<<<< Updated upstream
 			const synonyms = await res.phrases
 				.filter(fetchedPhrase => {
 					return phrase.text.startsWith(fetchedPhrase.text) && fetchedPhrase.words.length <= maxSize;
@@ -447,42 +311,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		//else: allocate 1-to-1
 		else {
 			for (var i = 0; i + phraseIndex < phrase.words.length && i < phraseLength; i++) {
-=======
-			try {
-				const synonyms = await res.phrases
-					.filter(fetchedPhrase => {
-						return phrase.text.startsWith(fetchedPhrase.text) && fetchedPhrase.words.length <= maxSize;
-					})
-					.flatMap(async fetchedPhrase => {
-						//call func recursively. if call succesful append and return
-						const subgroup = await addSynonymsToGraphColumns(
-							graphColumns,
-							columnIndex + 1,
-							columnLength - 1,
-							phraseIndex + fetchedPhrase.words.length,
-							phrase
-						);
-						if (subgroup.length > 0) {
-							subgroup.unshift(fetchedPhrase.words.flatMap(a => a.text));
-							return subgroup;
-						}
-					})
-					.reduce(async (a, b) => {
-						const aVal = await a;
-						const bVal = await b;
-						if (aVal?.length ?? 0 > (bVal?.length ?? 0)) return aVal;
-						return bVal;
-					}, Promise.resolve(undefined));
-
-				return synonyms ?? [];
-			} catch {
-				return [];
-			}
-		}
-		//else: allocate 1-to-1
-		else {
-			for (let i = 0; i + phraseIndex < phrase.words.length && i < phraseLength; i++) {
->>>>>>> Stashed changes
 				finalSynonymGrouping.push([phrase.words[phraseIndex + i].text]);
 			}
 		}
@@ -494,16 +322,11 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		maxLen: number,
 		previousMaxLen: number,
 		splitFrom: GroupWordsSetting
-<<<<<<< Updated upstream
 	) => {
-=======
-	): NetspeakGraphColumn[] => {
->>>>>>> Stashed changes
 		//find number of sub culumns, (1 column per word)
 		const maxColumns = maxLen;
 		//prepare array
 		const splitColumns: NetspeakGraphColumn[] = [];
-<<<<<<< Updated upstream
 		for (var i = 0; i < maxColumns; i++) {
 			splitColumns.push({ name: column.name, elements: [] });
 		}
@@ -512,25 +335,11 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			let elementWords = element.text.split(" ");
 			// //add spaces to array to enable inheritance
 			if (splitFrom == GroupWordsSetting.FromTrailing) {
-=======
-		for (let i = 0; i < maxColumns; i++) {
-			splitColumns.push({ name: column.name, elements: [] });
-		}
-		for (let i = 0; i < column.elements.length; i++) {
-			const element = column.elements[i];
-			let elementWords = element.text.split(" ");
-			// //add spaces to array to enable inheritance
-			if (splitFrom === GroupWordsSetting.FromTrailing) {
->>>>>>> Stashed changes
 				while (elementWords.length < maxColumns) {
 					elementWords.unshift(" ");
 				}
 			}
-<<<<<<< Updated upstream
 			if (splitFrom == GroupWordsSetting.FromLeading) {
-=======
-			if (splitFrom === GroupWordsSetting.FromLeading) {
->>>>>>> Stashed changes
 				while (elementWords.length < maxColumns) {
 					elementWords.push(" ");
 				}
@@ -538,11 +347,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 			//turn empty words to spaces
 			elementWords = elementWords.flatMap(word => {
-<<<<<<< Updated upstream
 				if (word == "") return " ";
-=======
-				if (word === "") return " ";
->>>>>>> Stashed changes
 				else return word;
 			});
 			for (let j = 0; j < elementWords.length; j++) {
@@ -554,17 +359,10 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 						j > 0
 							? [elementWords[j - 1]]
 							: element.previous?.flatMap(previous => {
-<<<<<<< Updated upstream
 									if (previous.length == 1) {
 										return previous[0];
 									}
 									if (splitFrom == GroupWordsSetting.FromLeading) {
-=======
-									if (previous.length === 1) {
-										return previous[0];
-									}
-									if (splitFrom === GroupWordsSetting.FromLeading) {
->>>>>>> Stashed changes
 										return previous.split(" ").length < previousMaxLen
 											? " "
 											: previous.split(" ").pop() ?? " ";
@@ -573,11 +371,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 									}
 							  }),
 				};
-<<<<<<< Updated upstream
 				// var targetColumn = (splitFrom == Direction.Left) ? j : j + maxColumns - elementWords.length
-=======
-				// let targetColumn = (splitFrom == Direction.Left) ? j : j + maxColumns - elementWords.length
->>>>>>> Stashed changes
 				splitColumns[j].elements.push(wordElement);
 			}
 		}
@@ -589,11 +383,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		columns: [title: string, cLength: number][],
 		graphColumns: NetspeakGraphColumn[],
 		promises: Promise<string[][]>[]
-<<<<<<< Updated upstream
 	) => {
-=======
-	): Promise<void> => {
->>>>>>> Stashed changes
 		let last = "";
 		const frequency = phrase.frequency;
 		let i = 0;
@@ -603,40 +393,23 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		});
 		const selected =
 			props.statePhrases.filter(val => {
-<<<<<<< Updated upstream
 				return val.expanded && val.phrase.id == phrase.id;
-=======
-				return val.expanded && val.phrase.id === phrase.id;
->>>>>>> Stashed changes
 			}).length > 0;
 
 		const graphPhrase: GraphPhrase = { text: phrase.text, frequency: phrase.frequency, selected: selected };
 		//iterate over every column for every phrase, skipping len forward, resolve unclear allocations (due to len)
 
-<<<<<<< Updated upstream
 		for (let j = 0; j < columns.length && i < words.length; j++) {
-=======
-		for (let j = 0; j < graphColumns.length && j < columns.length && i < words.length; j++) {
->>>>>>> Stashed changes
 			const expectedLen = columns[j][1];
 			// if len unknown:
 			if (expectedLen <= 0) {
 				// if  wildcard :
-<<<<<<< Updated upstream
 				if (expectedLen == 0 || expectedLen == -2) {
 					let realLen = 0;
 					const wordType = expectedLen == 0 ? WordTypes.WORD_FOR_STAR : WordTypes.WORD_FOR_QMARK;
 					// allocate words until next word has different type
 					for (let k = i; k < words.length; k++) {
 						if (words[k].type == wordType) {
-=======
-				if (expectedLen === 0 || expectedLen === -2) {
-					let realLen = 0;
-					const wordType = expectedLen === 0 ? WordTypes.WORD_FOR_STAR : WordTypes.WORD_FOR_QMARK;
-					// allocate words until next word has different type
-					for (let k = i; k < words.length; k++) {
-						if (words[k].type === wordType) {
->>>>>>> Stashed changes
 							realLen++;
 						} else {
 							break;
@@ -659,19 +432,11 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 					i += realLen;
 				}
 				//if synonym
-<<<<<<< Updated upstream
 				if (expectedLen == -1) {
 					// 1. find all adjacened synonyms in query
 					let synonymsCount = 1;
 					while (j + synonymsCount < columns.length) {
 						if (columns[j + synonymsCount][1] == -1) {
-=======
-				if (expectedLen === -1) {
-					// 1. find all adjacened synonyms in query
-					let synonymsCount = 1;
-					while (j + synonymsCount < columns.length) {
-						if (columns[j + synonymsCount][1] === -1) {
->>>>>>> Stashed changes
 							synonymsCount++;
 						} else break;
 					}
@@ -711,15 +476,9 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			}
 		}
 	};
-<<<<<<< Updated upstream
 	const generateGraphNodes = async () => {
 		if (query == "") {
 			return;
-=======
-	const generateGraphNodes = async (): Promise<NetspeakGraphColumn[]> => {
-		if (query === "") {
-			return [];
->>>>>>> Stashed changes
 		}
 
 		const readonlyPhrases = (await getPhrases(props.pageQuerry, props.corpus, 100)).phrases;
@@ -734,16 +493,9 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		let graphColumns: NetspeakGraphColumn[] = [];
 
 		//handle pinned phrases by adding extra columns to fit pinned elements from longer queries
-<<<<<<< Updated upstream
 		props.statePhrases.map(statePhrase => {
 			if (statePhrase.pinned) {
 				if (statePhrase.phrase.query != props.pageQuerry) {
-=======
-		props.statePhrases.forEach(statePhrase => {
-			if (statePhrase.pinned) {
-				console.log(statePhrase);
-				if (statePhrase.phrase.query !== props.pageQuerry) {
->>>>>>> Stashed changes
 					// phrases.push(statePhrase.phrase)
 					//if phrase longer than there are columns - add new ones
 					const pinnedQueryColumns = mapQueryToColumns(statePhrase.phrase.query);
@@ -756,11 +508,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			}
 		});
 
-<<<<<<< Updated upstream
 		for (var i = 0; i < columns.length; i++) {
-=======
-		for (let i = 0; i < columns.length; i++) {
->>>>>>> Stashed changes
 			graphColumns.push({ name: columns[i][0], elements: [] });
 		}
 
@@ -771,11 +519,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 		});
 		props.statePhrases.forEach(async statePhrase => {
 			if (statePhrase.pinned) {
-<<<<<<< Updated upstream
 				if (statePhrase.phrase.query != props.pageQuerry) {
-=======
-				if (statePhrase.phrase.query !== props.pageQuerry) {
->>>>>>> Stashed changes
 					phraseToNode(
 						statePhrase.phrase,
 						mapQueryToColumns(statePhrase.phrase.query),
@@ -786,25 +530,14 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			}
 		});
 
-<<<<<<< Updated upstream
 		const waiting = await Promise.all(promises);
 		//split columns to group similar words together
 		if (groupWordsSetting != GroupWordsSetting.DoNotGroup) {
-=======
-		// eslint-disable-next-line @typescript-eslint/no-unused-vars
-		const waiting = await Promise.all(promises);
-		//split columns to group similar words together
-		if (groupWordsSetting !== GroupWordsSetting.DoNotGroup) {
->>>>>>> Stashed changes
 			let splitColumns: NetspeakGraphColumn[] = [];
 
 			let previousMaxLen = 0;
 
-<<<<<<< Updated upstream
 			for (var i = 0; i < graphColumns.length; i++) {
-=======
-			for (let i = 0; i < graphColumns.length; i++) {
->>>>>>> Stashed changes
 				const maxColumns = Math.max.apply(
 					null,
 					graphColumns[i].elements.flatMap(element => {
@@ -827,12 +560,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 		let removedPhrases: GraphPhrase[] = [];
 
-<<<<<<< Updated upstream
 		for (var i = 0; i < graphColumns.length; i++) {
-=======
-		for (let i = 0; i < graphColumns.length; i++) {
-			let phrasesToRemove: GraphPhrase[] = [];
->>>>>>> Stashed changes
 			const sortedColumn: NetspeakGraphColumn = { name: graphColumns[i].name, elements: [] };
 			//remove any paths with frequencies out of range
 			graphColumns[i].elements = graphColumns[i].elements.filter(element => {
@@ -841,7 +569,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 			//go over column, sum, append to sortedColumn and remove all of one text type until empty
 			while (graphColumns[i].elements.length > 0) {
 				const text = graphColumns[i].elements[0].text;
-<<<<<<< Updated upstream
 				var previous: string[] = [];
 				var frequency = 0;
 				var summedPhrases: GraphPhrase[] = [];
@@ -850,16 +577,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 					if (element.text == text) {
 						frequency += element.frequency;
 						if (element.previous != undefined) {
-=======
-				const previous: string[] = [];
-				let frequency = 0;
-				let summedPhrases: GraphPhrase[] = [];
-				//sum and filter
-				graphColumns[i].elements = graphColumns[i].elements.filter(element => {
-					if (element.text === text) {
-						frequency += element.frequency;
-						if (element.previous !== undefined) {
->>>>>>> Stashed changes
 							if (!previous.includes(element.previous[0])) previous.push(element.previous[0]);
 						}
 						summedPhrases = summedPhrases.concat(element.phrases);
@@ -883,20 +600,13 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 			//!remove words past max; join their phrases to propagate later
 			//find all phrases to remove
-<<<<<<< Updated upstream
 			graphColumns[i].elements.map((element, eIndex) => {
 				if (eIndex >= maxRows) {
 					removedPhrases = [...new Set([...removedPhrases, ...element.phrases])];
-=======
-			graphColumns[i].elements.forEach((element, eIndex) => {
-				if (eIndex >= maxRows) {
-					phrasesToRemove = [...new Set([...phrasesToRemove, ...element.phrases])];
->>>>>>> Stashed changes
 				}
 			});
 			// remove the overflowing words
 			graphColumns[i].elements = graphColumns[i].elements.slice(0, maxRows);
-<<<<<<< Updated upstream
 		}
 
 		//propagate removal of overflowing words (remove any word that is no longer connected to at least one phrase)
@@ -905,17 +615,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 				graphColumns[cIndex].elements[eIndex].phrases = element.phrases.filter(val => {
 					return !removedPhrases.some(removedPhrase => {
 						return removedPhrase.text == val.text && removedPhrase.frequency == val.frequency;
-=======
-			removedPhrases = [...new Set([...removedPhrases, ...phrasesToRemove])];
-		}
-
-		//propagate removal of overflowing words (remove any word that is no longer connected to at least one phrase)
-		graphColumns.forEach((column, cIndex) => {
-			column.elements.forEach((element, eIndex) => {
-				graphColumns[cIndex].elements[eIndex].phrases = element.phrases.filter(val => {
-					return !removedPhrases.some(removedPhrase => {
-						return removedPhrase.text === val.text && removedPhrase.frequency === val.frequency;
->>>>>>> Stashed changes
 					});
 				});
 			});
@@ -930,15 +629,10 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	};
 
 	// * Render page
-<<<<<<< Updated upstream
 	// var graphColumns = useAsync(generateGraphNodes, [props.pageQuerry, frequencyRange]).res ?? []
 	// setGraphColumns(await generateGraphNodes(result.res?.phrases ?? [], columns))
 	const loadGraph = useAsync(generateGraphNodes, [
 		props.pageQuerry,
-=======
-	const loadGraph = useAsync(generateGraphNodes, [
-		query,
->>>>>>> Stashed changes
 		props.statePhrases,
 		frequencyRange,
 		maxRows,
@@ -948,11 +642,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	const screenWidth = useWindowDimensions().width;
 	return (
 		<div id="graphWrapper" className={loadGraph.loading ? "loading" : ""}>
-<<<<<<< Updated upstream
 			{optional(props.pageQuerry != "", () => (
-=======
-			{optional(props.pageQuerry !== "", () => (
->>>>>>> Stashed changes
 				<NetspeakGraphBody
 					columns={columns}
 					alwaysShowPaths={alwaysShowPaths}
@@ -970,11 +660,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 			<Popup
 				trigger={<img src={gearIcon} alt="Settings" className="GraphMenuButton" />}
-<<<<<<< Updated upstream
 				position={(screenWidth >= 1150 ? ("left top" as Position) : ("right" as Position))!}>
-=======
-				position={(screenWidth >= 1150 ? ("left top" as Position) : ("right center" as Position))!}>
->>>>>>> Stashed changes
 				<div className="popupGrid" style={{ display: "grid" }}>
 					<h3> Graph Settings </h3>
 
@@ -1039,14 +725,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	);
 };
 
-<<<<<<< Updated upstream
 const useAsync = <T extends unknown>(fn: () => Promise<T>, deps: any[]) => {
-=======
-const useAsync = <T extends unknown>(
-	fn: () => Promise<T>,
-	deps: any[]
-): { loading: boolean; error: Error | undefined; res: T | undefined } => {
->>>>>>> Stashed changes
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<Error | undefined>();
 	const [res, setRes] = useState<T | undefined>();
@@ -1068,24 +747,12 @@ const useAsync = <T extends unknown>(
 		return () => {
 			cancel = true;
 		};
-<<<<<<< Updated upstream
 	}, [fn]);
-=======
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, deps);
->>>>>>> Stashed changes
 	return { loading, error, res };
 };
 
 //window dimensions function to notice resizing
-<<<<<<< Updated upstream
 function getWindowDimensions() {
-=======
-function getWindowDimensions(): {
-	width: number;
-	height: number;
-} {
->>>>>>> Stashed changes
 	const { innerWidth: width, innerHeight: height } = window;
 	return {
 		width,
@@ -1093,7 +760,6 @@ function getWindowDimensions(): {
 	};
 }
 
-<<<<<<< Updated upstream
 const useWindowDimensions = () => {
 	const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
 
@@ -1102,19 +768,6 @@ const useWindowDimensions = () => {
 			setWindowDimensions(getWindowDimensions());
 		}
 
-=======
-const useWindowDimensions = (): {
-	width: number;
-	height: number;
-} => {
-	const [windowDimensions, setWindowDimensions] = useState(getWindowDimensions());
-
-	useEffect(() => {
-		function handleResize(): void {
-			setWindowDimensions(getWindowDimensions());
-		}
-
->>>>>>> Stashed changes
 		window.addEventListener("resize", handleResize);
 		return () => window.removeEventListener("resize", handleResize);
 	}, []);
