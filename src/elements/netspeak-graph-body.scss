@@ -15,16 +15,13 @@
 	}
 }
 
-// @media (max-width: 1000px) {
-//     #graphWrapper {
-//         flex: 0 0 500px;
-//         position: sticky;
-//         top: 0px;
-//     }
-// }
 @media (max-width: 1170px) {
 	#graphWrapper {
+<<<<<<< Updated upstream
 		flex: 0 0 500px;
+=======
+		flex: 0 1 500px;
+>>>>>>> Stashed changes
 		position: relative;
 	}
 }

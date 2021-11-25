@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 import {
@@ -36,6 +37,7 @@ import Popup from "reactjs-popup";
 import NetspeakQueryText from "./netspeak-query-text";
 import { QueryHistory } from "../lib/query-history";
 import { GraphElement } from "./netspeak-graph";
+
 
 export type ExampleVisibility = "visible" | "hidden" | "peek";
 
