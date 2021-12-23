@@ -2,12 +2,12 @@ import React from "react";
 import { Link } from "gatsby";
 import "./netspeak-footer.scss";
 import {
-	LocalizableProps,
-	Locales,
-	SimpleLocale,
 	createLocalizer,
-	SupportedLanguage,
+	Locales,
+	LocalizableProps,
 	setCurrentLang,
+	SimpleLocale,
+	SupportedLanguage,
 } from "../lib/localize";
 
 export default function NetspeakFooter(props: LocalizableProps): JSX.Element {
@@ -103,8 +103,8 @@ function LangSelect(props: { lang: string; thisLang: SupportedLanguage; children
 		setCurrentLang(thisLang);
 		window.location.reload();
 	};
-	// eslint-disable-next-line jsx-a11y/anchor-is-valid
 	return (
+		// eslint-disable-next-line jsx-a11y/anchor-is-valid
 		<a className={className} href="#" onClick={clickHandler}>
 			{props.children}
 		</a>
