@@ -157,6 +157,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 				highlightedPhrases: phrases,
 			};
 		});
+	};
 	private _onShowExperimental = (): void => {
 		this.setState(state => ({ betaResults: !state.betaResults }));
 	};
@@ -164,30 +165,19 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	render(): JSX.Element {
 		return (
 			<Page lang={this.lang} className="SearchPage">
-				{optional(this.state.corpora.length > 0, () => (
-					<NetspeakCorpusSelector
-						lang={this.lang}
-						selected={this.state.currentCorpusKey}
-						corpora={this.state.corpora}
-						unavailable={this.state.unavailableCorpora}
-						onCorpusSelected={this._onCorpusSelectedHandler}
-					/>
-				))}
+				<div className="options-wrapper">
+					{optional(this.state.corpora.length > 0, () => (
+						<NetspeakCorpusSelector
+							lang={this.lang}
+							selected={this.state.currentCorpusKey}
+							corpora={this.state.corpora}
+							unavailable={this.state.unavailableCorpora}
+							onCorpusSelected={this._onCorpusSelectedHandler}
+						/>
+					))}
+				</div>
 
 				<div className="flexbox-container">
-				<div className="section">
-					<div className="options-wrapper">
-						{optional(this.state.corpora.length > 0, () => (
-							<NetspeakCorpusSelector
-								lang={this.lang}
-								selected={this.state.currentCorpusKey}
-								corpora={this.state.corpora}
-								unavailable={this.state.unavailableCorpora}
-								onCorpusSelected={this._onCorpusSelectedHandler}
-							/>
-						))}
-					</div>
-
 					<div className="search-wrapper">
 						<NetspeakSearch
 							key={this.state.queryId + ";" + this.state.currentCorpusKey}
@@ -214,20 +204,19 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						onSetSelection={this._onSetSelection}
 						highlightedPhrases={this.state.highlightedPhrases}
 						setHighlightedPhrases={this._setHighlightedPhrases}
+						apiType={NetspeakApiKind.ngram}
 					/>
-						/>
-					</div>
 				</div>
-				<div className="section">
-					<div className="options-wrapper">
-						<AdditionalFeatureSelector
-							lang={this.lang}
-							active={this.state.betaResults}
-							onClicked={this._onShowExperimental}
-						/>
-					</div>
-					<div className="search-wrapper">
-						{optional(this.state.betaResults, () => (
+				<div className="options-wrapper">
+					<AdditionalFeatureSelector
+						lang={this.lang}
+						active={this.state.betaResults}
+						onClicked={this._onShowExperimental}
+					/>
+				</div>
+				{optional(this.state.betaResults, () => (
+					<div className="flexbox-container beta">
+						<div className="search-wrapper beta">
 							<NetspeakSearch
 								key={this.state.queryId + ";" + this.state.currentCorpusKey}
 								lang={this.lang}
@@ -239,10 +228,17 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 								defaultExampleVisibility={"hidden"}
 								pageSize={40}
 								autoFocus={false}
+								onCommitQuery={this._onQueryCommitHandler}
+								selectedWords={this.state.selectedWords}
+								history={this.state.history}
+								onSetExampleVisibility={this._onSetExampleVisibilityHandler}
+								syncStateWithGraph={this._syncStateWithGraph}
+								setHighlightedPhrases={this._setHighlightedPhrases}
+								highlightedPhrases={this.state.highlightedPhrases}
 							/>
-						))}
+						</div>
 					</div>
-				</div>
+				))}
 			</Page>
 		);
 	}

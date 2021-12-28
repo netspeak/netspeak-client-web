@@ -1,7 +1,7 @@
 import React from "react";
 import "./help-page.scss";
-import Page from "./page";
 import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
+import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
 
 export default function HelpPage(): JSX.Element {
@@ -35,11 +35,16 @@ export default function HelpPage(): JSX.Element {
 									defaultExampleVisibility="hidden"
 									pageSize={10}
 									storedQuery={""}
+									highlightedPhrases={[]}
+									selectedWords={[]}
+									setHighlightedPhrases={() => undefined}
+									syncStateWithGraph={() => undefined}
 								/>
 							</div>
 						</div>
 					);
 				})}
+
 				{Toc.h2("for-developers", l("devs"))}
 				{l("devsP")()}
 			</Toc>

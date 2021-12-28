@@ -9,6 +9,17 @@
 		border: 1px #bbb solid;
 		// background-color: #f8f8f8;
 	}
+	
+	.flexbox-container.beta {
+	border: none;
+	}
+
+	.flexbox-container.beta .NetspeakSearch{
+		border-left: 1px solid #bbb;
+		border-bottom: 1px solid #bbb;
+
+	}
+	
 	#content {
 		max-width: 1200px;
 		margin: 0 64px;
@@ -50,7 +61,7 @@
 	}
 
 	.AdditionalViewSelector {
-		margin: 0 0 2em 0;
+		margin: 1em 0 2em 0;
 	}
 
 	@media screen and (max-width: 1128px /* 1000px + 64px * 2 */) {
