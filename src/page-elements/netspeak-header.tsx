@@ -1,6 +1,6 @@
 import React from "react";
 import "./netspeak-header.scss";
-import { Locales, SimpleLocale, createLocalizer, LocalizableProps } from "../lib/localize";
+import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
 import { Link } from "gatsby";
 
 export default function NetspeakHeader(props: LocalizableProps): JSX.Element {
