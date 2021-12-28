@@ -1,14 +1,13 @@
 import React from "react";
 import "./search-page.scss";
-import Page from "./page";
 import NetspeakCorpusSelector from "../elements/netspeak-corpus-selector";
-import AdditionalFeatureSelector from "../elements/addon-visibility-selector";
 import { getCurrentLang } from "../lib/localize";
-import { ExampleVisibility, NetspeakSearch } from "../elements/netspeak-search";
-import { CorporaInfo, Corpus, Netspeak, NetspeakApiKind } from "../lib/netspeak";
+import { NetspeakSearch, ExampleVisibility } from "../elements/netspeak-search";
+import { Corpus, CorporaInfo, Netspeak } from "../lib/netspeak";
 import { CancelablePromise, ignoreCanceled } from "../lib/cancelable-promise";
-import { nextId, optional } from "../lib/util";
+import { optional, nextId } from "../lib/util";
 import { QueryHistory } from "../lib/query-history";
+import Page from "./page";
 import { addHashChangeListener, removeHashChangeListener } from "../lib/hash";
 import NetspeakGraph, { GraphElement } from "../elements/netspeak-graph";
 import { PhraseState } from "../elements/netspeak-result-list";
@@ -32,8 +31,6 @@ interface State {
 	corpora: readonly Corpus[];
 	unavailableCorpora: ReadonlySet<Corpus>;
 
-	betaResults: boolean;
-
 	pageQuery: string;
 	currentQuery: string;
 	queryId: number;
@@ -55,8 +52,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 		corpora: KNOWN_CORPORA,
 		unavailableCorpora: new Set(),
 
-		betaResults: false,
-
 		pageQuery: getPageParam("q") || "",
 		currentQuery: "",
 		queryId: nextId(),
@@ -68,8 +63,7 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 	};
 
 	componentDidMount(): void {
-		// TODO this should probably happen for the addons too
-		this._corporaPromise = new CancelablePromise(Netspeak.getNetspeakClient(NetspeakApiKind.ngram).queryCorpora());
+		this._corporaPromise = new CancelablePromise(Netspeak.instance.queryCorpora());
 		this._corporaPromise
 			.then(info => {
 				const available = new Set(info.corpora.map(c => c.key));
@@ -157,8 +151,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 				highlightedPhrases: phrases,
 			};
 		});
-	private _onShowExperimental = (): void => {
-		this.setState(state => ({ betaResults: !state.betaResults }));
 	};
 
 	render(): JSX.Element {
@@ -175,18 +167,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 				))}
 
 				<div className="flexbox-container">
-				<div className="section">
-					<div className="options-wrapper">
-						{optional(this.state.corpora.length > 0, () => (
-							<NetspeakCorpusSelector
-								lang={this.lang}
-								selected={this.state.currentCorpusKey}
-								corpora={this.state.corpora}
-								unavailable={this.state.unavailableCorpora}
-								onCorpusSelected={this._onCorpusSelectedHandler}
-							/>
-						))}
-					</div>
 					<div className="search-wrapper">
 						<NetspeakSearch
 							key={this.state.queryId + ";" + this.state.currentCorpusKey}
@@ -195,7 +175,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 							defaultQuery={this.state.pageQuery}
 							onCommitQuery={this._onQueryCommitHandler}
 							selectedWords={this.state.selectedWords}
-							storedQuery={""}
 							history={this.state.history}
 							defaultExampleVisibility={this.state.exampleVisibility}
 							onSetExampleVisibility={this._onSetExampleVisibilityHandler}
@@ -214,33 +193,6 @@ export default class SearchPage extends React.PureComponent<unknown, State> {
 						highlightedPhrases={this.state.highlightedPhrases}
 						setHighlightedPhrases={this._setHighlightedPhrases}
 					/>
-						/>
-					</div>
-				</div>
-				<div className="section">
-					<div className="options-wrapper">
-						<AdditionalFeatureSelector
-							lang={this.lang}
-							active={this.state.betaResults}
-							onClicked={this._onShowExperimental}
-						/>
-					</div>
-					<div className="search-wrapper">
-						{optional(this.state.betaResults, () => (
-							<NetspeakSearch
-								key={this.state.queryId + ";" + this.state.currentCorpusKey}
-								lang={this.lang}
-								corpusKey={this.state.currentCorpusKey}
-								defaultQuery={this.state.pageQuery}
-								apiType={NetspeakApiKind.neural}
-								beta={true}
-								storedQuery={this.state.currentQuery}
-								defaultExampleVisibility={"hidden"}
-								pageSize={40}
-								autoFocus={false}
-							/>
-						))}
-					</div>
 				</div>
 			</Page>
 		);

@@ -1,13 +1,13 @@
 import { Metadata } from "grpc-web";
 import { NetspeakServiceClient } from "./generated/NetspeakServiceServiceClientPb";
 import {
-	CorporaRequest,
-	PhraseConstraints,
 	SearchRequest,
+	PhraseConstraints,
+	CorporaRequest,
 	Phrase as ServicePhrase,
 } from "./generated/NetspeakService_pb";
 import { LRUCache } from "./lru-cache";
-import { assertNever, noop } from "./util";
+import { noop } from "./util";
 
 /**
  * Normalizes the given query such that two identical queries have the same string representation.
@@ -49,11 +49,6 @@ export interface NetspeakSearchOptions {
 	 */
 	topkMode?: "default" | "fill";
 }
-export enum NetspeakApiKind {
-	/** Enum to select the api type */
-	neural = "neural",
-	ngram = "ngram",
-}
 
 export interface ReadonlyNetspeakSearchResult {
 	/** The phrases returned by the API. */
@@ -75,8 +70,8 @@ export class Netspeak {
 	private _cache = new LRUCache<Promise<ReadonlyNetspeakSearchResult>>(100);
 	private _cachedCorpus: Readonly<CorporaInfo> | undefined = undefined;
 
-	private constructor(hostname: string) {
-		this._client = new NetspeakServiceClient(hostname);
+	private constructor() {
+		this._client = new NetspeakServiceClient(Netspeak.defaultHostname);
 	}
 
 	/**
@@ -286,35 +281,18 @@ export class Netspeak {
 	}
 
 	/**
-	 * The ngram host of the Netspeak API.
+	 * The default host of the Netspeak API.
 	 */
-	static get ngramHostname(): string {
+	static get defaultHostname(): string {
 		return "https://ngram.api.netspeak.org";
 	}
-	/**
-	 * The host for the neural netspeak API.
-	 */
-	static get neuralHostname(): string {
-		return "https://neural.api.netspeak.org";
-	}
 
-	/**
-	 * Get an instance calling different hosts depending on the apiType
-	 */
-	static getNetspeakClient(apiKind: NetspeakApiKind = NetspeakApiKind.ngram): Netspeak {
-		switch (apiKind) {
-			case NetspeakApiKind.neural:
-				return (neuralNetspeakInstance ??= new Netspeak(Netspeak.neuralHostname));
-			case NetspeakApiKind.ngram:
-				return (ngramNetspeakInstance ??= new Netspeak(Netspeak.ngramHostname));
-			default:
-				assertNever(apiKind);
-		}
+	static get instance(): Netspeak {
+		return (defaultNetspeakInstance = defaultNetspeakInstance || new Netspeak());
 	}
 }
 
-let ngramNetspeakInstance: Netspeak | undefined = undefined;
-let neuralNetspeakInstance: Netspeak | undefined = undefined;
+let defaultNetspeakInstance: Netspeak | undefined = undefined;
 
 export class NetspeakError extends Error {
 	constructor(errorCode: number | string, message: string) {

@@ -1,6 +1,6 @@
 import React from "react";
 import "./netspeak-corpus-selector.scss";
-import { createLocalizer, Locales, LocalizableProps, SimpleLocale } from "../lib/localize";
+import { LocalizableProps, Locales, SimpleLocale, createLocalizer } from "../lib/localize";
 import { Corpus } from "../lib/netspeak";
 
 interface Props extends LocalizableProps {

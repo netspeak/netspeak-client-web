@@ -28,8 +28,6 @@ module.exports = {
 		"@typescript-eslint/no-non-null-assertion": "off",
 		"@typescript-eslint/no-explicit-any": "off",
 		"no-restricted-globals": "off",
-
-		"sort-imports": ["warn", { ignoreDeclarationSort: true, ignoreCase: true }],
 	},
 	ignorePatterns: ["src/img/**", "*.css", "*.scss", "gulpfile.js", "publish/**", "src/lib/generated/**"],
 };
