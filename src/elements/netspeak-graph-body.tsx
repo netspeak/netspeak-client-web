@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { GraphElement, GraphPhrase, NetspeakGraphColumn } from "./netspeak-graph";
+import { NetspeakGraphColumn, GraphPhrase, GraphElement } from "./netspeak-graph";
 import { linkHorizontal } from "d3";
 import * as d3 from "d3";
 import "./netspeak-graph-body.scss";
@@ -138,7 +138,6 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 	};
 
 	// var links: string[] = []
-	// eslint-disable-next-line react-hooks/exhaustive-deps
 	const links: GraphLink[] = [];
 
 	//initiate positions of elements

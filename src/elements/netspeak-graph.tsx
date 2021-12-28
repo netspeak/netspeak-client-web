@@ -6,8 +6,8 @@ import Switch from "react-switch";
 import Select from "react-select";
 import Popup, { Position } from "reactjs-popup";
 
-import React, { useCallback, useEffect, useState } from "react";
-import { Netspeak, NetspeakApiKind, Phrase, ReadonlyNetspeakSearchResult, WordTypes } from "../lib/netspeak";
+import React, { useState, useEffect, useCallback } from "react";
+import { ReadonlyNetspeakSearchResult, Netspeak, Phrase, WordTypes } from "../lib/netspeak";
 import { optional } from "../lib/util";
 import { NetspeakGraphBody } from "./netspeak-graph-body";
 import { PhraseState } from "./netspeak-result-list";
@@ -26,7 +26,6 @@ type NetspeakGraphProps = {
 	onSetSelection: (arg0: GraphElement[]) => void;
 	highlightedPhrases: string[];
 	setHighlightedPhrases: (arg0: string[]) => void;
-	apiType: NetspeakApiKind;
 };
 
 export type NetspeakGraphColumn = {
@@ -92,6 +91,21 @@ const FrequencySlider = (props: {
 	);
 };
 
+//cache last results of search
+
+const phraseCache: { [query: string]: ReadonlyNetspeakSearchResult } = {};
+
+const getPhrases = async (query: string, corpus: string, n: number): Promise<ReadonlyNetspeakSearchResult> => {
+	if (phraseCache[query] === undefined) {
+		phraseCache[query] = await Netspeak.instance.search({
+			query: query,
+			corpus: corpus,
+			topk: n,
+		});
+	}
+	return phraseCache[query];
+};
+
 const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	//range constants
 	const maxRange = 10000;
@@ -103,21 +117,6 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 				return element.frequency;
 			})
 		);
-	};
-
-	//cache last results of search
-
-	const phraseCache: { [query: string]: ReadonlyNetspeakSearchResult } = {};
-
-	const getPhrases = async (query: string, corpus: string, n: number): Promise<ReadonlyNetspeakSearchResult> => {
-		if (phraseCache[query] === undefined) {
-			phraseCache[query] = await Netspeak.getNetspeakClient(props.apiType).search({
-				query: query,
-				corpus: corpus,
-				topk: n,
-			});
-		}
-		return phraseCache[query];
 	};
 
 	//menu states
