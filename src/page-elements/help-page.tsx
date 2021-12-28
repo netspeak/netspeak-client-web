@@ -1,6 +1,6 @@
 import React from "react";
 import "./help-page.scss";
-import { getCurrentLang, Locales, SimpleLocale, createLocalizer, SupplierLocale } from "../lib/localize";
+import { createLocalizer, getCurrentLang, Locales, SimpleLocale, SupplierLocale } from "../lib/localize";
 import Page from "./page";
 import { NetspeakSearch } from "../elements/netspeak-search";
 
@@ -34,6 +34,11 @@ export default function HelpPage(): JSX.Element {
 									defaultQuery={data.query}
 									defaultExampleVisibility="hidden"
 									pageSize={10}
+									storedQuery={""}
+									highlightedPhrases={[]}
+									selectedWords={[]}
+									setHighlightedPhrases={() => undefined}
+									syncStateWithGraph={() => undefined}
 								/>
 							</div>
 						</div>
