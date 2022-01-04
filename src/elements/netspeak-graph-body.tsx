@@ -261,7 +261,7 @@ export const NetspeakGraphBody = (props: NetspeakGraphBodyProps): JSX.Element =>
 				(d3.select("#" + linkData.targetId + "text").node() as SVGSVGElement) ??
 				(d3.select("#" + linkData.targetId + "rect").node() as SVGSVGElement);
 
-			if (source === undefined || target === undefined) {
+			if (source === undefined || target === undefined || source === null || target === null) {
 			} else {
 				let sourceRect = source.getBBox();
 				let targetRect = target.getBBox();
