@@ -23,7 +23,7 @@
     "gatsby-plugin-sass": "^4.14.0",
     "google-protobuf": "^3.13.0",
     "grpc-web": "^1.2.1",
-    "node-sass": "^6.0.1",
+    "node-sass": "^7.0.0",
     "postcss": "^8.3.9",
     "prismjs": "^1.21.0",
     "react": "^17.0.2",
