@@ -4,7 +4,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import Switch from "react-switch";
 import Select from "react-select";
-import Popup, { Position } from "reactjs-popup";
+import Popup from "reactjs-popup";
 
 import React, { useCallback, useEffect, useState } from "react";
 import { Netspeak, NetspeakApiKind, Phrase, ReadonlyNetspeakSearchResult, WordTypes } from "../lib/netspeak";
@@ -13,6 +13,7 @@ import { NetspeakGraphBody } from "./netspeak-graph-body";
 import { PhraseState } from "./netspeak-result-list";
 
 import "./netspeak-graph.scss";
+import { PopupPosition } from "reactjs-popup/dist/types";
 
 const { createSliderWithTooltip } = Slider;
 const Range = createSliderWithTooltip(Slider.Range);
@@ -670,7 +671,7 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 
 			<Popup
 				trigger={<img src={gearIcon} alt="Settings" className="GraphMenuButton" />}
-				position={(screenWidth >= 1150 ? ("left top" as Position) : ("right center" as Position))!}>
+				position={(screenWidth >= 1150 ? ("left top" as PopupPosition) : ("right center" as PopupPosition))!}>
 				<div className="popupGrid" style={{ display: "grid" }}>
 					<h3> Graph Settings </h3>
 
