@@ -328,7 +328,7 @@ export class NetspeakInvalidQueryError extends NetspeakError {
 }
 
 export const WordTypes = ServicePhrase.Word.Tag;
-// eslint-disable-next-line no-redeclare
+// eslint-disable-next-line @typescript-eslint/no-redeclare
 export type WordTypes = ServicePhrase.Word.Tag;
 
 export class Word {

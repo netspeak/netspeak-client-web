@@ -736,10 +736,10 @@ const NetspeakGraph = (props: NetspeakGraphProps): JSX.Element => {
 	);
 };
 
-const useAsync = <T extends unknown>(
+function useAsync<T>(
 	fn: () => Promise<T>,
 	deps: any[]
-): { loading: boolean; error: Error | undefined; res: T | undefined } => {
+): { loading: boolean; error: Error | undefined; res: T | undefined } {
 	const [loading, setLoading] = useState<boolean>(false);
 	const [error, setError] = useState<Error | undefined>();
 	const [res, setRes] = useState<T | undefined>();
@@ -764,7 +764,7 @@ const useAsync = <T extends unknown>(
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, deps);
 	return { loading, error, res };
-};
+}
 
 //window dimensions function to notice resizing
 function getWindowDimensions(): {

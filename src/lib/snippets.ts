@@ -415,7 +415,8 @@ export class Snippets {
 	}
 }
 
-const URL_REGEX = /(?:https?\s*:\s*\/\s*\/\s*(?:www\s*\.\s*)?|www\s*\.\s*)(?:\w|\s*[-@:%.+~#=]\s*){1,256}\s*\.\s*[a-z0-9()]{1,6}\b[-\w()@:%+.~#/?&=]*/gi;
+const URL_REGEX =
+	/(?:https?\s*:\s*\/\s*\/\s*(?:www\s*\.\s*)?|www\s*\.\s*)(?:\w|\s*[-@:%.+~#=]\s*){1,256}\s*\.\s*[a-z0-9()]{1,6}\b[-\w()@:%+.~#/?&=]*/gi;
 
 interface NetspeakSnippetsRequest {
 	query: string;
