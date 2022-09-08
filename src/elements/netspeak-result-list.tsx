@@ -450,9 +450,11 @@ function PhraseExample(props: Readonly<{ phrase: Phrase; snippet: Snippet }>): J
 	);
 }
 
-const locales: Locales<SimpleLocale<
-	"failed-to-load-examples" | "no-examples-found" | "no-further-examples-found" | "copy" | "copied" | "pin"
->> = {
+const locales: Locales<
+	SimpleLocale<
+		"failed-to-load-examples" | "no-examples-found" | "no-further-examples-found" | "copy" | "copied" | "pin"
+	>
+> = {
 	en: {
 		"failed-to-load-examples": "Failed to load examples.",
 		"no-examples-found": "No examples found.",
