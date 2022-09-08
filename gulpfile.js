@@ -1,4 +1,4 @@
-const git = require("simple-git/promise");
+const { simpleGit } = require("simple-git");
 const sh = require("shelljs");
 
 async function publishDemo() {
@@ -8,7 +8,7 @@ async function publishDemo() {
 
 	sh.rm("-rf", "publish");
 	sh.exec("git clone https://github.com/netspeak/netspeak.github.io.git publish");
-	const repo = git(__dirname + "/publish");
+	const repo = simpleGit(__dirname + "/publish");
 	await repo.status(); // verify repo
 
 	sh.exec("npm run clean");
@@ -39,7 +39,7 @@ async function publishRelease() {
 
 	sh.rm("-rf", "publish");
 	sh.exec("git clone https://github.com/netspeak/netspeak.github.io.git publish");
-	const repo = git(__dirname + "/publish");
+	const repo = simpleGit(__dirname + "/publish");
 	await repo.status(); // verify repo
 
 	sh.exec("npm run clean");
