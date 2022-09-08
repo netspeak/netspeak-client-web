@@ -17,15 +17,12 @@
     "publish-release": "npx gulp publishRelease"
   },
   "dependencies": {
-    "@babel/plugin-transform-spread": "^7.12.1",
     "d3": "^7.0.4",
     "gatsby": "^3.14.2",
     "gatsby-plugin-react-helmet": "^4.14.0",
     "gatsby-plugin-sass": "^4.14.0",
     "google-protobuf": "^3.13.0",
     "grpc-web": "^1.2.1",
-    "node-sass": "^6.0.1",
-    "postcss": "^8.3.9",
     "prismjs": "^1.25.0",
     "rc-slider": "^9.7.2",
     "react": "^17.0.2",
@@ -36,6 +33,7 @@
     "reactjs-popup": "^2.0.5"
   },
   "devDependencies": {
+    "@babel/plugin-transform-spread": "^7.19.0",
     "@types/d3": "^7.0.0",
     "@types/google-protobuf": "^3.7.3",
     "@types/node": "^14.10.2",
@@ -51,6 +49,8 @@
     "eslint-config-react-app": "^7.0.1",
     "eslint-plugin-prettier": "^4.2.1",
     "gulp": "^4.0.2",
+    "node-sass": "^6.0.1",
+    "postcss": "^8.4.16",
     "prettier": "^2.7.1",
     "shelljs": "^0.8.3",
     "simple-git": "^1.132.0",
